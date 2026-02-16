@@ -7,12 +7,12 @@ export default function HeroSection() {
     <section className="relative flex min-h-screen w-full flex-col justify-center">
       <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-10 px-6 py-16 pt-24 md:grid-cols-12 md:items-center">
         {/* LEFT */}
-        <div className="md:col-span-4">
+        <div className="md:col-span-5 md:pr-2">
           <div className="text-sm font-semibold tracking-wide text-white/70">
             CONSTANTINE
           </div>
 
-          <h1 className="mt-4 text-balance text-4xl font-semibold leading-[1.08] tracking-tight md:text-5xl">
+          <h1 className="mt-4 max-w-2xl text-balance text-4xl font-semibold leading-[1.08] tracking-tight md:text-5xl">
             AI-powered Engagement Analytics for Art Galleries
           </h1>
 
@@ -21,10 +21,10 @@ export default function HeroSection() {
             where they walk.
           </p>
 
-          <div className="mt-7 flex flex-wrap items-center gap-4">
+          <div className="mt-7 flex flex-col gap-4">
             <a
               href="#pilot"
-              className="rounded-lg bg-white px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-zinc-200"
+              className="inline-flex w-fit min-w-[280px] items-center justify-center rounded-lg bg-white px-8 py-3.5 text-sm font-semibold text-black transition-colors hover:bg-zinc-200"
             >
               Request a pilot
             </a>
@@ -42,9 +42,9 @@ export default function HeroSection() {
         </div>
 
         {/* RIGHT */}
-        <div className="md:col-span-8 md:pl-8">
-          <div className="flex min-h-[480px] w-full flex-col gap-12 overflow-visible md:min-h-[420px] md:flex-row md:gap-16 md:justify-center md:items-center">
-            <div className="flex min-w-0 flex-1 justify-center md:max-w-[420px]">
+        <div className="md:col-span-7 md:pl-8">
+          <div className="flex min-h-[480px] w-full flex-col gap-12 overflow-visible md:min-h-[420px] md:flex-row md:gap-12 md:justify-center md:items-center">
+            <div className="flex min-w-0 flex-1 justify-center md:max-w-[320px]">
               <PaintingWall
                 src="/Mona_Lisa.jpg"
                 alt="Mona Lisa"
@@ -53,7 +53,7 @@ export default function HeroSection() {
                 compact
               />
             </div>
-            <div className="flex min-w-0 flex-1 justify-center md:max-w-[420px]">
+            <div className="flex min-w-0 flex-1 justify-center md:ml-32 md:max-w-[320px]">
               <PaintingWall
                 src="/Monet_Lillies.jpg"
                 alt="Water Lilies and Japanese Bridge"
