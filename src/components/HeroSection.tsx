@@ -48,7 +48,7 @@ export default function HeroSection() {
               <PaintingWall
                 src="/Mona_Lisa.jpg"
                 alt="Mona Lisa"
-                title="Mona Lisa"
+                title="Mona Lisa - Leonardo da Vinci"
                 chartColor="rgba(239,68,68,0.8)"
                 compact
               />
@@ -56,8 +56,8 @@ export default function HeroSection() {
             <div className="flex min-w-0 flex-1 justify-center md:ml-32 md:max-w-[320px]">
               <PaintingWall
                 src="/Monet_Lillies.jpg"
-                alt="Water Lilies and Japanese Bridge"
-                title="Water Lilies"
+                alt="The Water Lily Pond"
+                title="The Water Lily Pond - Claude Monet"
                 chartColor="rgba(59,130,246,0.8)"
                 compact
                 minColorFloor={0.40}

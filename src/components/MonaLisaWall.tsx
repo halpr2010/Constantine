@@ -339,7 +339,7 @@ export default function PaintingWall({
             </div>
 
             {/* small plaque */}
-            <div className={`mt-2 w-full text-white/60 ${plaqueSize}`}>
+            <div className={`mt-0.5 w-full text-white/60 ${plaqueSize}`}>
               <div className="text-center pb-4">
                 <div className="font-medium text-white/80">{title}</div>
                 {plaqueSubtitle && (
