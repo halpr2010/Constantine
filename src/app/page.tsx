@@ -70,8 +70,10 @@ export default function Home() {
             {/* 1. Integrate */}
             <div className="flex flex-col gap-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 md:flex-row md:items-center md:gap-8 md:p-8">
               <div className="flex-1">
-                <span className="text-sm font-medium text-white/60">1.</span>
-                <h3 className="mt-1 text-xl font-semibold">Integrate</h3>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-xl font-semibold text-white/60">1.</span>
+                  <h3 className="text-xl font-semibold">Integrate</h3>
+                </div>
                 <p className="mt-3 text-zinc-400">
                   Constantine works with your current CCTV or gallery camera setup.
                 </p>
@@ -106,8 +108,10 @@ export default function Home() {
             {/* 2. Calibrate */}
             <div className="flex flex-col gap-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 md:flex-row md:items-center md:gap-8 md:p-8">
               <div className="flex-1">
-                <span className="text-sm font-medium text-white/60">2.</span>
-                <h3 className="mt-1 text-xl font-semibold">Calibrate</h3>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-xl font-semibold text-white/60">2.</span>
+                  <h3 className="text-xl font-semibold">Calibrate</h3>
+                </div>
                 <p className="mt-3 text-zinc-400">
                   Every gallery is mapped to its real-world dimensions.
                 </p>
@@ -145,8 +149,10 @@ export default function Home() {
             {/* 3. Measure */}
             <div className="flex flex-col gap-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 md:flex-row md:items-center md:gap-8 md:p-8">
               <div className="flex-1">
-                <span className="text-sm font-medium text-white/60">3.</span>
-                <h3 className="mt-1 text-xl font-semibold">Measure</h3>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-xl font-semibold text-white/60">3.</span>
+                  <h3 className="text-xl font-semibold">Measure</h3>
+                </div>
                 <p className="mt-3 text-zinc-400">
                   Each artwork is assigned an engagement zone, the space where
                   meaningful attention can occur.
@@ -186,8 +192,10 @@ export default function Home() {
             {/* 4. Insight */}
             <div className="flex flex-col gap-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 md:flex-row md:items-center md:gap-8 md:p-8">
               <div className="flex-1">
-                <span className="text-sm font-medium text-white/60">4.</span>
-                <h3 className="mt-1 text-xl font-semibold">Insight</h3>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-xl font-semibold text-white/60">4.</span>
+                  <h3 className="text-xl font-semibold">Insight</h3>
+                </div>
                 <p className="mt-3 text-zinc-400">
                   Curators and directors receive a real-time analytics and
                   AI-powered recommendations:

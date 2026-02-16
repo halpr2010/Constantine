@@ -4,8 +4,8 @@ import PaintingWall from "@/components/MonaLisaWall";
 
 export default function HeroSection() {
   return (
-    <section className="relative w-full min-h-screen">
-      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-10 px-6 pt-32 pb-8 md:grid-cols-12 md:items-center">
+    <section className="relative flex min-h-screen w-full flex-col justify-center">
+      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-10 px-6 py-16 pt-24 md:grid-cols-12 md:items-center">
         {/* LEFT */}
         <div className="md:col-span-5">
           <div className="text-sm font-semibold tracking-wide text-white/70">
@@ -43,7 +43,7 @@ export default function HeroSection() {
 
         {/* RIGHT */}
         <div className="md:col-span-7">
-          <div className="flex min-h-[1100px] w-full flex-col gap-12 overflow-visible md:min-h-[680px] md:flex-row md:gap-24 md:justify-center md:items-center">
+          <div className="flex min-h-[480px] w-full flex-col gap-12 overflow-visible md:min-h-[420px] md:flex-row md:gap-24 md:justify-center md:items-center">
             <div className="flex min-w-0 flex-1 justify-center md:max-w-[400px]">
               <PaintingWall
                 src="/Mona_Lisa.jpg"
