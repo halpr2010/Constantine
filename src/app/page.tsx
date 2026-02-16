@@ -232,8 +232,8 @@ export default function Home() {
                   <div className="h-[440px] w-full">
                     <PaintingWall
                       src="/Rothkos.jpg"
-                      alt="Rothko"
-                      title="Rothko - Mark Rothko"
+                      alt="No. 61 (Rust and Blue) 1953"
+                      title="No. 61 (Rust and Blue) 1953 - Mark Rothko"
                       chartColor="rgba(59,130,246,0.8)"
                       size="mini"
                       minColorFloor={0.40}
