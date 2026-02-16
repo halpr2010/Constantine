@@ -280,7 +280,7 @@ export default function PaintingWall({
   const imageSize = isMini
     ? "h-[180px] w-[135px] md:h-[200px] md:w-[150px]"
     : compact
-      ? "h-[260px] w-[195px] md:h-[320px] md:w-[240px]"
+      ? "h-[300px] w-[225px] md:h-[380px] md:w-[285px]"
       : "h-[360px] w-[270px] md:h-[500px] md:w-[375px]";
   const plaqueSize = isMini ? "min-w-[200px] space-y-2.5 px-2 py-2 text-xs" : "min-w-[240px] space-y-3 px-2 py-3 text-sm";
   const chartSize = isMini ? "min-h-[32px] h-8" : "min-h-[48px] h-11";
@@ -304,24 +304,22 @@ export default function PaintingWall({
           {/* frame + painting */}
             <div
               ref={paintingRef}
-              className={`relative flex flex-col items-center rounded-[20px] bg-zinc-950/30 ring-1 ring-white/15 shadow-[0_40px_90px_rgba(0,0,0,0.65)] ${
+              className={`relative flex flex-col items-center rounded-[20px] bg-zinc-950/30 shadow-[0_40px_90px_rgba(0,0,0,0.65)] ${
                 isMini ? "w-[260px] p-2 rounded-[12px] md:w-[280px]" : "p-5"
               }`}
             >
             {/* outer frame */}
-            <div className={`rounded-[16px] ring-1 ring-white/10 ${
-              isMini ? "rounded-[10px] overflow-hidden p-0 bg-transparent" : "p-3 bg-gradient-to-b from-white/18 to-white/6"
+            <div className={`rounded-[16px] ${
+              isMini ? "rounded-[10px] overflow-hidden p-0 bg-transparent" : "p-3 bg-transparent"
             }`}>
               {/* inner mat */}
               <div className={`rounded-[12px] ${
-                isMini ? "rounded-[8px] overflow-hidden p-0" : "rounded-[12px] bg-white/8 p-3 ring-1 ring-white/10"
+                isMini ? "rounded-[8px] overflow-hidden p-0" : "rounded-[12px] p-3"
               }`}>
                 {/* actual image */}
                 <div
                   ref={imageRef}
-                  className={`relative overflow-hidden rounded-[10px] ${imageSize} ${
-                    isMini ? "rounded-[6px] ring-1 ring-white/5" : "ring-1 ring-white/10"
-                  }`}
+                  className={`relative overflow-hidden rounded-[10px] ${imageSize}`}
                 >
                   <Image
                     src={src}
