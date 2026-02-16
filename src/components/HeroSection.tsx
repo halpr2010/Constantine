@@ -5,7 +5,7 @@ import PaintingWall from "@/components/MonaLisaWall";
 export default function HeroSection() {
   return (
     <section className="relative w-full min-h-screen">
-      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-10 px-6 pt-32 pb-20 md:grid-cols-12 md:items-center">
+      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-10 px-6 pt-32 pb-8 md:grid-cols-12 md:items-center">
         {/* LEFT */}
         <div className="md:col-span-5">
           <div className="text-sm font-semibold tracking-wide text-white/70">

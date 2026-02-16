@@ -54,7 +54,7 @@ export default function Home() {
       {/* How it works */}
       <section
         id="how"
-        className="border-t border-zinc-800/50 px-6 py-24"
+        className="border-t border-zinc-800/50 px-6 pt-12 pb-24"
       >
         <div className="mx-auto max-w-6xl">
           <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
