@@ -61,8 +61,9 @@ export default function Home() {
             How it works
           </h2>
           <p className="mt-4 max-w-2xl text-zinc-400">
-            From your existing cameras to artwork-level engagement insights —
-            integrate, calibrate, measure, and understand visitor attention in
+            From your existing cameras to artwork-level engagement insights:
+            <br />
+            Integrate, calibrate, measure, and understand visitor attention in
             real-world space.
           </p>
 
