@@ -198,7 +198,7 @@ export default function Home() {
                   <h3 className="text-xl font-semibold">Insight</h3>
                 </div>
                 <p className="mt-3 text-zinc-400">
-                  Curators and directors receive a real-time analytics and
+                  Curators and directors receive real-time analytics and
                   AI-powered recommendations:
                 </p>
                 <ul className="mt-4 space-y-2">
