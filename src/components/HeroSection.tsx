@@ -1,10 +1,40 @@
 "use client";
 
+import { useState } from "react";
 import PaintingWall from "@/components/MonaLisaWall";
+import EquipmentWall from "@/components/EquipmentWall";
+
+type Space = "museums" | "gyms";
+
+// Cross-fade through black: the outgoing set fades out, the hero holds black
+// for a beat, then the incoming set fades up.
+const FADE_MS = 400;
+const BLACK_HOLD_MS = 140;
 
 export default function HeroSection() {
+  const [space, setSpace] = useState<Space>("museums");
+
+  // Both panels share one grid cell, so they sit in exactly the same place and
+  // the hero keeps its natural height. The incoming set waits for the outgoing
+  // one to reach full black before it begins fading up, so the two are never
+  // both on screen at once. Everything inside a panel — painting or equipment,
+  // plaque and metrics alike — fades together, because the panel is what fades.
+  // `visibility` is in the transition list on purpose: CSS holds a panel
+  // visible for the whole fade and only flips it hidden at the very end.
+  const panelStyle = (mine: Space) => ({
+    opacity: space === mine ? 1 : 0,
+    visibility: (space === mine ? "visible" : "hidden") as "visible" | "hidden",
+    transitionDelay: `${space === mine ? FADE_MS + BLACK_HOLD_MS : 0}ms`,
+  });
+
   return (
-    <section className="relative flex min-h-screen w-full flex-col justify-center">
+    <section
+      className="relative flex min-h-screen w-full flex-col justify-center overflow-x-clip"
+      // A wall's card is wider than its column by design (up to ~140px each
+      // side). Clip generously so that overhang still shows exactly as it did
+      // before the switcher existed, without leaving a horizontal scrollbar.
+      style={{ overflowClipMargin: "150px" }}
+    >
       <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-10 px-6 py-16 pt-24 md:grid-cols-12 md:items-center">
         {/* LEFT */}
         <div className="md:col-span-5 md:pr-2">
@@ -43,25 +73,105 @@ export default function HeroSection() {
 
         {/* RIGHT */}
         <div className="md:col-span-7 md:pl-8">
-          <div className="flex min-h-[480px] w-full flex-col gap-12 overflow-visible md:min-h-[420px] md:flex-row md:gap-12 md:justify-center md:items-center">
-            <div className="flex min-w-0 flex-1 justify-center md:max-w-[320px]">
-              <PaintingWall
-                src="/Mona_Lisa.jpg"
-                alt="Mona Lisa"
-                title="Mona Lisa - Leonardo da Vinci"
-                chartColor="rgba(239,68,68,0.8)"
-                compact
+          {/* Slide control */}
+          <div className="mb-8 flex justify-center">
+            <div className="relative grid grid-cols-2 rounded-full border border-zinc-800 bg-zinc-900/60 p-1 text-sm font-semibold">
+              <span
+                aria-hidden
+                className="pointer-events-none absolute bottom-1 left-1 top-1 w-[calc(50%-0.25rem)] rounded-full bg-white transition-transform duration-500 ease-in-out"
+                style={{
+                  transform:
+                    space === "gyms" ? "translateX(100%)" : "translateX(0)",
+                }}
               />
+              {(
+                [
+                  ["museums", "Museums & Galleries"],
+                  ["gyms", "Gyms"],
+                ] as [Space, string][]
+              ).map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setSpace(id)}
+                  aria-pressed={space === id}
+                  className={`relative z-10 rounded-full px-5 py-2 transition-colors ${
+                    space === id ? "text-black" : "text-zinc-400 hover:text-zinc-200"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
-            <div className="flex min-w-0 flex-1 justify-center md:ml-32 md:max-w-[320px]">
-              <PaintingWall
-                src="/Monet_Lillies.jpg"
-                alt="The Water Lily Pond"
-                title="The Water Lily Pond - Claude Monet"
-                chartColor="rgba(59,130,246,0.8)"
-                compact
-                minColorFloor={0.40}
-              />
+          </div>
+
+          {/* Both panels occupy the same grid cell and cross-fade through black. */}
+          <div className="grid">
+            {/* Museums & Galleries */}
+            <div
+              className={`col-start-1 row-start-1 ease-in-out ${
+                space === "museums" ? "" : "pointer-events-none"
+              }`}
+              style={{
+                ...panelStyle("museums"),
+                transitionProperty: "opacity, visibility",
+                transitionDuration: `${FADE_MS}ms`,
+              }}
+              aria-hidden={space !== "museums"}
+            >
+              <div className="flex min-h-[480px] w-full flex-col gap-12 overflow-visible md:min-h-[420px] md:flex-row md:gap-12 md:justify-center md:items-center">
+                <div className="flex min-w-0 flex-1 justify-center md:max-w-[320px]">
+                  <PaintingWall
+                    src="/Mona_Lisa.jpg"
+                    alt="Mona Lisa"
+                    title="Mona Lisa - Leonardo da Vinci"
+                    chartColor="rgba(239,68,68,0.8)"
+                    compact
+                  />
+                </div>
+                <div className="flex min-w-0 flex-1 justify-center md:ml-32 md:max-w-[320px]">
+                  <PaintingWall
+                    src="/Monet_Lillies.jpg"
+                    alt="The Water Lily Pond"
+                    title="The Water Lily Pond - Claude Monet"
+                    chartColor="rgba(59,130,246,0.8)"
+                    compact
+                    minColorFloor={0.40}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Gyms */}
+            <div
+              className={`col-start-1 row-start-1 ease-in-out ${
+                space === "gyms" ? "" : "pointer-events-none"
+              }`}
+              style={{
+                ...panelStyle("gyms"),
+                transitionProperty: "opacity, visibility",
+                transitionDuration: `${FADE_MS}ms`,
+              }}
+              aria-hidden={space !== "gyms"}
+            >
+              <div className="flex min-h-[480px] w-full flex-col gap-12 overflow-visible md:min-h-[420px] md:flex-row md:gap-12 md:justify-center md:items-center">
+                <div className="flex min-w-0 flex-1 justify-center md:max-w-[320px]">
+                  <EquipmentWall
+                    kind="bench"
+                    title="Bench Press - Free Weights"
+                    chartColor="rgba(239,68,68,0.8)"
+                    compact
+                  />
+                </div>
+                <div className="flex min-w-0 flex-1 justify-center md:ml-32 md:max-w-[320px]">
+                  <EquipmentWall
+                    kind="stair"
+                    title="Stairmaster - Cardio Floor"
+                    chartColor="rgba(59,130,246,0.8)"
+                    compact
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
