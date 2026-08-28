@@ -45,7 +45,7 @@ const MUSEUM_STEPS: Step[] = [
       "Circulation flow between rooms",
     ],
     closer:
-      "Because the room is mapped to its real dimensions, every measurement is in real-world distance — how far a visitor stands from a work, not where they appear on screen.",
+      "Because the room is mapped to its real dimensions, every measurement is a real-world distance. Constantine knows how far a visitor stands from a work, not just where they appear on a screen.",
     image: {
       src: "/Calibrate - CCTV.png",
       alt: "Gallery mapped to real-world dimensions — camera field of view calibration",
@@ -64,7 +64,7 @@ const MUSEUM_STEPS: Step[] = [
       "How engagement shifts across the exhibition",
     ],
     closer:
-      "It captures which works actually hold attention and for how long — not just how many people passed through.",
+      "It captures which works hold attention, and for how long. That is a different question from how many people walked past.",
     image: {
       src: "/Measure.png",
       alt: "Engagement zones — artwork-level attention measurement",
@@ -122,7 +122,7 @@ const GYM_STEPS: Step[] = [
       "Movement patterns between zones",
     ],
     closer:
-      "Constantine reads utilisation from the cameras alone — there are no smart sensors, connected machines or equipment modifications of any kind.",
+      "Constantine reads utilisation from the cameras alone. There are no smart sensors, no connected machines and no equipment modifications of any kind.",
     image: {
       src: "/calibrate_gym.png",
       alt: "Gym equipment mapped to real-world dimensions",

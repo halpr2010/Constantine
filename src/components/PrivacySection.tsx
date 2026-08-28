@@ -57,7 +57,7 @@ export default function PrivacySection() {
             identity from the output.{" "}
             <span className="font-semibold text-zinc-400">
               Even Constantine cannot access individual {person}-level tracking
-              data — because it does not exist.
+              data, because it does not exist.
             </span>
           </p>
         </div>

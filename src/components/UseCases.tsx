@@ -56,7 +56,7 @@ export default function UseCases() {
         </h2>
         <p className="mt-4 max-w-2xl text-zinc-400">
           {isGym
-            ? "Three ways an operator turns floor-level behaviour into decisions — inside a club, across the estate, and in members' hands."
+            ? "Three ways an operator turns floor-level behaviour into decisions: inside a club, across the estate, and in members' hands."
             : "From permanent collections to temporary exhibitions and cultural venues."}
         </p>
         <div className="mt-12 grid gap-8 md:grid-cols-3">

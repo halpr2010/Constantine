@@ -12,16 +12,13 @@ const BLACK_HOLD_MS = 140;
 export default function HeroSection() {
   // One source of truth, shared with every section below the hero.
   const { vertical, setVertical } = useVertical();
-  const isGym = vertical === "gyms";
 
-  // The gym headline and subtitle are the deck's own lines, so the hero stops
-  // contradicting the sections below it once you switch vertical.
-  const headline = isGym
-    ? "The behavioural data layer for your gym floor"
-    : "AI-powered Behavioural Analytics for Physical Spaces";
-  const subtitle = isGym
-    ? "Measure how members actually use the floor — utilisation, wait times and friction — starting from the CCTV you already own."
-    : "Measure how people truly use physical space — attention, movement and flow — not just footfall.";
+  // Title, subtitle and chips are deliberately identical on both tabs: the hero
+  // states what Constantine does for any physical space, and the demo below it
+  // is what changes with the vertical.
+  const headline = "AI-powered Behavioural Analytics for Physical Spaces";
+  const subtitle =
+    "Measure how people actually use physical space: attention, movement and flow, not just footfall.";
   // One chip set across every vertical, per the copy spec.
   const chips = [
     "Edge-processed",
