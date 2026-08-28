@@ -95,15 +95,17 @@ export default function PaintingWall({
     if (!active) {
       targetRevealRef.current = 0;
       currentRevealRef.current = 0;
-      setReveal(0);
       attentionStartRef.current = null;
       lastAttentionUpdateRef.current = 0;
-      setAttentionSeconds(0);
       samplesRef.current = [];
-      const c = chartRef.current;
-      const cx = c?.getContext("2d");
-      if (c && cx) cx.clearRect(0, 0, c.width, c.height);
-      return;
+      const id = requestAnimationFrame(() => {
+        setReveal(0);
+        setAttentionSeconds(0);
+        const c = chartRef.current;
+        const cx = c?.getContext("2d");
+        if (c && cx) cx.clearRect(0, 0, c.width, c.height);
+      });
+      return () => cancelAnimationFrame(id);
     }
     let raf: number | null = null;
 

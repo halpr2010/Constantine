@@ -25,6 +25,14 @@ const BARBELL_REST_TOP_PCT = 15.0; // where the bar sits racked, when unused
 // and presses PRESS_DOWN_PCT below it, both in percent of container height.
 // PRESS_DOWN_PCT sets the low point over the chest — leave it alone to keep the
 // bottom of the rep where it is. LIFT_UP_PCT sets how high the bar returns.
+// The bench render is landscape inside a portrait card, so at 1:1 it is
+// width-limited and reads far smaller than the portrait stairmaster. Zooming
+// past the card width and letting the card crop evens them up; ZOOM is a
+// percentage of the card width, LEFT centres the barbell so both plates lose
+// the same sliver at the edges.
+const BENCH_ZOOM_PCT = 135;
+const BENCH_LEFT_PCT = -10.7; // right plate flush to the card edge, left plate clear
+
 const PRESS_DOWN_PCT = 16;
 const LIFT_UP_PCT = 64;
 
@@ -103,7 +111,16 @@ export default function BenchPressWireframe({ util }: { util: number }) {
   }, []);
 
   return (
-    <div className="relative w-full" style={{ aspectRatio: "1402 / 1122" }}>
+    <div
+      className="absolute"
+      style={{
+        width: `${BENCH_ZOOM_PCT}%`,
+        left: `${BENCH_LEFT_PCT}%`,
+        top: "50%",
+        transform: "translateY(-50%)",
+        aspectRatio: "1402 / 1122",
+      }}
+    >
       <Image
         src="/bench2.png"
         alt=""

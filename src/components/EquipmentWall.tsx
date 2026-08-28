@@ -105,15 +105,19 @@ export default function EquipmentWall({
     if (!active) {
       targetRevealRef.current = 0;
       currentRevealRef.current = 0;
-      setReveal(0);
       workoutStartRef.current = null;
       lastWorkoutUpdateRef.current = 0;
-      setWorkoutSeconds(0);
       samplesRef.current = [];
-      const c = chartRef.current;
-      const cx = c?.getContext("2d");
-      if (c && cx) cx.clearRect(0, 0, c.width, c.height);
-      return;
+      // Scheduled rather than called straight from the effect body, which the
+      // compiler's set-state-in-effect rule rejects as a cascading render.
+      const id = requestAnimationFrame(() => {
+        setReveal(0);
+        setWorkoutSeconds(0);
+        const c = chartRef.current;
+        const cx = c?.getContext("2d");
+        if (c && cx) cx.clearRect(0, 0, c.width, c.height);
+      });
+      return () => cancelAnimationFrame(id);
     }
     let raf: number | null = null;
 
@@ -338,11 +342,7 @@ export default function EquipmentWall({
               <div className="rounded-[12px] p-3">
                 <div
                   ref={displayRef}
-                  className={`relative rounded-[10px] ${
-                    // The barbell's near plate deliberately overhangs the
-                    // bench image to the left, so this box must not clip.
-                    kind === "bench" ? "overflow-visible" : "overflow-hidden"
-                  } ${displaySize}`}
+                  className={`relative overflow-hidden rounded-[10px] ${displaySize}`}
                   aria-label={
                     isStatic
                       ? title
@@ -365,7 +365,7 @@ export default function EquipmentWall({
                     // brightness rest state lifts the barbell's solid black
                     // plates to grey and washes the whole wireframe out. This
                     // graphic shows utilisation through motion instead.
-                    <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="absolute inset-0">
                       <BenchPressWireframe util={reveal} />
                     </div>
                   ) : (
