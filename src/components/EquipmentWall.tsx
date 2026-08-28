@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import BenchPressWireframe from "@/components/BenchPressWireframe";
 import StairmasterVideo from "@/components/StairmasterVideo";
@@ -12,11 +13,37 @@ function lerp(a: number, b: number, t: number) {
 }
 
 type EquipmentWallProps = {
-  kind: "bench" | "stair";
+  /** Live mode only: which animated piece to render. */
+  kind?: "bench" | "stair";
   title: string;
   chartColor: string;
   compact?: boolean;
+  size?: "default" | "mini";
+  /** Static, ranked leaderboard card — mirrors PaintingWall's static mode. */
+  static?: boolean;
+  /** False while this wall is on a hidden vertical: park and reset it. */
+  active?: boolean;
+  /** Static cards show a still of the equipment rather than the live animation. */
+  imageSrc?: string;
+  imageAlt?: string;
+  fixedUtilisation?: number;
+  rankingInGym?: number;
+  /** Positive = moved up the ranking (green), negative = down (red). */
+  rankingChange?: number;
+  /** 12 monthly values, 0..1, for the static sparkline. */
+  staticChartValues?: number[];
 };
+
+const DEFAULT_CHART_VALUES = [
+  0.42, 0.48, 0.58, 0.52, 0.44, 0.35, 0.38, 0.52, 0.67, 0.78, 0.88, 0.94,
+];
+const CHART_LABELS = [
+  { month: "Jan", index: 0 },
+  { month: "Mar", index: 2 },
+  { month: "Jun", index: 5 },
+  { month: "Sep", index: 8 },
+  { month: "Dec", index: 11 },
+];
 
 /**
  * EquipmentWall — the gym counterpart to PaintingWall (MonaLisaWall.tsx).
@@ -33,11 +60,21 @@ export default function EquipmentWall({
   title,
   chartColor,
   compact = false,
+  size = "default",
+  static: isStatic = false,
+  active = true,
+  imageSrc,
+  imageAlt,
+  fixedUtilisation,
+  rankingInGym,
+  rankingChange,
+  staticChartValues,
 }: EquipmentWallProps) {
+  const isMini = size === "mini";
   const displayRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<HTMLCanvasElement | null>(null);
 
-  const [reveal, setReveal] = useState(0);
+  const [reveal, setReveal] = useState(isStatic ? 1 : 0);
   const [workoutSeconds, setWorkoutSeconds] = useState(0);
   const currentRevealRef = useRef(0);
   const targetRevealRef = useRef(0);
@@ -60,6 +97,24 @@ export default function EquipmentWall({
   const workoutUpdateInterval = 0.1;
 
   useEffect(() => {
+    // A static card is a frozen leaderboard entry: no proximity engine, no
+    // animation loop, no pointer listeners.
+    if (isStatic) return;
+    // Parked on the hidden vertical: reset so utilisation and workout time
+    // start from zero when this tab returns.
+    if (!active) {
+      targetRevealRef.current = 0;
+      currentRevealRef.current = 0;
+      setReveal(0);
+      workoutStartRef.current = null;
+      lastWorkoutUpdateRef.current = 0;
+      setWorkoutSeconds(0);
+      samplesRef.current = [];
+      const c = chartRef.current;
+      const cx = c?.getContext("2d");
+      if (c && cx) cx.clearRect(0, 0, c.width, c.height);
+      return;
+    }
     let raf: number | null = null;
 
     const compute = () => {
@@ -186,14 +241,80 @@ export default function EquipmentWall({
       window.removeEventListener("pointerenter", onPointer, opts);
       if (raf != null) cancelAnimationFrame(raf);
     };
-  }, [chartColor, kind]);
+  }, [chartColor, kind, isStatic, active]);
 
-  const displaySize = compact
-    ? "h-[300px] w-[225px] md:h-[380px] md:w-[285px]"
-    : "h-[360px] w-[270px] md:h-[500px] md:w-[375px]";
+  // Static mode draws the 12-point monthly sparkline once, the same way
+  // PaintingWall does for its leaderboard cards.
+  useEffect(() => {
+    if (!isStatic) return;
+    const values = staticChartValues ?? DEFAULT_CHART_VALUES;
+
+    const draw = () => {
+      const canvas = chartRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      const cw = canvas.clientWidth || 140;
+      const ch = canvas.clientHeight || 44;
+      if (canvas.width !== cw || canvas.height !== ch) {
+        canvas.width = cw;
+        canvas.height = ch;
+      }
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const labelH = 12;
+      const pad = { top: 8, right: 12, bottom: labelH, left: 12 };
+      const plotW = w - pad.left - pad.right;
+      const plotH = h - pad.top - pad.bottom;
+      const n = values.length;
+
+      ctx.strokeStyle = chartColor;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let i = 0; i < n; i++) {
+        const x = pad.left + (i / (n - 1)) * plotW;
+        const y = pad.top + plotH - values[i] * plotH;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(255,255,255,0.75)";
+      const fontFamily =
+        typeof document !== "undefined"
+          ? getComputedStyle(document.body).fontFamily
+          : "system-ui, sans-serif";
+      ctx.font = `400 11px ${fontFamily}`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "alphabetic";
+      for (const { month, index } of CHART_LABELS) {
+        const x = pad.left + (index / (n - 1)) * plotW;
+        ctx.fillText(month, x, h - 3);
+      }
+    };
+
+    draw();
+    window.addEventListener("resize", draw);
+    return () => window.removeEventListener("resize", draw);
+  }, [isStatic, chartColor, staticChartValues]);
+
+  const displaySize = isMini
+    ? "h-[180px] w-[180px] md:h-[200px] md:w-[200px]"
+    : compact
+      ? "h-[300px] w-[225px] md:h-[380px] md:w-[285px]"
+      : "h-[360px] w-[270px] md:h-[500px] md:w-[375px]";
+  const plaqueSize = isMini
+    ? "min-w-[200px] space-y-2.5 px-2 py-2 text-xs"
+    : "min-w-[240px] space-y-3 px-2 py-3 text-sm";
 
   return (
-    <div className="relative h-full w-full flex-shrink-0 overflow-visible rounded-3xl min-h-[480px] md:min-h-[600px]">
+    <div
+      className={`relative h-full w-full flex-shrink-0 overflow-visible rounded-3xl ${
+        isMini ? "min-h-[360px] md:min-h-[400px]" : "min-h-[480px] md:min-h-[600px]"
+      }`}
+    >
       {/* Floor background - matches page background */}
       <div
         className="absolute inset-0 rounded-3xl"
@@ -202,7 +323,17 @@ export default function EquipmentWall({
 
       <div className="absolute inset-0 flex items-center justify-center overflow-visible">
         <div className="relative">
-          <div className="relative flex flex-col items-center rounded-[20px] bg-zinc-950/30 p-5 shadow-[0_40px_90px_rgba(0,0,0,0.65)]">
+          {/* No panel tint or drop shadow here. A painting covers its card, so
+              the tint never shows; this equipment is transparent line art, so a
+              zinc-950/30 panel (~rgb(6,6,7)) and a 65% black shadow both read as
+              a rectangle of a slightly different black against the page. */}
+          <div
+            className={`relative flex flex-col items-center ${
+              isMini
+                ? "w-[260px] rounded-[12px] p-2 md:w-[280px]"
+                : "rounded-[20px] p-5"
+            }`}
+          >
             <div className="rounded-[16px] bg-transparent p-3">
               <div className="rounded-[12px] p-3">
                 <div
@@ -212,9 +343,24 @@ export default function EquipmentWall({
                     // bench image to the left, so this box must not clip.
                     kind === "bench" ? "overflow-visible" : "overflow-hidden"
                   } ${displaySize}`}
-                  aria-label={`${title} — utilisation rises as the pointer approaches`}
+                  aria-label={
+                    isStatic
+                      ? title
+                      : `${title} — utilisation rises as the pointer approaches`
+                  }
                 >
-                  {kind === "bench" ? (
+                  {imageSrc ? (
+                    // No blend mode: these stills are already exported on the
+                    // page's own background, so screening them would lift that
+                    // backdrop above rgb(5,5,5) and reintroduce a seam.
+                    <Image
+                      src={imageSrc}
+                      alt={imageAlt ?? title}
+                      fill
+                      sizes="200px"
+                      className="object-contain"
+                    />
+                  ) : kind === "bench" ? (
                     // No colour ramp here: the filter's low-contrast, high-
                     // brightness rest state lifts the barbell's solid black
                     // plates to grey and washes the whole wireframe out. This
@@ -225,37 +371,103 @@ export default function EquipmentWall({
                   ) : (
                     <StairmasterVideo util={reveal} />
                   )}
-                  {/* subtle sheen, mirrors the painting's glass */}
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-40" />
+                  {/* Subtle sheen, mirroring the painting's glass. Live cards
+                      only: over a still exported on the page background it just
+                      washes a diagonal band up to rgb(15,15,15), undoing the
+                      background match. */}
+                  {!isStatic && (
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-40" />
+                  )}
                 </div>
               </div>
             </div>
 
             {/* plaque */}
-            <div className="mt-0.5 w-full min-w-[240px] space-y-3 px-2 py-3 text-sm text-white/60">
+            <div className={`mt-0.5 w-full text-white/60 ${plaqueSize}`}>
               <div className="pb-4 text-center">
                 <div className="font-medium text-white/80">{title}</div>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="whitespace-nowrap">Workout Time (s)</span>
-                <span style={{ opacity: 0.45 + reveal * 0.55 }}>
-                  {workoutSeconds.toFixed(1)}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="whitespace-nowrap">Utilisation</span>
-                <span style={{ opacity: 0.45 + reveal * 0.55 }}>
-                  {Math.round(reveal * 100)}%
-                </span>
-              </div>
-              <div className="mt-4 h-11 min-h-[48px]">
+
+              {isStatic ? (
+                <>
+                  {rankingInGym != null && (
+                    <div className="flex items-center justify-between">
+                      <span className="whitespace-nowrap">Ranking in Gym</span>
+                      <span className="flex items-center gap-1">
+                        #{rankingInGym}
+                        {rankingChange != null && rankingChange !== 0 && (
+                          <span
+                            className={`inline-flex items-center gap-0.5 text-[10px] font-medium ${
+                              rankingChange > 0
+                                ? "text-emerald-500"
+                                : "text-red-500"
+                            }`}
+                          >
+                            {rankingChange > 0 ? (
+                              <>
+                                <span aria-hidden>↑</span>
+                                <span>(+{rankingChange})</span>
+                              </>
+                            ) : (
+                              <>
+                                <span aria-hidden>↓</span>
+                                <span>({rankingChange})</span>
+                              </>
+                            )}
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <span className="whitespace-nowrap">
+                      Avg. Utilisation (%)
+                    </span>
+                    <span>{(fixedUtilisation ?? 0).toFixed(0)}%</span>
+                  </div>
+                  <div className="pt-1 text-center text-xs font-medium text-white/60">
+                    Monthly Utilisation
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="whitespace-nowrap">Workout Time (s)</span>
+                    <span style={{ opacity: 0.45 + reveal * 0.55 }}>
+                      {workoutSeconds.toFixed(1)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="whitespace-nowrap">Utilisation</span>
+                    <span style={{ opacity: 0.45 + reveal * 0.55 }}>
+                      {Math.round(reveal * 100)}%
+                    </span>
+                  </div>
+                </>
+              )}
+
+              <div
+                className={`${isStatic ? "" : "mt-4"} ${
+                  isStatic && isMini ? "h-11 min-h-[44px]" : "h-11 min-h-[48px]"
+                }`}
+              >
                 <canvas
                   ref={chartRef}
-                  width={260}
+                  width={isMini ? 140 : 260}
                   height={44}
-                  className="w-full min-w-[200px] rounded bg-zinc-950/60"
-                  style={{ width: "100%", height: "44px", minWidth: "200px" }}
-                  aria-label="Utilisation over last 10 seconds"
+                  className={`w-full rounded bg-zinc-950/60 ${
+                    isMini ? "min-w-[120px]" : "min-w-[200px]"
+                  }`}
+                  style={{
+                    width: "100%",
+                    height: "44px",
+                    minWidth: isMini ? "120px" : "200px",
+                  }}
+                  aria-label={
+                    isStatic
+                      ? "Utilisation by month"
+                      : "Utilisation over last 10 seconds"
+                  }
                 />
               </div>
             </div>

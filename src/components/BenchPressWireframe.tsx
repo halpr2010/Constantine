@@ -17,9 +17,9 @@ import { useEffect, useRef, useState } from "react";
 
 // Placement of the barbell over the bench, as percentages of the container.
 // Nudge these if the bar doesn't sit exactly on the rack hooks.
-const BARBELL_WIDTH_PCT = 98.3;
-const BARBELL_LEFT_PCT = -6.1; // negative: the near plate overhangs to the left
-const BARBELL_REST_TOP_PCT = 11.2; // where the bar sits racked, when unused
+const BARBELL_WIDTH_PCT = 85.1;
+const BARBELL_LEFT_PCT = 2.3;
+const BARBELL_REST_TOP_PCT = 15.0; // where the bar sits racked, when unused
 
 // The rep is centred on the racked position: the bar rises LIFT_UP_PCT above it
 // and presses PRESS_DOWN_PCT below it, both in percent of container height.
@@ -103,12 +103,12 @@ export default function BenchPressWireframe({ util }: { util: number }) {
   }, []);
 
   return (
-    <div className="relative w-full" style={{ aspectRatio: "1074 / 991" }}>
+    <div className="relative w-full" style={{ aspectRatio: "1402 / 1122" }}>
       <Image
-        src="/bp_bench.png"
+        src="/bench2.png"
         alt=""
-        width={1074}
-        height={991}
+        width={1402}
+        height={1122}
         className="absolute inset-0 h-full w-full object-contain"
       />
       <Image

@@ -18,12 +18,12 @@ export default function HeroSection() {
   // is what changes with the vertical.
   const headline = "AI-powered Behavioural Analytics for Physical Spaces";
   const subtitle =
-    "Measure how people actually use physical space: attention, movement and flow, not just footfall.";
+    "Measure how people actually use your space: attention, engagement and movement, not just footfall.";
   // One chip set across every vertical, per the copy spec.
   const chips = [
-    "Edge-processed",
     "Anonymous by design",
-    "Works with existing cameras",
+    "Edge processing",
+    "Works with existing CCTV cameras",
   ];
 
   // Both panels share one grid cell, so they sit in exactly the same place and
@@ -139,6 +139,7 @@ export default function HeroSection() {
                     title="Mona Lisa - Leonardo da Vinci"
                     chartColor="rgba(239,68,68,0.8)"
                     compact
+                    active={vertical === "museums"}
                   />
                 </div>
                 <div className="flex min-w-0 flex-1 justify-center md:ml-32 md:max-w-[320px]">
@@ -149,6 +150,7 @@ export default function HeroSection() {
                     chartColor="rgba(59,130,246,0.8)"
                     compact
                     minColorFloor={0.40}
+                    active={vertical === "museums"}
                   />
                 </div>
               </div>
@@ -173,6 +175,7 @@ export default function HeroSection() {
                     title="Bench Press - Strength"
                     chartColor="rgba(239,68,68,0.8)"
                     compact
+                    active={vertical === "gyms"}
                   />
                 </div>
                 <div className="flex min-w-0 flex-1 justify-center md:ml-32 md:max-w-[320px]">
@@ -181,6 +184,7 @@ export default function HeroSection() {
                     title="Stairmaster - Cardio"
                     chartColor="rgba(59,130,246,0.8)"
                     compact
+                    active={vertical === "gyms"}
                   />
                 </div>
               </div>

@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Constantine: privacy-preserving museum engagement analytics",
+  title: "Constantine: privacy-preserving engagement analytics for physical spaces",
   description:
-    "Measure attention, not people. Privacy-preserving visitor analytics for museums and galleries: dwell, movement, facing, and engagement per artwork, calibrated to real-world meters.",
+    "Measure how people actually use physical space. Privacy-preserving, edge-processed behavioural analytics for museums, galleries and gyms: attention, engagement, movement and flow, calibrated to real-world dimensions.",
 };
 
 export default function RootLayout({

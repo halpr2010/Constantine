@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import PaintingWall from "@/components/MonaLisaWall";
+import EquipmentWall from "@/components/EquipmentWall";
 import { useVertical } from "@/components/VerticalContext";
 
 type Step = {
@@ -16,6 +17,8 @@ type Step = {
   image?: { src: string; alt: string; w: number; h: number };
   /** Step 4 of the museum flow shows two static painting cards instead. */
   paintings?: boolean;
+  /** Gym analogue: two static, ranked equipment cards. */
+  equipment?: boolean;
 };
 
 const MUSEUM_STEPS: Step[] = [
@@ -45,7 +48,7 @@ const MUSEUM_STEPS: Step[] = [
       "Circulation flow between rooms",
     ],
     closer:
-      "Because the room is mapped to its real dimensions, every measurement is a real-world distance. Constantine knows how far a visitor stands from a work, not just where they appear on a screen.",
+      "Because the room is mapped to its real-world distances, Constantine can build true engagement metrics based on a visitor's position, walking speed and orientation.",
     image: {
       src: "/Calibrate - CCTV.png",
       alt: "Gallery mapped to real-world dimensions — camera field of view calibration",
@@ -105,10 +108,10 @@ const GYM_STEPS: Step[] = [
     closer:
       "Video is processed on-site and immediately destroyed, only aggregated counts and metrics leave the venue.",
     image: {
-      src: "/integrate_gym.png",
+      src: "/gym_integrate.png",
       alt: "Gym floor CCTV coverage survey",
-      w: 716,
-      h: 480,
+      w: 666,
+      h: 468,
     },
   },
   {
@@ -124,10 +127,10 @@ const GYM_STEPS: Step[] = [
     closer:
       "Constantine reads utilisation from the cameras alone. There are no smart sensors, no connected machines and no equipment modifications of any kind.",
     image: {
-      src: "/calibrate_gym.png",
+      src: "/gym_calibrate.png",
       alt: "Gym equipment mapped to real-world dimensions",
-      w: 716,
-      h: 480,
+      w: 694,
+      h: 440,
     },
   },
   {
@@ -141,11 +144,26 @@ const GYM_STEPS: Step[] = [
       "How engagement shifts across the day, week, and by site",
     ],
     image: {
-      src: "/measure_gym.png",
+      src: "/gym_measure.png",
       alt: "Equipment zones — utilisation and wait time measurement",
-      w: 716,
-      h: 480,
+      w: 690,
+      h: 446,
     },
+  },
+  {
+    n: "4.",
+    title: "Insight",
+    lede: "Operators, analysts and beyond receive real-time analytics and AI-powered recommendations:",
+    items: [
+      "Utilisation distributions per equipment type",
+      "Wait-time and queue comparisons between zones",
+      "Member flow across the floor",
+      "Abandoned-attempt hot spots",
+      "Utilisation patterns by hour/day/week",
+      "AI-powered layout and equipment-mix recommendations",
+    ],
+    closer: "All outputs are aggregated and privacy-first.",
+    equipment: true,
   },
 ];
 
@@ -163,7 +181,7 @@ export default function HowItWorks() {
         <p className="mt-4 max-w-2xl text-zinc-400">
           {isGym ? (
             <>
-              From the CCTV you already own to floor-level behavioural insight:
+              From the CCTV you already own to equipment-level behavioural insight:
               <br />
               integrate, calibrate, and measure how members use the gym floor.
             </>
@@ -253,6 +271,47 @@ export default function HowItWorks() {
                         staticChartValues={[
                           0.52, 0.68, 0.55, 0.44, 0.58, 0.36, 0.74, 0.52, 0.68,
                           0.85, 0.78, 0.68,
+                        ]}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : step.equipment ? (
+                <div className="flex shrink-0 flex-row flex-nowrap items-start gap-4 md:gap-6">
+                  <div className="w-[280px] shrink-0 md:w-[300px]">
+                    <div className="h-[440px] w-full">
+                      <EquipmentWall
+                        title="Treadmill - Cardio"
+                        chartColor="rgba(239,68,68,0.8)"
+                        size="mini"
+                        static
+                        imageSrc="/treadmill2.png"
+                        imageAlt="Treadmill"
+                        fixedUtilisation={92}
+                        rankingInGym={1}
+                        rankingChange={2}
+                        staticChartValues={[
+                          0.42, 0.55, 0.6, 0.5, 0.48, 0.32, 0.4, 0.62, 0.74,
+                          0.8, 0.9, 0.96,
+                        ]}
+                      />
+                    </div>
+                  </div>
+                  <div className="w-[280px] shrink-0 md:w-[300px]">
+                    <div className="h-[440px] w-full">
+                      <EquipmentWall
+                        title="Exercise Bike - Cardio"
+                        chartColor="rgba(59,130,246,0.8)"
+                        size="mini"
+                        static
+                        imageSrc="/bike2.png"
+                        imageAlt="Exercise bike"
+                        fixedUtilisation={28}
+                        rankingInGym={7}
+                        rankingChange={-1}
+                        staticChartValues={[
+                          0.5, 0.62, 0.52, 0.42, 0.55, 0.34, 0.6, 0.48, 0.5,
+                          0.44, 0.4, 0.3,
                         ]}
                       />
                     </div>

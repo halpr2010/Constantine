@@ -131,6 +131,10 @@ export default function StairmasterVideo({ util = 0 }: { util?: number }) {
         left: `${LEFT_PCT}%`,
         top: `${TOP_PCT}%`,
         display: "block",
+        // The clip is white line art on pure black, which sits darker than the
+        // page. Screen blending maps that black to the backdrop exactly, so the
+        // wireframe floats on the page colour instead of on a black rectangle.
+        mixBlendMode: "screen",
         pointerEvents: "none",
       }}
     />

@@ -24,6 +24,8 @@ type PaintingWallProps = {
   /** Change in ranking (positive = moved up, negative = moved down) */
   rankingChange?: number;
   static?: boolean;
+  /** False while this wall is on a hidden vertical: park and reset it. */
+  active?: boolean;
   /** 12 monthly values for static chart (Jan–Dec), should peak in Dec */
   staticChartValues?: number[];
 };
@@ -41,6 +43,7 @@ export default function PaintingWall({
   rankingInExhibition,
   rankingChange,
   static: isStatic = false,
+  active = true,
   staticChartValues: staticChartValuesProp,
 }: PaintingWallProps) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -86,6 +89,22 @@ export default function PaintingWall({
   );
 
   useEffect(() => {
+    // Parked: this wall belongs to the vertical that is not on screen. Reset it
+    // so it starts cold when its tab comes back, rather than inheriting the
+    // engagement the other vertical's wall built up under the same pointer.
+    if (!active) {
+      targetRevealRef.current = 0;
+      currentRevealRef.current = 0;
+      setReveal(0);
+      attentionStartRef.current = null;
+      lastAttentionUpdateRef.current = 0;
+      setAttentionSeconds(0);
+      samplesRef.current = [];
+      const c = chartRef.current;
+      const cx = c?.getContext("2d");
+      if (c && cx) cx.clearRect(0, 0, c.width, c.height);
+      return;
+    }
     let raf: number | null = null;
 
     const compute = () => {
@@ -258,7 +277,7 @@ export default function PaintingWall({
       }
       if (raf != null) cancelAnimationFrame(raf);
     };
-  }, [chartColor, isStatic, staticChartValues, staticChartLabels]);
+  }, [chartColor, isStatic, staticChartValues, staticChartLabels, active]);
 
   // Compute filters from reveal so:
   // far: 5% color minimum (not fully white)
