@@ -371,13 +371,10 @@ export default function EquipmentWall({
                   ) : (
                     <StairmasterVideo util={reveal} />
                   )}
-                  {/* Subtle sheen, mirroring the painting's glass. Live cards
-                      only: over a still exported on the page background it just
-                      washes a diagonal band up to rgb(15,15,15), undoing the
-                      background match. */}
-                  {!isStatic && (
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-40" />
-                  )}
+                  {/* No sheen. The painting card's glass highlight reads as
+                      glass over artwork, but over gym line art on the page
+                      background it just washes a diagonal band up to
+                      rgb(15,15,15) against a rgb(5,5,5) page. */}
                 </div>
               </div>
             </div>
