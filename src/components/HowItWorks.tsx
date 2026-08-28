@@ -1,0 +1,280 @@
+"use client";
+
+import Image from "next/image";
+import PaintingWall from "@/components/MonaLisaWall";
+import { useVertical } from "@/components/VerticalContext";
+
+type Step = {
+  n: string;
+  title: string;
+  /** Opening line. Bold in the gym variant, per the pitch deck. */
+  lede: string;
+  ledeBold?: boolean;
+  sub?: string;
+  items: string[];
+  closer?: string;
+  image?: { src: string; alt: string; w: number; h: number };
+  /** Step 4 of the museum flow shows two static painting cards instead. */
+  paintings?: boolean;
+};
+
+const MUSEUM_STEPS: Step[] = [
+  {
+    n: "1.",
+    title: "Integrate",
+    lede: "A coverage survey maps your CCTV; standard IP cameras fill any blind spots.",
+    items: ["No facial recognition is used.", "No identity profiles are created."],
+    closer:
+      "Each camera simply observes how visitors move and orient within the room.",
+    image: {
+      src: "/CCTV - Integrate2.png",
+      alt: "CCTV camera in gallery corner — typical setup Constantine integrates with",
+      w: 384,
+      h: 384,
+    },
+  },
+  {
+    n: "2.",
+    title: "Calibrate",
+    lede: "Every gallery is mapped to its real-world dimensions.",
+    sub: "This allows Constantine to understand:",
+    items: [
+      "Where artworks are located",
+      "Viewing distances",
+      "Movement patterns between works",
+      "Circulation flow between rooms",
+    ],
+    closer:
+      "Because the room is mapped to its real dimensions, every measurement is in real-world distance — how far a visitor stands from a work, not where they appear on screen.",
+    image: {
+      src: "/Calibrate - CCTV.png",
+      alt: "Gallery mapped to real-world dimensions — camera field of view calibration",
+      w: 384,
+      h: 384,
+    },
+  },
+  {
+    n: "3.",
+    title: "Measure",
+    lede: "Each artwork is assigned an engagement zone, the space where meaningful attention can occur.",
+    sub: "When a visitor enters that zone and orients toward the work, Constantine measures:",
+    items: [
+      "How long attention is sustained",
+      "How frequently visitors return",
+      "How engagement shifts across the exhibition",
+    ],
+    closer:
+      "It captures which works actually hold attention and for how long — not just how many people passed through.",
+    image: {
+      src: "/Measure.png",
+      alt: "Engagement zones — artwork-level attention measurement",
+      w: 384,
+      h: 384,
+    },
+  },
+  {
+    n: "4.",
+    title: "Insight",
+    lede: "Curators, directors, analysts and beyond receive real-time analytics and AI-powered recommendations:",
+    items: [
+      "Dwell time distributions per artwork",
+      "Engagement comparisons between rooms",
+      "Visitor flow through the exhibition",
+      "Attention drop-off points",
+      "Engagement patterns by hour/day/week",
+      "AI-powered curation and layout recommendations",
+    ],
+    closer: "All outputs are aggregated and privacy-first.",
+    paintings: true,
+  },
+];
+
+// The gym flow is three steps, not four — this is the vetted version from the
+// operator pitch deck, kept word for word.
+const GYM_STEPS: Step[] = [
+  {
+    n: "1.",
+    title: "Integrate",
+    lede: "A coverage survey maps your CCTV, standard IP cameras fill any blind spots",
+    ledeBold: true,
+    items: [
+      "Compatible with major CCTV setups (e.g. Hikvision, Axis)",
+      "No facial recognition or identity profiles",
+      "No per-machine sensors or equipment changes",
+    ],
+    closer:
+      "Video is processed on-site and immediately destroyed, only aggregated counts and metrics leave the venue.",
+    image: {
+      src: "/integrate_gym.png",
+      alt: "Gym floor CCTV coverage survey",
+      w: 716,
+      h: 480,
+    },
+  },
+  {
+    n: "2.",
+    title: "Calibrate",
+    lede: "Every piece of gym equipment is mapped to its real-world dimensions",
+    ledeBold: true,
+    items: [
+      "Zone boundaries (cardio vs free-weight etc.)",
+      "Utilisation of each piece of equipment",
+      "Movement patterns between zones",
+    ],
+    closer:
+      "Constantine reads utilisation from the cameras alone — there are no smart sensors, connected machines or equipment modifications of any kind.",
+    image: {
+      src: "/calibrate_gym.png",
+      alt: "Gym equipment mapped to real-world dimensions",
+      w: 716,
+      h: 480,
+    },
+  },
+  {
+    n: "3.",
+    title: "Measure",
+    lede: "Designed for cross-site analysis at scale and delivered via API into your existing stack, with a dashboard for teams acting on the signal directly.",
+    ledeBold: true,
+    items: [
+      "How long the equipment is in active use",
+      "How long members wait or queue",
+      "How engagement shifts across the day, week, and by site",
+    ],
+    image: {
+      src: "/measure_gym.png",
+      alt: "Equipment zones — utilisation and wait time measurement",
+      w: 716,
+      h: 480,
+    },
+  },
+];
+
+export default function HowItWorks() {
+  const { vertical } = useVertical();
+  const isGym = vertical === "gyms";
+  const steps = isGym ? GYM_STEPS : MUSEUM_STEPS;
+
+  return (
+    <section id="how" className="border-t border-zinc-800/50 px-6 pt-12 pb-24">
+      <div className="mx-auto max-w-6xl">
+        <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
+          How it Works…
+        </h2>
+        <p className="mt-4 max-w-2xl text-zinc-400">
+          {isGym ? (
+            <>
+              From the CCTV you already own to floor-level behavioural insight:
+              <br />
+              integrate, calibrate, and measure how members use the gym floor.
+            </>
+          ) : (
+            <>
+              From a camera coverage survey to artwork-level engagement insights:
+              <br />
+              Integrate, calibrate, measure, and understand visitor attention in
+              real-world space.
+            </>
+          )}
+        </p>
+
+        <div className="mt-12 space-y-16">
+          {steps.map((step) => (
+            <div
+              key={step.n + step.title}
+              className="flex flex-col gap-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 md:flex-row md:items-center md:gap-8 md:p-8"
+            >
+              <div className="flex-1">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-xl font-semibold text-white/60">
+                    {step.n}
+                  </span>
+                  <h3 className="text-xl font-semibold">{step.title}</h3>
+                </div>
+                <p
+                  className={`mt-3 ${
+                    step.ledeBold ? "font-medium text-zinc-300" : "text-zinc-400"
+                  }`}
+                >
+                  {step.lede}
+                </p>
+                {step.sub && (
+                  <p className="mt-2 text-sm text-zinc-500">{step.sub}</p>
+                )}
+                <ul className="mt-4 space-y-2">
+                  {step.items.map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-start gap-2 text-sm text-zinc-400"
+                    >
+                      <span className="mt-0.5 shrink-0 text-emerald-500">✓</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                {step.closer && (
+                  <p className="mt-4 text-sm text-zinc-500">{step.closer}</p>
+                )}
+              </div>
+
+              {step.paintings ? (
+                <div className="flex shrink-0 flex-row flex-nowrap items-start gap-4 md:gap-6">
+                  <div className="w-[280px] shrink-0 md:w-[300px]">
+                    <div className="h-[440px] w-full">
+                      <PaintingWall
+                        src="/Pearls.jpg"
+                        alt="Girl with a Pearl Earring"
+                        title="Girl with a Pearl Earring - Vermeer"
+                        chartColor="rgba(239,68,68,0.8)"
+                        size="mini"
+                        fixedAttentionTime={12.4}
+                        rankingInExhibition={1}
+                        rankingChange={3}
+                        static
+                        staticChartValues={[
+                          0.38, 0.55, 0.62, 0.48, 0.42, 0.28, 0.35, 0.58, 0.71,
+                          0.78, 0.88, 0.98,
+                        ]}
+                      />
+                    </div>
+                  </div>
+                  <div className="w-[280px] shrink-0 md:w-[300px]">
+                    <div className="h-[440px] w-full">
+                      <PaintingWall
+                        src="/Rothkos.jpg"
+                        alt="No. 61 (Rust and Blue) 1953"
+                        title="No. 61 (Rust and Blue) 1953 - Mark Rothko"
+                        chartColor="rgba(59,130,246,0.8)"
+                        size="mini"
+                        minColorFloor={0.4}
+                        fixedAttentionTime={9.8}
+                        rankingInExhibition={6}
+                        rankingChange={-1}
+                        static
+                        staticChartValues={[
+                          0.52, 0.68, 0.55, 0.44, 0.58, 0.36, 0.74, 0.52, 0.68,
+                          0.85, 0.78, 0.68,
+                        ]}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                step.image && (
+                  <div className="shrink-0 md:w-96">
+                    <Image
+                      src={step.image.src}
+                      alt={step.image.alt}
+                      width={step.image.w}
+                      height={step.image.h}
+                      className="w-full rounded-lg object-contain"
+                    />
+                  </div>
+                )
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
