@@ -13,9 +13,31 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  // Makes the relative /og-image.png resolve to an absolute URL for scrapers.
+  metadataBase: new URL("https://constantineanalytics.com"),
   title: "Constantine: privacy-preserving engagement analytics for physical spaces",
   description:
     "Measure how people actually use physical space. Privacy-preserving, edge-processed behavioural analytics for museums, galleries and gyms: attention, engagement, movement and flow, calibrated to real-world dimensions.",
+  openGraph: {
+    title:
+      "Constantine: privacy-preserving engagement analytics for physical spaces",
+    description:
+      "Measure how people actually use physical space. Privacy-preserving, edge-processed behavioural analytics for museums, galleries and gyms.",
+    url: "https://constantineanalytics.com",
+    siteName: "Constantine",
+    images: [
+      { url: "/og-image.png", width: 1200, height: 630, alt: "Constantine" },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title:
+      "Constantine: privacy-preserving engagement analytics for physical spaces",
+    description:
+      "Measure how people actually use physical space. Privacy-preserving, edge-processed behavioural analytics for museums, galleries and gyms.",
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({
