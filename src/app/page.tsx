@@ -5,6 +5,7 @@ import ValueSection from "@/components/ValueSection";
 import PrivacySection from "@/components/PrivacySection";
 import UseCases from "@/components/UseCases";
 import PilotForm from "@/components/PilotForm";
+import ScrollProgress from "@/components/ScrollProgress";
 import { VerticalProvider } from "@/components/VerticalContext";
 import Image from "next/image";
 
@@ -48,6 +49,10 @@ export default function Home() {
               Request a pilot
             </a>
           </div>
+          {/* The §5 rule rides the header's own bottom hairline, so page
+              position is read off the edge that is already there rather than
+              off a second band of chrome. */}
+          <ScrollProgress />
         </header>
 
         <HeroSection />

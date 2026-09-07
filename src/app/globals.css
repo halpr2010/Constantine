@@ -120,6 +120,15 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Smooth scrolling is animation the reader did not ask for: an anchor jump
+   under prefers-reduced-motion lands instantly, and the §5 rule reads the new
+   position in the same frame. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
   background: var(--surface-page);
   color: var(--foreground);

@@ -146,8 +146,15 @@ the loop does not rebuild them, and so their §5 conflicts are visible.
   This is the largest spec/repo gap and affects every future candidate.
 - **Typography.** The site uses Geist and Geist Mono. §5 specifies Inter
   Display for headings and NB International for body.
-- **Ambient background** and **scroll progress bar** — `[UNBUILT]`.
-  `src/components/ParticleField.tsx` exists but is imported nowhere.
+- **Ambient background** — `[UNBUILT]`. `ParticleField.tsx` was deleted in the
+  tokenisation session; §5 asks for this to be built fresh against the
+  reduced-motion floor.
+- **Scroll progress bar** — `[BUILT]` 07 Sep 2026.
+  `src/components/ScrollProgress.tsx`, rendered inside the header in
+  `src/app/page.tsx`. A graduated rule on the header's own bottom hairline:
+  fine graduations every 4%, a major mark at each section's measured scroll
+  offset, and a read head that inks the scale behind it. The §5 corner
+  next-section preview it pairs with is still `[UNBUILT]`.
 - **Accessibility floor.** CORRECTED 30 Aug 2026 after running the suite:
   tap DOES start the demos on touch, because the walls listen for
   `pointerover` as well as `pointermove` and a tap fires it. That is
