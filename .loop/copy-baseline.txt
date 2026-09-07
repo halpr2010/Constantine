@@ -1,0 +1,9 @@
+src/components/HeroSection.tsx	"Measure how people actually use your space: attention, engagement and movement, not just footfall
+src/components/ProblemSection.tsx	"Churn models see the outcome, not the cause
+src/components/ProblemSection.tsx	"Footfall counts visits, not engagement
+src/components/ProblemSection.tsx	"Turnstile counts entries, not what happens inside
+src/components/ProblemSection.tsx	heading: "You can measure who came in. Not what held them.
+src/components/ProblemSection.tsx	heading: "Your CRM records who cancelled. Not the friction that made them.
+src/components/ValueSection.tsx	desc: "Catch equipment whose usage drops out of pattern the same day, not a week later
+src/components/ValueSection.tsx	desc: "Measure a re-hang or exhibition change against a real before-and-after, not a hunch
+src/components/ValueSection.tsx	desc: "See what members actually use, so refresh and buying decisions follow real demand, not guesswork

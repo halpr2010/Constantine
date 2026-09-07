@@ -42,7 +42,10 @@ for (const [w, h] of [[1440, 900], [390, 844]]) {
     for (const [name, sel] of VIEWS) {
       const el = page.locator(sel).first();
       if (!(await el.count())) continue;
-      await el.screenshot({ path: `${OUT}/${vertical}-${name}-${w}.png`, mask, animations: "disabled" });
+      // Neutral mask: Playwright's default is magenta, which reads as a design
+      // choice on a contact sheet and drags the critic's D2 score.
+      await el.screenshot({ path: `${OUT}/${vertical}-${name}-${w}.png`, mask,
+        maskColor: "#1b1b1f", animations: "disabled" });
     }
     await ctx.close();
   }

@@ -45,3 +45,15 @@ shots/
 verdict-*.json
 test-results/
 playwright-report/
+
+# Loop working state: captures are large and regenerated every cycle;
+# baselines are tracked, run artefacts are not.
+shots/best/
+shots/candidate/
+shots/compare/
+.loop/cycle-*/
+.loop/last-run.json
+.loop/build.log
+.loop/floors.txt
+.loop/verdict.json
+test-results/
