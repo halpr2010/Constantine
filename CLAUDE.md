@@ -21,6 +21,20 @@ Opening backlog — this is the work, not a list of defects to clear by hand:
 - 9 `X, not Y` copy violations (`COPY-VIOLATIONS.md`). The ban is absolute;
   the ratchet exists only because the site starts non-compliant.
 
+## References — look at them
+
+`design-refs/` holds screenshots of every site §6 cites, named for the
+attribute they demonstrate (`Slingshot-Scroll-Bar-1.png`, `Claryo-scroll-2.png`,
+`Pocket-Privacy-1.png`, …). §6 says what to take from each and what to ignore.
+
+**Before building anything §6 names, open the reference image for it.** Read
+the picture, not just the prose about the picture. DESIGN.md's descriptions are
+secondary sources and have been wrong: the scroll-bar entry called for "a
+measurement instrument in the site's data-overlay idiom", the reference shows a
+plain hairline, and a candidate that followed the prose built an engraved ruler
+that was rejected on sight. Where the prose and the image disagree, the image
+wins and you fix the prose in the same commit.
+
 ## Gates
 
 Run `./scripts/floors.sh` before claiming anything works. Two rule kinds:

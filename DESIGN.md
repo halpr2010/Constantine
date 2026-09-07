@@ -151,10 +151,10 @@ the loop does not rebuild them, and so their §5 conflicts are visible.
   reduced-motion floor.
 - **Scroll progress bar** — `[BUILT]` 07 Sep 2026.
   `src/components/ScrollProgress.tsx`, rendered inside the header in
-  `src/app/page.tsx`. A graduated rule on the header's own bottom hairline:
-  fine graduations every 4%, a major mark at each section's measured scroll
-  offset, and a read head that inks the scale behind it. The §5 corner
-  next-section preview it pairs with is still `[UNBUILT]`.
+  `src/app/page.tsx`. One hairline on the header's bottom edge growing left to
+  right, per the Slingshot reference. Built first as a graduated rule and
+  rejected; see experiments.md 20260907-184421-1. The §5 corner next-section
+  preview it pairs with is still `[UNBUILT]`.
 - **Accessibility floor.** CORRECTED 30 Aug 2026 after running the suite:
   tap DOES start the demos on touch, because the walls listen for
   `pointerover` as well as `pointermove` and a tap fires it. That is
@@ -293,11 +293,16 @@ hard constraints: low intensity (the hero demo remains the obvious
 protagonist), zero measurable FPS impact on demo timers, fully static under
 prefers-reduced-motion, never behind the technical register.
 
-**Scroll progress bar** *(Slingshot)*. Persistent thin horizontal bar
-showing page position — styled as a measurement instrument in the site's
-data-overlay idiom, not a generic loading strip. Pairs with a corner
-next-section preview *(Claryo)* so heavy scroll choreography stays
-navigable.
+**Scroll progress bar** *(Slingshot)*. A single hairline on the header's
+bottom edge, growing left to right as the page scrolls. See
+design-refs/Slingshot-Scroll-Bar-{1,2}.png: no graduations, no section marks,
+no read head — the restraint is the whole effect. Pairs with a corner
+next-section preview *(Claryo)* so heavy scroll choreography stays navigable.
+CORRECTED 07 Sep 2026. This entry previously read "styled as a measurement
+instrument in the site's data-overlay idiom, not a generic loading strip".
+That gloss described nothing Slingshot does, and a candidate built faithfully
+to it produced an engraved ruler the founder rejected on sight. Reference
+entries describe the reference; interpretation belongs in the candidate.
 
 **Viewport-fit discipline** *(anti-pattern from Pocket)*. Every scroll-step
 section must compose completely within one viewport at 1440×900 and 390×844

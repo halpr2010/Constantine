@@ -21,6 +21,19 @@ Canvases and video are MASKED to flat grey. That is a capture artefact, not a
 design choice: their content is rAF-driven and cannot be captured stably. Never
 score a masked region as a blank or missing element.
 
+## References
+
+`design-refs/` holds a screenshot of every site §6 cites, named for the
+attribute it demonstrates. When a candidate builds something §6 names, OPEN THE
+REFERENCE and judge fidelity to it under D2 and D5.
+
+This is not optional. A previous candidate built the Slingshot scroll bar as an
+engraved measuring rule; the critic scored it a D2 win for being "calibrated
+and monotonic rather than a filled tube", having never opened
+`Slingshot-Scroll-Bar-1.png`, which shows a plain hairline. The founder
+rejected it immediately. A verdict that never consults the reference is worth
+less than no verdict, because it launders a drift as an improvement.
+
 ## How to judge
 
 Score D1–D5 pairwise, one sentence each, then D6 pass/fail. The candidate WINS
