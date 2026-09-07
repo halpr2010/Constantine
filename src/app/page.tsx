@@ -1,5 +1,7 @@
 import HeroSection from "@/components/HeroSection";
+import ProblemSection from "@/components/ProblemSection";
 import HowItWorks from "@/components/HowItWorks";
+import ValueSection from "@/components/ValueSection";
 import PrivacySection from "@/components/PrivacySection";
 import UseCases from "@/components/UseCases";
 import PilotForm from "@/components/PilotForm";
@@ -50,7 +52,11 @@ export default function Home() {
 
         <HeroSection />
 
+        <ProblemSection />
+
         <HowItWorks />
+
+        <ValueSection />
 
         <PrivacySection />
 
