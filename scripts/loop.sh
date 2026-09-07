@@ -80,6 +80,7 @@ genuinely different one rather than repeating it." \
   nohup npx next start -p 3000 > /dev/null 2>&1 &
   for j in $(seq 1 60); do curl -sf -m 5 -o /dev/null http://localhost:3000/ && break; sleep 1; done
   rm -rf shots/candidate && ./scripts/capture.sh candidate
+  node scripts/compare-sheet.mjs
 
   echo "── critic ───────────────────────────────────────────"
   rm -f .loop/verdict.json

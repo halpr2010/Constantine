@@ -6,11 +6,14 @@ how either was built; judge only what you see. Read `DESIGN.md` §2, §5, §6 an
 
 ## Evidence
 
-- `shots/best/` — the current best.
-- `shots/candidate/` — the candidate.
-- Both contain: `dark/`, `light-canvas/`, `dark-canvas/`, `instrument/`, each
-  with the six §7 views at 1440w and 390w in both verticals, plus `strips/`
-  (full-page, one per palette).
+- **`shots/compare/` — start here.** 24 sheets, one per view × width ×
+  vertical, named `<vertical>-<view>-<width>.png`. Each puts BEST above
+  CANDIDATE with all four palettes across, which is exactly the comparison
+  this rubric asks for. Read these first and read all of them.
+- `shots/best/` and `shots/candidate/` — the same captures as individual PNGs
+  (`<palette>/<vertical>-<view>-<width>.png`), plus `strips/` (full-page, one
+  per palette). Go here only when a sheet leaves you unsure about a detail, or
+  when you need to see a whole page top to bottom.
 - `.loop/floors.txt` — the D6 gate output. It has already passed, or you would
   not be reading this.
 
