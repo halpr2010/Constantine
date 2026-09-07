@@ -81,7 +81,8 @@ build had moved on, the description is corrected here rather than the code.
 ## 4. Sections to BUILD (the expansion brief)
 
 Status tags reconciled against the codebase on 30 Aug 2026. The loop targets
-only `[UNBUILT]` and `[PARTIAL]` items.
+only `[UNBUILT]` and `[PARTIAL]` items. `[SLOT-BUILT — awaiting media]`
+(see §4d) counts as complete and is NOT a target.
 
 - **Persona gate** *(Claryo)* — `[PARTIAL — gap]`. A persistent two-way
   switcher exists and reconfigures every section of the page per vertical,
@@ -172,6 +173,50 @@ are hollow and would let a regression through:
 - **viewport-fit (mobile)** — HOLLOW. It loops over zero tagged sections and
   passes trivially. The desktop variant asserts `n > 0` first and correctly
   fails. Add the same guard to the mobile test.
+
+### 4d. Media slots (product video & custom showcases)
+
+The loop may design, build, and proactively recommend placements for product
+footage and custom showcases even when no media file exists yet.
+
+1. **A slot is a finished component with pending content.** It ships fully
+   styled and tested: defined placement, aspect ratio (default 16:9 desktop;
+   9:16 permitted for mobile-specific slots), poster frame, playback
+   contract (muted, loop, lazy-loaded, no motion under
+   `prefers-reduced-motion`), and file-drop swap — replacing the media file
+   requires zero layout changes.
+2. **Placeholder honesty.** The pending state uses assets from the frozen
+   library (anonymised silhouette renders, register-appropriate diagrams)
+   and may be labelled as forthcoming pilot footage. NEVER: stock or
+   AI-generated video presented as product footage, fabricated screen
+   recordings, or any fill implying footage exists. This falls under §9.
+3. **The registry is the shot list.** Every slot gets an entry below with
+   location, a one-line purpose, and a footage spec (what the clip must
+   show, duration target, which visual register it sits in). The registry is
+   the founder's filming brief.
+4. **Status.** Slots use `[SLOT-BUILT — awaiting media]`, which the loop
+   treats as complete. Recommending a new slot means adding a registry entry
+   plus rationale in experiments.md; building it needs no separate approval
+   if it passes all floors.
+5. **Floors.** Tagged slots (`data-testid="media-slot"`) must render their
+   poster state: no 404s, no broken players, no layout shift on swap (poster
+   and video share dimensions).
+
+CONDITIONAL FLOOR, NOT AN ADOPTION FLOOR. The media-slot test must NOT
+assert `n > 0`. Slots are discretionary, so a page with zero slots passes
+legitimately and the rule reads "if you build a slot, it must meet these
+floors". This is the opposite of the viewport-fit test, where `n > 0` is
+required because §5 mandates adoption. Do not "fix" one to match the other.
+
+**Registry — opening entries**
+
+| Slot | Purpose | Footage spec |
+|---|---|---|
+| Hero walkthrough | Constantine live in a museum | Silhouettes + engagement overlays on real gallery footage, ~30–45s, product/atmosphere register. Claryo hero-video pattern. |
+| Measure step clip | Engagement zones drawn live | Zones drawing over anonymised venue footage, ~15s, sits in P4's Measure step. PlayVision annotated-footage pattern. |
+| Outputs capture | Dashboard fragment in motion | Fragment updating from live floor data, ~15s, outputs section. |
+
+All three are `[UNBUILT]` as slots today.
 
 ## 5. Visual language (v2 — founder-stated, no longer assumed)
 
@@ -383,6 +428,10 @@ D1–D5 and regresses on none. D6 is pass/fail, not comparative.
   progress bar, viewport-fit, reduced-motion, touch); Lighthouse perf ≥ 90
   / a11y ≥ 95; no console errors; NO identifiable faces anywhere; honesty
   guards intact (no fabricated clients/partnerships).
+  PLACEHOLDER ADDENDUM (§4d): a well-executed placeholder state is NOT a
+  deficiency. Judge the slot's design, not the absence of media. Without
+  this, a vision judge reliably scores "has real video" over "has
+  placeholder" and the loop learns never to build slots at all.
   RATCHET RULE (30 Aug 2026): floors whose starting state is already failing
   are enforced as ratchets, not absolutes — the measure may never worsen
   against `best`, and hardens to the absolute target once first met. This
@@ -410,6 +459,9 @@ D1–D5 and regresses on none. D6 is pass/fail, not comparative.
 
 - No fabricated client names, testimonials, results, or implied
   partnerships (integration spokes framed per §4 honesty guard).
+- No stock or AI-generated video presented as product footage, no fabricated
+  screen recordings, and no placeholder that implies footage exists which
+  does not (§4d rule 2).
 - No regenerating/restyling frozen brand assets in /public.
 - No weakening privacy copy for layout convenience; no tracking scripts on
   a privacy-branded site.
