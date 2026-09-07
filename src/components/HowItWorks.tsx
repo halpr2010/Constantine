@@ -173,12 +173,12 @@ export default function HowItWorks() {
   const steps = isGym ? GYM_STEPS : MUSEUM_STEPS;
 
   return (
-    <section id="how" className="border-t border-zinc-800/50 px-6 pt-12 pb-24">
+    <section id="how" className="border-t border-line-hairline px-6 pt-12 pb-24">
       <div className="mx-auto max-w-6xl">
         <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
           How it Works…
         </h2>
-        <p className="mt-4 max-w-2xl text-zinc-400">
+        <p className="mt-4 max-w-2xl text-fg-secondary">
           {isGym ? (
             <>
               From the CCTV you already own to equipment-level behavioural insight:
@@ -199,38 +199,38 @@ export default function HowItWorks() {
           {steps.map((step) => (
             <div
               key={step.n + step.title}
-              className="flex flex-col gap-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-6 md:flex-row md:items-center md:gap-8 md:p-8"
+              className="flex flex-col gap-6 rounded-xl border border-line-card bg-surface-card p-6 md:flex-row md:items-center md:gap-8 md:p-8"
             >
               <div className="flex-1">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-xl font-semibold text-white/60">
+                  <span className="text-xl font-semibold text-instrument-fg">
                     {step.n}
                   </span>
                   <h3 className="text-xl font-semibold">{step.title}</h3>
                 </div>
                 <p
                   className={`mt-3 ${
-                    step.ledeBold ? "font-medium text-zinc-300" : "text-zinc-400"
+                    step.ledeBold ? "font-medium text-fg-emphasis" : "text-fg-secondary"
                   }`}
                 >
                   {step.lede}
                 </p>
                 {step.sub && (
-                  <p className="mt-2 text-sm text-zinc-500">{step.sub}</p>
+                  <p className="mt-2 text-sm text-fg-muted">{step.sub}</p>
                 )}
                 <ul className="mt-4 space-y-2">
                   {step.items.map((item) => (
                     <li
                       key={item}
-                      className="flex items-start gap-2 text-sm text-zinc-400"
+                      className="flex items-start gap-2 text-sm text-fg-muted-list"
                     >
-                      <span className="mt-0.5 shrink-0 text-emerald-500">✓</span>
+                      <span className="mt-0.5 shrink-0 text-accent-positive">✓</span>
                       {item}
                     </li>
                   ))}
                 </ul>
                 {step.closer && (
-                  <p className="mt-4 text-sm text-zinc-500">{step.closer}</p>
+                  <p className="mt-4 text-sm text-fg-muted">{step.closer}</p>
                 )}
               </div>
 
@@ -242,7 +242,7 @@ export default function HowItWorks() {
                         src="/Pearls.jpg"
                         alt="Girl with a Pearl Earring"
                         title="Girl with a Pearl Earring - Vermeer"
-                        chartColor="rgba(239,68,68,0.8)"
+                        chartToken="chart-1"
                         size="mini"
                         fixedAttentionTime={12.4}
                         rankingInExhibition={1}
@@ -261,7 +261,7 @@ export default function HowItWorks() {
                         src="/Rothkos.jpg"
                         alt="No. 61 (Rust and Blue) 1953"
                         title="No. 61 (Rust and Blue) 1953 - Mark Rothko"
-                        chartColor="rgba(59,130,246,0.8)"
+                        chartToken="chart-2"
                         size="mini"
                         minColorFloor={0.4}
                         fixedAttentionTime={9.8}
@@ -282,7 +282,7 @@ export default function HowItWorks() {
                     <div className="h-[440px] w-full">
                       <EquipmentWall
                         title="Treadmill - Cardio"
-                        chartColor="rgba(239,68,68,0.8)"
+                        chartToken="chart-1"
                         size="mini"
                         static
                         imageSrc="/treadmill2.png"
@@ -301,7 +301,7 @@ export default function HowItWorks() {
                     <div className="h-[440px] w-full">
                       <EquipmentWall
                         title="Exercise Bike - Cardio"
-                        chartColor="rgba(59,130,246,0.8)"
+                        chartToken="chart-2"
                         size="mini"
                         static
                         imageSrc="/bike2.png"

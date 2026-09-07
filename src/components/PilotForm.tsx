@@ -52,7 +52,7 @@ export default function PilotForm() {
   return (
     <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
       <div>
-        <label htmlFor="email" className="mb-2 block text-sm text-zinc-500">
+        <label htmlFor="email" className="mb-2 block text-sm text-fg-muted">
           Email
         </label>
         <input
@@ -62,11 +62,11 @@ export default function PilotForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder={isGym ? "you@yourgroup.com" : "you@museum.org"}
-          className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-zinc-50 placeholder:text-zinc-500 focus:border-zinc-600 focus:outline-none"
+          className="w-full rounded-lg border border-line-input bg-surface-inset px-4 py-3 text-sm text-fg-primary placeholder:text-fg-muted focus:border-line-input-focus focus:outline-none"
         />
       </div>
       <div>
-        <label htmlFor="venue" className="mb-2 block text-sm text-zinc-500">
+        <label htmlFor="venue" className="mb-2 block text-sm text-fg-muted">
           {isGym ? "Gym name" : "Venue name"}
         </label>
         <input
@@ -75,24 +75,24 @@ export default function PilotForm() {
           value={venue}
           onChange={(e) => setVenue(e.target.value)}
           placeholder={isGym ? "e.g. City Centre Gym" : "e.g. City Art Museum"}
-          className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-zinc-50 placeholder:text-zinc-500 focus:border-zinc-600 focus:outline-none"
+          className="w-full rounded-lg border border-line-input bg-surface-inset px-4 py-3 text-sm text-fg-primary placeholder:text-fg-muted focus:border-line-input-focus focus:outline-none"
         />
       </div>
       <button
         type="submit"
         disabled={status === "submitting"}
-        className="w-full rounded-lg bg-white px-6 py-3 text-sm font-semibold text-black transition-colors hover:bg-zinc-200"
+        className="w-full rounded-lg bg-action px-6 py-3 text-sm font-semibold text-on-action transition-colors hover:bg-action-hover"
       >
         {status === "submitting" ? "Sending…" : "Request pilot"}
       </button>
 
       {status === "success" && (
-        <p className="text-sm text-emerald-400">
+        <p className="text-sm text-accent-positive-soft">
           Thanks, your pilot request is in. We&apos;ll be in touch shortly.
         </p>
       )}
       {status === "error" && (
-        <p className="text-sm text-red-400">
+        <p className="text-sm text-accent-negative-soft">
           Something went wrong. Please email ronanj.halpin@gmail.com directly.
         </p>
       )}

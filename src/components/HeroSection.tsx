@@ -50,7 +50,7 @@ export default function HeroSection() {
       <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-10 px-6 py-16 pt-24 md:grid-cols-12 md:items-center">
         {/* LEFT */}
         <div className="md:col-span-5 md:pr-2">
-          <div className="text-sm font-semibold tracking-wide text-white/70">
+          <div className="text-sm font-semibold tracking-wide text-instrument-fg-weak">
             CONSTANTINE
           </div>
 
@@ -58,14 +58,14 @@ export default function HeroSection() {
             {headline}
           </h1>
 
-          <p className="mt-5 max-w-md text-base leading-relaxed text-zinc-400">
+          <p className="mt-5 max-w-md text-base leading-relaxed text-fg-secondary">
             {subtitle}
           </p>
 
           <div className="mt-7 flex flex-col gap-4">
             <a
               href="#pilot"
-              className="inline-flex w-fit min-w-[280px] items-center justify-center rounded-lg bg-white px-8 py-3.5 text-sm font-semibold text-black transition-colors hover:bg-zinc-200"
+              className="inline-flex w-fit min-w-[280px] items-center justify-center rounded-lg bg-action px-8 py-3.5 text-sm font-semibold text-on-action transition-colors hover:bg-action-hover"
             >
               Request a pilot
             </a>
@@ -73,9 +73,9 @@ export default function HeroSection() {
               {chips.map((chip) => (
                 <span
                   key={chip}
-                  className="flex items-center gap-2 text-sm text-zinc-400"
+                  className="flex items-center gap-2 text-sm text-fg-secondary"
                 >
-                  <span className="text-emerald-500">✓</span>
+                  <span className="text-accent-positive">✓</span>
                   {chip}
                 </span>
               ))}
@@ -87,10 +87,10 @@ export default function HeroSection() {
         <div className="md:col-span-7 md:pl-8">
           {/* Slide control */}
           <div className="mb-8 flex justify-center">
-            <div className="relative grid grid-cols-2 rounded-full border border-zinc-800 bg-zinc-900/60 p-1 text-sm font-semibold">
+            <div className="relative grid grid-cols-2 rounded-full border border-line-card bg-surface-control p-1 text-sm font-semibold">
               <span
                 aria-hidden
-                className="pointer-events-none absolute bottom-1 left-1 top-1 w-[calc(50%-0.25rem)] rounded-full bg-white transition-transform duration-500 ease-in-out"
+                className="pointer-events-none absolute bottom-1 left-1 top-1 w-[calc(50%-0.25rem)] rounded-full bg-action transition-transform duration-500 ease-in-out"
                 style={{
                   transform:
                     vertical === "gyms" ? "translateX(100%)" : "translateX(0)",
@@ -109,7 +109,7 @@ export default function HeroSection() {
                   onClick={() => setVertical(id)}
                   aria-pressed={vertical === id}
                   className={`relative z-10 rounded-full px-5 py-2 transition-colors ${
-                    vertical === id ? "text-black" : "text-zinc-400 hover:text-zinc-200"
+                    vertical === id ? "text-on-action" : "text-fg-secondary hover:text-fg-emphasis-strong"
                   }`}
                 >
                   {label}
@@ -138,7 +138,7 @@ export default function HeroSection() {
                     src="/Mona_Lisa.jpg"
                     alt="Mona Lisa"
                     title="Mona Lisa - Leonardo da Vinci"
-                    chartColor="rgba(239,68,68,0.8)"
+                    chartToken="chart-1"
                     compact
                     active={vertical === "museums"}
                   />
@@ -148,7 +148,7 @@ export default function HeroSection() {
                     src="/Monet_Lillies.jpg"
                     alt="The Water Lily Pond"
                     title="The Water Lily Pond - Claude Monet"
-                    chartColor="rgba(59,130,246,0.8)"
+                    chartToken="chart-2"
                     compact
                     minColorFloor={0.40}
                     active={vertical === "museums"}
@@ -174,7 +174,7 @@ export default function HeroSection() {
                   <EquipmentWall
                     kind="bench"
                     title="Bench Press - Strength"
-                    chartColor="rgba(239,68,68,0.8)"
+                    chartToken="chart-1"
                     compact
                     active={vertical === "gyms"}
                   />
@@ -183,7 +183,7 @@ export default function HeroSection() {
                   <EquipmentWall
                     kind="stair"
                     title="Stairmaster - Cardio"
-                    chartColor="rgba(59,130,246,0.8)"
+                    chartToken="chart-2"
                     compact
                     active={vertical === "gyms"}
                   />

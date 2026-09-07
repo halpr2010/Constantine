@@ -1,12 +1,114 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+   Theme layer — variant zero (dark). Values reference Tailwind's own palette
+   variables and its color-mix() opacity form, so tokenisation changes
+   structure and not appearance. See TOKENS.md for the vocabulary and the
+   demotion rule governing ★ tokens.
+   --------------------------------------------------------------------------- */
 :root {
-  --background: #050505;
+  /* R1 · canvas — surfaces and borders */
+  --surface-page: #050505;
+  --surface-card: color-mix(in oklab, var(--color-zinc-900) 40%, transparent);
+  --surface-inset: var(--color-zinc-950);
+  --surface-inset-soft: color-mix(in oklab, var(--color-zinc-950) 30%, transparent);
+  --surface-control: color-mix(in oklab, var(--color-zinc-900) 60%, transparent);
+  --border-hairline: color-mix(in oklab, var(--color-zinc-800) 50%, transparent);
+  --border-card: var(--color-zinc-800);
+  --border-input: var(--color-zinc-700);
+  --border-input-focus: var(--color-zinc-600);
+
+  /* R1 · canvas — text scale. zinc-400 splits: body copy vs receding list. */
+  --text-primary: var(--color-zinc-50);
+  --text-secondary: var(--color-zinc-400);
+  --text-muted-list: var(--color-zinc-400);
+  --text-muted: var(--color-zinc-500);
+  --text-emphasis: var(--color-zinc-300);
+  --text-emphasis-strong: var(--color-zinc-200);
+  --text-subtle: var(--color-zinc-600);
+  --marker-weak: var(--color-zinc-600);
+
+  /* R2 · product / atmosphere — the stage the demos are rendered on.
+     Independent of --surface-page by design: the walls keep their dark stage
+     even when the canvas register goes light. Equal here, hence variant zero. */
+  --stage-surface: var(--surface-page);
+  --wall-backdrop: var(--stage-surface); /* alias, never a copy */
+
+  /* ★ on-stage-only (TOKENS.md demotion rule) */
+  --instrument-fg: color-mix(in oklab, var(--color-white) 60%, transparent);
+  --instrument-fg-strong: color-mix(in oklab, var(--color-white) 80%, transparent);
+  --instrument-fg-weak: color-mix(in oklab, var(--color-white) 70%, transparent);
+  --instrument-fg-faint: color-mix(in oklab, var(--color-white) 50%, transparent);
+  --instrument-well: color-mix(in oklab, var(--color-zinc-950) 60%, transparent);
+  --chart-label: rgba(255, 255, 255, 0.75);
+  --chart-1: rgba(239, 68, 68, 0.8);
+  --chart-2: rgba(59, 130, 246, 0.8);
+  --card-shadow: rgba(0, 0, 0, 0.65);
+  --glass-sheen: color-mix(in oklab, var(--color-white) 10%, transparent);
+
+  /* R3 · technical register — reserved, no consumer yet (§4 items UNBUILT) */
+  --tech-surface: var(--color-white);
+  --tech-ink: var(--color-black);
+  --tech-rule: var(--color-zinc-300);
+
+  /* cross-register · single CTA and semantic accents */
+  --action-bg: var(--color-white);
+  --action-bg-hover: var(--color-zinc-200);
+  --action-fg: var(--color-black);
+  /* theme-scoped, hue constrained to green, AA required per theme */
+  --accent-positive: var(--color-emerald-500);
+  --accent-positive-soft: var(--color-emerald-400);
+  --accent-negative: var(--color-red-500);
+  --accent-negative-soft: var(--color-red-400);
+
   --foreground: #fafafa;
 }
 
 @theme inline {
-  --color-background: var(--background);
+  /* Utility names avoid stutter: the CSS custom properties keep the semantic
+     names from TOKENS.md, the Tailwind mapping reads naturally in markup. */
+  --color-surface-page: var(--surface-page);
+  --color-surface-card: var(--surface-card);
+  --color-surface-inset: var(--surface-inset);
+  --color-surface-inset-soft: var(--surface-inset-soft);
+  --color-surface-control: var(--surface-control);
+
+  --color-line-hairline: var(--border-hairline);
+  --color-line-card: var(--border-card);
+  --color-line-input: var(--border-input);
+  --color-line-input-focus: var(--border-input-focus);
+
+  --color-fg-primary: var(--text-primary);
+  --color-fg-secondary: var(--text-secondary);
+  --color-fg-muted-list: var(--text-muted-list);
+  --color-fg-muted: var(--text-muted);
+  --color-fg-emphasis: var(--text-emphasis);
+  --color-fg-emphasis-strong: var(--text-emphasis-strong);
+  --color-fg-subtle: var(--text-subtle);
+  --color-marker-weak: var(--marker-weak);
+
+  --color-stage: var(--stage-surface);
+  --color-wall-backdrop: var(--wall-backdrop);
+  --color-instrument-fg: var(--instrument-fg);
+  --color-instrument-fg-strong: var(--instrument-fg-strong);
+  --color-instrument-fg-weak: var(--instrument-fg-weak);
+  --color-instrument-fg-faint: var(--instrument-fg-faint);
+  --color-instrument-well: var(--instrument-well);
+  --color-glass-sheen: var(--glass-sheen);
+
+  --color-tech-surface: var(--tech-surface);
+  --color-tech-ink: var(--tech-ink);
+  --color-tech-rule: var(--tech-rule);
+
+  --color-action: var(--action-bg);
+  --color-action-hover: var(--action-bg-hover);
+  --color-on-action: var(--action-fg);
+  --color-accent-positive: var(--accent-positive);
+  --color-accent-positive-soft: var(--accent-positive-soft);
+  --color-accent-negative: var(--accent-negative);
+  --color-accent-negative-soft: var(--accent-negative-soft);
+
+  --color-background: var(--surface-page);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -17,10 +119,9 @@ html {
 }
 
 body {
-  background: var(--background);
+  background: var(--surface-page);
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
-

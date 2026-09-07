@@ -49,12 +49,12 @@ export default function UseCases() {
   const cards = isGym ? GYM_CARDS : MUSEUM_CARDS;
 
   return (
-    <section id="use" className="border-t border-zinc-800/50 px-6 py-24">
+    <section id="use" className="border-t border-line-hairline px-6 py-24">
       <div className="mx-auto max-w-6xl">
         <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
           {isGym ? "Fitness Space Use Cases" : "Museum & Gallery Use Cases"}
         </h2>
-        <p className="mt-4 max-w-2xl text-zinc-400">
+        <p className="mt-4 max-w-2xl text-fg-secondary">
           {isGym
             ? "Three ways an operator turns floor-level behaviour into decisions: inside a club, across the estate, and in members' hands."
             : "From permanent collections to temporary exhibitions and cultural venues."}
@@ -63,18 +63,18 @@ export default function UseCases() {
           {cards.map((item) => (
             <div
               key={item.title}
-              className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-6"
+              className="rounded-xl border border-line-card bg-surface-card p-6"
             >
               {item.tag && (
-                <div className="mb-2 text-xs tracking-wide text-zinc-500">
+                <div className="mb-2 text-xs tracking-wide text-fg-muted">
                   {item.tag}
                 </div>
               )}
               <h3 className="text-lg font-semibold">{item.title}</h3>
-              <p className="mt-2 text-sm text-zinc-500">{item.desc}</p>
+              <p className="mt-2 text-sm text-fg-muted">{item.desc}</p>
               {item.signals && (
-                <p className="mt-4 text-sm text-zinc-400">
-                  <span className="text-emerald-500">New signals: </span>
+                <p className="mt-4 text-sm text-fg-secondary">
+                  <span className="text-accent-positive">New signals: </span>
                   {item.signals}
                 </p>
               )}

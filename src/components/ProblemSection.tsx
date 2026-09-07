@@ -27,24 +27,24 @@ export default function ProblemSection() {
   const copy = vertical === "gyms" ? GYM : MUSEUM;
 
   return (
-    <section id="problem" className="border-t border-zinc-800/50 px-6 py-24">
+    <section id="problem" className="border-t border-line-hairline px-6 py-24">
       <div className="mx-auto max-w-6xl">
-        <div className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+        <div className="text-xs font-semibold uppercase tracking-wider text-fg-muted">
           The problem
         </div>
         <h2 className="mt-4 max-w-3xl text-3xl font-semibold leading-tight md:text-4xl">
           {copy.heading}
         </h2>
-        <p className="mt-4 max-w-2xl text-zinc-400">{copy.lede}</p>
+        <p className="mt-4 max-w-2xl text-fg-secondary">{copy.lede}</p>
         <ul className="mt-8 space-y-3">
           {copy.points.map((point) => (
             <li
               key={point}
-              className="flex items-start gap-3 text-sm text-zinc-400"
+              className="flex items-start gap-3 text-sm text-fg-muted-list"
             >
               <span
                 aria-hidden
-                className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-zinc-600"
+                className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-marker-weak"
               />
               {point}
             </li>

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { token } from "@/lib/palette";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 function clamp(v: number, a: number, b: number) {
@@ -14,7 +15,7 @@ type PaintingWallProps = {
   src: string;
   alt: string;
   title: string;
-  chartColor: string;
+  chartToken: string;
   compact?: boolean;
   minColorFloor?: number;
   plaqueSubtitle?: string;
@@ -34,7 +35,7 @@ export default function PaintingWall({
   src,
   alt,
   title,
-  chartColor,
+  chartToken,
   compact = false,
   minColorFloor = 0.45,
   plaqueSubtitle,
@@ -203,7 +204,7 @@ export default function PaintingWall({
             const plotH = h - padding.top - padding.bottom;
             const n = staticChartValues.length;
 
-            ctx.strokeStyle = chartColor;
+            ctx.strokeStyle = token(chartToken);
             ctx.lineWidth = 1;
             ctx.beginPath();
             for (let i = 0; i < n; i++) {
@@ -214,7 +215,7 @@ export default function PaintingWall({
             }
             ctx.stroke();
 
-            ctx.fillStyle = "rgba(255,255,255,0.75)";
+            ctx.fillStyle = token("chart-label");
             const fontFamily =
               typeof document !== "undefined"
                 ? getComputedStyle(document.body).fontFamily
@@ -234,7 +235,7 @@ export default function PaintingWall({
             const tMax = now;
             const tRange = tMax - tMin;
             if (tRange >= 0.01) {
-              ctx.strokeStyle = chartColor;
+              ctx.strokeStyle = token(chartToken);
               ctx.lineWidth = 1;
               ctx.beginPath();
               for (let i = 0; i < samplesRef.current.length; i++) {
@@ -279,7 +280,7 @@ export default function PaintingWall({
       }
       if (raf != null) cancelAnimationFrame(raf);
     };
-  }, [chartColor, isStatic, staticChartValues, staticChartLabels, active]);
+  }, [chartToken, isStatic, staticChartValues, staticChartLabels, active]);
 
   // Compute filters from reveal so:
   // far: 5% color minimum (not fully white)
@@ -316,7 +317,7 @@ export default function PaintingWall({
       {/* Wall background - matches page background */}
       <div
         className="absolute inset-0 rounded-3xl"
-        style={{ background: "#050505" }}
+        style={{ background: "var(--wall-backdrop)" }}
       />
 
       {/* Painting area */}
@@ -331,7 +332,7 @@ export default function PaintingWall({
               data-testid={
                 isStatic ? "insight-card" : active ? "exhibit-card" : undefined
               }
-              className={`relative flex flex-col items-center rounded-[20px] bg-zinc-950/30 shadow-[0_40px_90px_rgba(0,0,0,0.65)] ${
+              className={`relative flex flex-col items-center rounded-[20px] bg-surface-inset-soft shadow-[0_40px_90px_var(--card-shadow)] ${
                 isMini ? "w-[260px] p-2 rounded-[12px] md:w-[280px]" : "p-5"
               }`}
             >
@@ -360,17 +361,17 @@ export default function PaintingWall({
                     }}
                   />
                   {/* subtle glass reflection */}
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent opacity-40" />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-glass-sheen to-transparent opacity-40" />
                 </div>
               </div>
             </div>
 
             {/* small plaque */}
-            <div className={`mt-0.5 w-full text-white/60 ${plaqueSize}`}>
+            <div className={`mt-0.5 w-full text-instrument-fg ${plaqueSize}`}>
               <div className="text-center pb-4">
-                <div className="font-medium text-white/80">{title}</div>
+                <div className="font-medium text-instrument-fg-strong">{title}</div>
                 {plaqueSubtitle && (
-                  <div className="mt-1 text-xs text-white/50">
+                  <div className="mt-1 text-xs text-instrument-fg-faint">
                     {plaqueSubtitle}
                   </div>
                 )}
@@ -387,7 +388,7 @@ export default function PaintingWall({
                     {rankingChange != null && rankingChange !== 0 && (
                       <span
                         className={`inline-flex items-center gap-0.5 text-[10px] font-medium ${
-                          rankingChange > 0 ? "text-emerald-500" : "text-red-500"
+                          rankingChange > 0 ? "text-accent-positive" : "text-accent-negative"
                         }`}
                       >
                         {rankingChange > 0 ? (
@@ -429,7 +430,7 @@ export default function PaintingWall({
                 </div>
               )}
               {isStatic && (
-                <div className="pt-1 text-center text-xs font-medium text-white/60">
+                <div className="pt-1 text-center text-xs font-medium text-instrument-fg">
                   Monthly Engagement
                 </div>
               )}
@@ -438,7 +439,7 @@ export default function PaintingWall({
                   ref={chartRef}
                   width={isMini ? 140 : 260}
                   height={isStatic && isMini ? 44 : isMini ? 28 : 44}
-                  className={`w-full rounded bg-zinc-950/60 ${isMini ? "min-w-[120px]" : "min-w-[200px]"}`}
+                  className={`w-full rounded bg-instrument-well ${isMini ? "min-w-[120px]" : "min-w-[200px]"}`}
                   style={{
                     width: "100%",
                     height: isStatic && isMini ? "44px" : isMini ? "28px" : "44px",

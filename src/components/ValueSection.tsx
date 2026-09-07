@@ -57,12 +57,12 @@ export default function ValueSection() {
   const copy = vertical === "gyms" ? GYM : MUSEUM;
 
   return (
-    <section id="value" className="border-t border-zinc-800/50 px-6 py-24">
+    <section id="value" className="border-t border-line-hairline px-6 py-24">
       <div className="mx-auto max-w-6xl">
         {/* Mirrors ProblemSection's "The problem" eyebrow. The spec's eyebrow
             text was identical to the museum heading, which rendered the same
             line twice. */}
-        <div className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+        <div className="text-xs font-semibold uppercase tracking-wider text-fg-muted">
           The value
         </div>
         <h2 className="mt-4 text-3xl font-semibold leading-tight md:text-4xl">
@@ -72,14 +72,14 @@ export default function ValueSection() {
           {copy.cards.map((item) => (
             <div
               key={item.title}
-              className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-6"
+              className="rounded-xl border border-line-card bg-surface-card p-6"
             >
               <h3 className="text-lg font-semibold">{item.title}</h3>
-              <p className="mt-2 text-sm text-zinc-500">{item.desc}</p>
+              <p className="mt-2 text-sm text-fg-muted">{item.desc}</p>
             </div>
           ))}
         </div>
-        <p className="mt-8 max-w-2xl text-zinc-400">{copy.closer}</p>
+        <p className="mt-8 max-w-2xl text-fg-secondary">{copy.closer}</p>
       </div>
     </section>
   );

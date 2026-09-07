@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { token } from "@/lib/palette";
 import React, { useEffect, useRef, useState } from "react";
 import BenchPressWireframe from "@/components/BenchPressWireframe";
 import StairmasterVideo from "@/components/StairmasterVideo";
@@ -16,7 +17,7 @@ type EquipmentWallProps = {
   /** Live mode only: which animated piece to render. */
   kind?: "bench" | "stair";
   title: string;
-  chartColor: string;
+  chartToken: string;
   compact?: boolean;
   size?: "default" | "mini";
   /** Static, ranked leaderboard card — mirrors PaintingWall's static mode. */
@@ -58,7 +59,7 @@ const CHART_LABELS = [
 export default function EquipmentWall({
   kind,
   title,
-  chartColor,
+  chartToken,
   compact = false,
   size = "default",
   static: isStatic = false,
@@ -205,7 +206,7 @@ export default function EquipmentWall({
             const tMax = now;
             const tRange = tMax - tMin;
             if (tRange >= 0.01) {
-              ctx.strokeStyle = chartColor;
+              ctx.strokeStyle = token(chartToken);
               ctx.lineWidth = 1;
               ctx.beginPath();
               for (let i = 0; i < samplesRef.current.length; i++) {
@@ -245,7 +246,7 @@ export default function EquipmentWall({
       window.removeEventListener("pointerenter", onPointer, opts);
       if (raf != null) cancelAnimationFrame(raf);
     };
-  }, [chartColor, kind, isStatic, active]);
+  }, [chartToken, kind, isStatic, active]);
 
   // Static mode draws the 12-point monthly sparkline once, the same way
   // PaintingWall does for its leaderboard cards.
@@ -274,7 +275,7 @@ export default function EquipmentWall({
       const plotH = h - pad.top - pad.bottom;
       const n = values.length;
 
-      ctx.strokeStyle = chartColor;
+      ctx.strokeStyle = token(chartToken);
       ctx.lineWidth = 1;
       ctx.beginPath();
       for (let i = 0; i < n; i++) {
@@ -285,7 +286,7 @@ export default function EquipmentWall({
       }
       ctx.stroke();
 
-      ctx.fillStyle = "rgba(255,255,255,0.75)";
+      ctx.fillStyle = token("chart-label");
       const fontFamily =
         typeof document !== "undefined"
           ? getComputedStyle(document.body).fontFamily
@@ -302,7 +303,7 @@ export default function EquipmentWall({
     draw();
     window.addEventListener("resize", draw);
     return () => window.removeEventListener("resize", draw);
-  }, [isStatic, chartColor, staticChartValues]);
+  }, [isStatic, chartToken, staticChartValues]);
 
   const displaySize = isMini
     ? "h-[180px] w-[180px] md:h-[200px] md:w-[200px]"
@@ -322,7 +323,7 @@ export default function EquipmentWall({
       {/* Floor background - matches page background */}
       <div
         className="absolute inset-0 rounded-3xl"
-        style={{ background: "#050505" }}
+        style={{ background: "var(--wall-backdrop)" }}
       />
 
       <div className="absolute inset-0 flex items-center justify-center overflow-visible">
@@ -386,9 +387,9 @@ export default function EquipmentWall({
             </div>
 
             {/* plaque */}
-            <div className={`mt-0.5 w-full text-white/60 ${plaqueSize}`}>
+            <div className={`mt-0.5 w-full text-instrument-fg ${plaqueSize}`}>
               <div className="pb-4 text-center">
-                <div className="font-medium text-white/80">{title}</div>
+                <div className="font-medium text-instrument-fg-strong">{title}</div>
               </div>
 
               {isStatic ? (
@@ -405,8 +406,8 @@ export default function EquipmentWall({
                           <span
                             className={`inline-flex items-center gap-0.5 text-[10px] font-medium ${
                               rankingChange > 0
-                                ? "text-emerald-500"
-                                : "text-red-500"
+                                ? "text-accent-positive"
+                                : "text-accent-negative"
                             }`}
                           >
                             {rankingChange > 0 ? (
@@ -431,7 +432,7 @@ export default function EquipmentWall({
                     </span>
                     <span>{(fixedUtilisation ?? 0).toFixed(0)}%</span>
                   </div>
-                  <div className="pt-1 text-center text-xs font-medium text-white/60">
+                  <div className="pt-1 text-center text-xs font-medium text-instrument-fg">
                     Monthly Utilisation
                   </div>
                 </>
@@ -467,7 +468,7 @@ export default function EquipmentWall({
                   ref={chartRef}
                   width={isMini ? 140 : 260}
                   height={44}
-                  className={`w-full rounded bg-zinc-950/60 ${
+                  className={`w-full rounded bg-instrument-well ${
                     isMini ? "min-w-[120px]" : "min-w-[200px]"
                   }`}
                   style={{

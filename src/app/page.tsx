@@ -10,13 +10,13 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#050505] text-zinc-50">
+    <main className="min-h-screen bg-surface-page text-fg-primary">
       {/* The hero's switcher and every section that swaps copy read one shared
           vertical from this provider. Only those pieces are client components;
           this page stays server-rendered. */}
       <VerticalProvider>
         {/* Header */}
-        <header className="pointer-events-none fixed left-0 right-0 top-0 z-50 border-b border-zinc-800/50 bg-[#050505]/80 backdrop-blur-xl">
+        <header className="pointer-events-none fixed left-0 right-0 top-0 z-50 border-b border-line-hairline bg-surface-page/80 backdrop-blur-xl">
           <div className="pointer-events-auto mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
             <a href="/" className="flex items-center gap-2">
               <Image
@@ -30,20 +30,20 @@ export default function Home() {
                 CONSTANTINE
               </span>
             </a>
-            <nav className="hidden items-center gap-8 text-sm text-zinc-400 md:flex">
-              <a className="transition-colors hover:text-zinc-50" href="#how">
+            <nav className="hidden items-center gap-8 text-sm text-fg-secondary md:flex">
+              <a className="transition-colors hover:text-fg-primary" href="#how">
                 How it works
               </a>
-              <a className="transition-colors hover:text-zinc-50" href="#privacy">
+              <a className="transition-colors hover:text-fg-primary" href="#privacy">
                 Privacy
               </a>
-              <a className="transition-colors hover:text-zinc-50" href="#use">
+              <a className="transition-colors hover:text-fg-primary" href="#use">
                 Use cases
               </a>
             </nav>
             <a
               href="#pilot"
-              className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-zinc-200"
+              className="rounded-lg bg-action px-4 py-2 text-sm font-semibold text-on-action transition-colors hover:bg-action-hover"
             >
               Request a pilot
             </a>
@@ -63,32 +63,32 @@ export default function Home() {
         <UseCases />
 
         {/* Pilot */}
-        <section id="pilot" className="border-t border-zinc-800/50 px-6 py-24">
+        <section id="pilot" className="border-t border-line-hairline px-6 py-24">
           <div className="mx-auto max-w-xl">
             <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
               Request a pilot
             </h2>
-            <p className="mt-4 text-zinc-400">
+            <p className="mt-4 text-fg-secondary">
               We&apos;ll reply with a 15-minute pilot checklist.
             </p>
             <PilotForm />
           </div>
         </section>
 
-        <footer className="border-t border-zinc-800/50 px-6 py-8">
+        <footer className="border-t border-line-hairline px-6 py-8">
           <div className="mx-auto flex max-w-6xl items-center justify-between">
-            <div className="flex items-center gap-6 text-sm text-zinc-500">
-              <a href="/" className="hover:text-zinc-400">
+            <div className="flex items-center gap-6 text-sm text-fg-muted">
+              <a href="/" className="hover:text-fg-secondary">
                 Constantine
               </a>
-              <a href="#how" className="hover:text-zinc-400">
+              <a href="#how" className="hover:text-fg-secondary">
                 How it works
               </a>
-              <a href="#privacy" className="hover:text-zinc-400">
+              <a href="#privacy" className="hover:text-fg-secondary">
                 Privacy
               </a>
             </div>
-            <div className="text-xs text-zinc-600">
+            <div className="text-xs text-fg-subtle">
               © {new Date().getFullYear()} Constantine
             </div>
           </div>
