@@ -105,6 +105,7 @@ export default function HeroSection() {
                 <button
                   key={id}
                   type="button"
+                  data-testid={`hero-tab-${id}`}
                   onClick={() => setVertical(id)}
                   aria-pressed={vertical === id}
                   className={`relative z-10 rounded-full px-5 py-2 transition-colors ${

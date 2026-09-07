@@ -1,0 +1,207 @@
+/**
+ * gimmicks.spec.ts — Protected-elements + design-floor tests (v2).
+ *
+ * Hard floor of the build loop: the critic judges taste; these assert the
+ * demos WORK and the v2 constitution's mechanical rules hold. Red test =
+ * candidate discarded before the critic sees it.
+ *
+ * SETUP (once): add stable data-testids, decoupled from styling the loop
+ * may change:
+ *   hero-tab-museums | hero-tab-gyms
+ *   exhibit-card, attention-value, engagement-value   (both hero tabs)
+ *   insight-card, ranking-value                       (Insight section)
+ *   scroll-progress                                   (progress bar, §5)
+ *   viewport-section                                  (each scroll-step
+ *     section subject to the §5 viewport-fit rule)
+ */
+
+import { test, expect, Page } from "@playwright/test";
+
+const BASE = process.env.SITE_URL ?? "http://localhost:3000";
+
+async function attentionValue(card: ReturnType<Page["locator"]>) {
+  const el = card.getByTestId("attention-value");
+  return parseFloat((await el.innerText()).replace(/[^\d.]/g, ""));
+}
+
+test.describe("P1 — Museums hero demo", () => {
+  test("hover starts the attention timer", async ({ page }) => {
+    await page.goto(BASE);
+    const card = page.getByTestId("exhibit-card").first();
+    expect(await attentionValue(card)).toBe(0);
+    await card.hover();
+    await page.waitForTimeout(1500);
+    expect(await attentionValue(card)).toBeGreaterThan(0.5);
+  });
+
+  test("hover raises engagement intensity within (0,100]", async ({ page }) => {
+    await page.goto(BASE);
+    const card = page.getByTestId("exhibit-card").first();
+    await card.hover();
+    await page.waitForTimeout(1000);
+    const pct = parseFloat(
+      (await card.getByTestId("engagement-value").innerText()).replace(/[^\d.]/g, "")
+    );
+    expect(pct).toBeGreaterThan(0);
+    expect(pct).toBeLessThanOrEqual(100);
+  });
+
+  test("cards track independently", async ({ page }) => {
+    await page.goto(BASE);
+    const cards = page.getByTestId("exhibit-card");
+    await cards.nth(0).hover();
+    await page.waitForTimeout(1200);
+    expect(await attentionValue(cards.nth(0))).toBeGreaterThan(0);
+    expect(await attentionValue(cards.nth(1))).toBe(0);
+  });
+});
+
+test.describe("P2 — Gyms hero demo", () => {
+  test("tab switch reveals gym metrics", async ({ page }) => {
+    await page.goto(BASE);
+    await page.getByTestId("hero-tab-gyms").click();
+    // Scoped to the hero card: both gym cards carry these labels, and
+    // "Utilisation" also appears in the Insight leaderboard, so an unscoped
+    // getByText is a strict-mode violation rather than a real failure.
+    const card = page.getByTestId("exhibit-card").first();
+    await expect(card).toContainText(/Workout Time/i);
+    await expect(card).toContainText(/Utilisation/i);
+  });
+
+  test("stairmaster video present and loadable", async ({ page }) => {
+    await page.goto(BASE);
+    await page.getByTestId("hero-tab-gyms").click();
+    const video = page.locator("video").first();
+    await expect(video).toBeVisible();
+    expect(
+      await video.evaluate((v: HTMLVideoElement) => v.readyState)
+    ).toBeGreaterThanOrEqual(1);
+  });
+
+  test("equipment hover drives the timer", async ({ page }) => {
+    await page.goto(BASE);
+    await page.getByTestId("hero-tab-gyms").click();
+    const card = page.getByTestId("exhibit-card").first();
+    await card.hover();
+    await page.waitForTimeout(1500);
+    expect(await attentionValue(card)).toBeGreaterThan(0.5);
+  });
+});
+
+test.describe("P3/P4/P5 — structure and substance", () => {
+  test("insight cards keep ranking + movement", async ({ page }) => {
+    await page.goto(BASE);
+    const cards = page.getByTestId("insight-card");
+    expect(await cards.count()).toBeGreaterThanOrEqual(2);
+    await expect(cards.first().getByTestId("ranking-value")).toContainText(/#\d/);
+    await expect(cards.first()).toContainText(/[↑↓].*\d/);
+  });
+
+  test("four-step sequence intact and ordered", async ({ page }) => {
+    await page.goto(BASE);
+    // Scoped to #how: "Measure" also opens the hero subtitle ("Measure how
+    // people actually use your space"), which sits ~875 characters before
+    // "Integrate" and inverts a whole-body ordering check.
+    const body = await page.locator("#how").innerText();
+    const order = ["Integrate", "Calibrate", "Measure", "Insight"].map((s) =>
+      body.indexOf(s)
+    );
+    order.forEach((i) => expect(i).toBeGreaterThan(-1));
+    expect([...order]).toEqual([...order].sort((a, b) => a - b));
+  });
+
+  test("privacy guarantees all present", async ({ page }) => {
+    await page.goto(BASE);
+    for (const claim of [/no identity profiles/i, /no facial recognition/i, /edge processing/i]) {
+      await expect(page.getByText(claim).first()).toBeVisible();
+    }
+  });
+});
+
+test.describe("§5 design floors (v2 constitution)", () => {
+  test("scroll progress bar exists, starts empty, completes at page end", async ({ page }) => {
+    await page.goto(BASE);
+    const bar = page.getByTestId("scroll-progress");
+    await expect(bar).toBeVisible();
+    const progressOf = () =>
+      bar.evaluate((el) => {
+        // Contract: element exposes progress via aria-valuenow (0–100)
+        // or scaleX width ratio. aria preferred.
+        const aria = el.getAttribute("aria-valuenow");
+        if (aria !== null) return parseFloat(aria);
+        const r = el.getBoundingClientRect();
+        const p = el.parentElement!.getBoundingClientRect();
+        return (r.width / p.width) * 100;
+      });
+    expect(await progressOf()).toBeLessThanOrEqual(2);
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(600);
+    expect(await progressOf()).toBeGreaterThanOrEqual(98);
+  });
+
+  test("viewport-fit: tagged sections compose within one screen (desktop)", async ({ browser }) => {
+    const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+    const page = await ctx.newPage();
+    await page.goto(BASE);
+    const sections = page.getByTestId("viewport-section");
+    const n = await sections.count();
+    expect(n).toBeGreaterThan(0); // rule must actually be adopted
+    for (let i = 0; i < n; i++) {
+      const h = await sections.nth(i).evaluate((el) => el.getBoundingClientRect().height);
+      expect(h, `viewport-section[${i}] exceeds 900px`).toBeLessThanOrEqual(900);
+    }
+    await ctx.close();
+  });
+
+  test("viewport-fit: tagged sections compose within one screen (mobile)", async ({ browser }) => {
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    const page = await ctx.newPage();
+    await page.goto(BASE);
+    const sections = page.getByTestId("viewport-section");
+    const n = await sections.count();
+    for (let i = 0; i < n; i++) {
+      const h = await sections.nth(i).evaluate((el) => el.getBoundingClientRect().height);
+      expect(h, `viewport-section[${i}] exceeds 844px on mobile`).toBeLessThanOrEqual(844);
+    }
+    await ctx.close();
+  });
+
+  test("reduced motion: page is static and complete", async ({ browser }) => {
+    const ctx = await browser.newContext({ reducedMotion: "reduce" });
+    const page = await ctx.newPage();
+    await page.goto(BASE, { waitUntil: "networkidle" });
+    // No running ambient animation (liquid background must freeze)
+    expect(
+      await page.evaluate(
+        () => document.getAnimations().filter((a) => a.playState === "running").length
+      )
+    ).toBe(0);
+    // Scrollytelling degrades: key content reachable by plain scroll
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    for (const t of [/Integrate/i, /no facial recognition/i]) {
+      expect(await page.getByText(t).count()).toBeGreaterThan(0);
+    }
+    await ctx.close();
+  });
+
+  test("touch: demos start via tap (hover is not the only path)", async ({ browser }) => {
+    const ctx = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      hasTouch: true,
+    });
+    const page = await ctx.newPage();
+    await page.goto(BASE);
+    const card = page.getByTestId("exhibit-card").first();
+    await card.tap();
+    await page.waitForTimeout(1500);
+    expect(await attentionValue(card)).toBeGreaterThan(0);
+    await ctx.close();
+  });
+
+  test("no console errors on load", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
+    await page.goto(BASE, { waitUntil: "networkidle" });
+    expect(errors).toEqual([]);
+  });
+});

@@ -325,6 +325,12 @@ export default function PaintingWall({
           {/* frame + painting */}
             <div
               ref={paintingRef}
+              // Static cards are the Insight leaderboard; live cards are the
+              // hero demo. Only the visible vertical's live cards carry
+              // exhibit-card, so tests never resolve a hidden panel's card.
+              data-testid={
+                isStatic ? "insight-card" : active ? "exhibit-card" : undefined
+              }
               className={`relative flex flex-col items-center rounded-[20px] bg-zinc-950/30 shadow-[0_40px_90px_rgba(0,0,0,0.65)] ${
                 isMini ? "w-[260px] p-2 rounded-[12px] md:w-[280px]" : "p-5"
               }`}
@@ -372,7 +378,11 @@ export default function PaintingWall({
               {rankingInExhibition != null && (
                 <div className="flex items-center justify-between">
                   <span className="whitespace-nowrap">Ranking in Exhibition</span>
-                  <span className="flex items-center gap-1" style={{ opacity: 0.45 + reveal * 0.55 }}>
+                  <span
+                    data-testid="ranking-value"
+                    className="flex items-center gap-1"
+                    style={{ opacity: 0.45 + reveal * 0.55 }}
+                  >
                     #{rankingInExhibition}
                     {rankingChange != null && rankingChange !== 0 && (
                       <span
@@ -400,14 +410,20 @@ export default function PaintingWall({
                 <span className="whitespace-nowrap">
                   {isStatic ? "Avg. Attention Time (s)" : "Attention (s)"}
                 </span>
-                <span style={{ opacity: 0.45 + reveal * 0.55 }}>
+                <span
+                  data-testid="attention-value"
+                  style={{ opacity: 0.45 + reveal * 0.55 }}
+                >
                   {(fixedAttentionTime ?? attentionSeconds).toFixed(1)}
                 </span>
               </div>
               {!isStatic && (
                 <div className="flex items-center justify-between">
                   <span className="whitespace-nowrap">Engagement Intensity</span>
-                  <span style={{ opacity: 0.45 + reveal * 0.55 }}>
+                  <span
+                    data-testid="engagement-value"
+                    style={{ opacity: 0.45 + reveal * 0.55 }}
+                  >
                     {Math.round(reveal * 100)}%
                   </span>
                 </div>

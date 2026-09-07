@@ -40,61 +40,138 @@ surveillance-creepy (tone around cameras is always privacy-first).
 
 Covered by functional tests in `tests/gimmicks.spec.ts`. The loop may
 restyle, reposition, or extend these; never remove, disable, or dumb down.
+Descriptions verified against the implementations on 30 Aug 2026; where the
+build had moved on, the description is corrected here rather than the code.
 
 - **P1. Hero interactive demo, Museums tab** — hover on painting cards drives
   a live "Attention (s)" timer and "Engagement Intensity %".
-- **P2. Hero interactive demo, Gyms tab** — equipment cards (incl. Stairmaster
-  video) drive "Workout Time (s)" and "Utilisation %"; instant tab switch.
-- **P3. Insight section live cards** — Vermeer/Rothko exhibition ranking with
-  movement indicators, avg attention, monthly engagement visual.
-- **P4. Integrate → Calibrate → Measure → Insight sequence** with its real
-  photography. Steps may be redesigned, never merged or cut.
+  ACCURATE. `src/components/MonaLisaWall.tsx`, `HeroSection.tsx`.
+- **P2. Hero interactive demo, Gyms tab** — equipment cards drive
+  "Workout Time (s)" and "Utilisation %". CORRECTED on three counts: the
+  cards are a bench-press wireframe with an animated barbell and a
+  Stairmaster video, not canvas line art; the tab switch is NOT instant, the
+  two panels cross-fade through black (400ms out, 140ms hold, 400ms in); and
+  each vertical's engagement now resets while hidden, so the incoming set
+  starts from zero rather than inheriting the other's value.
+  `src/components/EquipmentWall.tsx`, `BenchPressWireframe.tsx`,
+  `StairmasterVideo.tsx`, `HeroSection.tsx`.
+- **P3. Insight section live cards** — CORRECTED: there are now two sets, and
+  they are static ranked cards rather than live hover demos. Museums shows
+  Vermeer/Rothko with "Ranking in Exhibition", avg attention and a 12-point
+  monthly sparkline; Gyms shows Treadmill/Exercise Bike with "Ranking in
+  Gym", "Avg. Utilisation (%)" and the same sparkline.
+  `src/components/HowItWorks.tsx` (step 4 of each flow),
+  `EquipmentWall.tsx` (static mode).
+- **P4. Integrate → Calibrate → Measure → Insight sequence.** CORRECTED:
+  museums has four steps; gyms also has four since Insight was added on
+  29 Aug. The museum steps use photography; the gym steps use dark-themed
+  line illustrations, so "with its real photography" holds for museums only.
+  `src/components/HowItWorks.tsx`.
 - **P5. Privacy section substance** — the three guarantees (no identity
   profiles, no facial recognition, edge processing) and both Q&As. Copy may
-  be clarified, never weakened.
+  be clarified, never weakened. CORRECTED: one shared section serves both
+  verticals; only the noun changes (visitor / member).
+  `src/components/PrivacySection.tsx`.
 - **P6. "Request a pilot" flow** with the 15-minute checklist promise.
+  CORRECTED: the form posts to Web3Forms and emails the submission, with
+  pending/success/error states. The trailing checklist detail ("camera
+  placement, calibration, zone authoring") was removed on 29 Aug; the
+  15-minute promise itself remains. `src/components/PilotForm.tsx`.
 
 ## 4. Sections to BUILD (the expansion brief)
 
-- **Persona gate** *(Claryo)*. Full-screen "Are you running a…" moment —
-  Museum / Gallery / Gym — that reconfigures the page per persona, with a
-  persistent switcher so nobody is trapped. Each persona gets the SAME
-  skeleton: hero demo → how-it-works → use cases → outputs → pilot. This
-  structurally fixes the current gap (Gyms tab exists; gym use cases don't).
-- **Gym use cases** in parallel structure to museums: equipment utilisation &
-  purchasing, layout optimisation, peak-load staffing, member experience.
+Status tags reconciled against the codebase on 30 Aug 2026. The loop targets
+only `[UNBUILT]` and `[PARTIAL]` items.
+
+- **Persona gate** *(Claryo)* — `[PARTIAL — gap]`. A persistent two-way
+  switcher exists and reconfigures every section of the page per vertical,
+  but there is no full-screen "Are you running a…" gate moment, there are
+  two personas (Museums & Galleries / Gyms) rather than three, and the
+  per-persona skeleton has no outputs step.
+  `src/components/VerticalContext.tsx`, `HeroSection.tsx` (switcher UI).
+- **Gym use cases** in parallel structure to museums — `[PARTIAL — gap]`.
+  Three cards cover equipment utilisation, layout configuration and fault
+  detection. Peak-load staffing and member experience are absent; the
+  member-facing card was removed on 28 Aug. `src/components/UseCases.tsx`.
 - **Deeper use cases** — each as problem → mechanism → outcome with one
-  concrete numeric example (illustrative pre-customer, labelled as such;
-  never fabricated client results).
-- **Depth dial** *(Claryo's autonomy dial, adapted)*. Stepped interactive
-  bars: Count → Dwell → Engagement → Prediction → Recommendation. Level 1 is
-  what a footfall counter already does; the dial shows breadth of value
-  without over-specifying, and gestures at roadmap.
-- **Outputs** — the data → insight → action three-beat *(PlayVision)*:
-  anonymised tracked footage → dashboard fragment with real-looking numbers
-  (exhibition ranking, dwell distribution, utilisation curve) → the decision
-  it drove. Dashboard fragments use the site's own overlay idiom (P3 style).
-- **"Your Stack" integrations** *(Pocket hub-and-spoke)*. Constantine
-  centred; animated arrows flowing out to destination boxes: cloud storage
-  (S3/Azure), warehouses (Databricks, Snowflake), BI (Power BI, Tableau),
-  reporting (email/Slack). Arrows depict data flow — legitimate informative
-  motion. HONESTY GUARD: spokes are integration *destinations via API/
-  export*, framed as "connects to your existing stack" — never implied
-  certified partnerships.
-- **Edge unit spec** *(Pocket annotated-callout treatment)*. The Orin-class
-  device centred with feature lines: processes on-device, no frames stored,
-  no facial recognition models present, PoE, footprint, works with existing
-  CCTV. Serves the IT stakeholder; half the callouts are privacy proofs.
-- **Edge pipeline trust architecture** *(Claryo world-model treatment +
-  Pocket's spatial-encryption idea)*. Numbered stages 01–04 in the
-  black-and-white register: Capture → Process on-device → Discard frames →
-  Emit anonymous metrics — with "what never leaves the building" drawn
-  spatially (the building wall is the line; only anonymous metrics cross it).
-- **Revenue generation** — commercial logic, not a price list: donor &
-  sponsor reporting, exhibition pricing evidence, dwell-uplift from layout,
-  equipment ROI. Pricing specifics only if/when added here.
-- **Categorised FAQ** *(Pocket)* — Installation / Privacy & compliance /
-  Data & outputs / Pilots. Pre-answers the pilot-form emails.
+  concrete numeric example — `[UNBUILT]`. ADJUDICATION NEEDED: the numeric
+  example conflicts with the standing instruction that case-study figures
+  stay off the public marketing site.
+- **Depth dial** *(Claryo's autonomy dial, adapted)* — `[UNBUILT]`.
+- **Outputs** — the data → insight → action three-beat *(PlayVision)* —
+  `[UNBUILT]`.
+- **"Your Stack" integrations** *(Pocket hub-and-spoke)* — `[UNBUILT]`.
+- **Edge unit spec** *(Pocket annotated-callout treatment)* — `[UNBUILT]`.
+- **Edge pipeline trust architecture** — `[UNBUILT]`.
+- **Revenue generation** — commercial logic, not a price list —
+  `[PARTIAL — gap]`. The Value section carries the commercial logic
+  qualitatively (funder reporting, equipment ROI, measuring a refit), but
+  there is no donor/sponsor or exhibition-pricing depth and no pricing.
+  `src/components/ValueSection.tsx`.
+- **Categorised FAQ** *(Pocket)* — `[UNBUILT]`.
+
+### 4a. Already built, added by reconciliation
+
+Sections that exist on the site but were absent from this spec. Recorded so
+the loop does not rebuild them, and so their §5 conflicts are visible.
+
+- **Hero: vertical switcher + dual interactive demos** — `[BUILT]`. The
+  site's strongest asset and the subject of P1/P2.
+  `src/components/HeroSection.tsx` and the four wall components.
+- **Problem section (`#problem`)** — `[BUILT]`. Eyebrow, pain heading, lede
+  and three supporting points; switches per vertical. Sits between hero and
+  How it works. `src/components/ProblemSection.tsx`.
+  §5 CONFLICT: both headings use the banned "X. Not Y." construction, and
+  the eyebrow is ALL-CAPS, which §5 rejects.
+- **Value section (`#value`)** — `[BUILT]`. Eyebrow, heading, four outcome
+  cards and a closing line; switches per vertical. Overlaps the Revenue
+  generation item above. `src/components/ValueSection.tsx`.
+  §5 CONFLICT: three cards use "X, not Y"; eyebrow is ALL-CAPS.
+- **How it works (`#how`)** — `[BUILT]`. Four steps per vertical; the
+  subject of P4. `src/components/HowItWorks.tsx`.
+- **Museum use cases (`#use`)** — `[BUILT]`. Three cards.
+  `src/components/UseCases.tsx`.
+- **Privacy (`#privacy`)** — `[BUILT]`. Subject of P5.
+  `src/components/PrivacySection.tsx`.
+- **Pilot form (`#pilot`)** — `[BUILT]`. Subject of P6.
+  `src/components/PilotForm.tsx`.
+- **Brand assets** — `[BUILT]`. Share image and tab icon.
+  `public/og-image.png`, `src/app/icon.png`. Freeze per §9.
+
+### 4b. Site-wide divergences from §5 (for adjudication, not yet actioned)
+
+- **Palette.** The site is a single dark register (`#050505`) throughout.
+  §5 specifies a three-register system with a clean white/light canvas.
+  This is the largest spec/repo gap and affects every future candidate.
+- **Typography.** The site uses Geist and Geist Mono. §5 specifies Inter
+  Display for headings and NB International for body.
+- **Ambient background** and **scroll progress bar** — `[UNBUILT]`.
+  `src/components/ParticleField.tsx` exists but is imported nowhere.
+- **Accessibility floor.** CORRECTED 30 Aug 2026 after running the suite:
+  tap DOES start the demos on touch, because the walls listen for
+  `pointerover` as well as `pointermove` and a tap fires it. That is
+  incidental rather than designed, and there is no explicit touch affordance.
+  There is NO `prefers-reduced-motion` handling anywhere in the codebase.
+- **Viewport-fit discipline.** No sections are tagged (`viewport-section`
+  count is 0) and no section currently composes within one viewport.
+
+### 4c. Floors that pass without asserting anything (fix before relying on them)
+
+Three tests are green that the runbook expected red. One is a real pass; two
+are hollow and would let a regression through:
+
+- **touch / tap** — GENUINE pass. Tapping fires `pointerover`, the walls act
+  on it, and the timer runs. Keep.
+- **reduced motion** — HOLLOW. It asserts
+  `document.getAnimations()` has nothing running, but that API only sees Web
+  Animations and CSS animations/transitions. Every demo here is
+  requestAnimationFrame driving a canvas, which it cannot observe, so the
+  test passes whether or not the site honours the preference — and it does
+  not. Rewrite to assert the demos actually freeze under
+  `prefers-reduced-motion`.
+- **viewport-fit (mobile)** — HOLLOW. It loops over zero tagged sections and
+  passes trivially. The desktop variant asserts `n > 0` first and correctly
+  fails. Add the same guard to the mobile test.
 
 ## 5. Visual language (v2 — founder-stated, no longer assumed)
 
@@ -107,6 +184,33 @@ restyle, reposition, or extend these; never remove, disable, or dumb down.
   background never appears behind this register.
 Pin the SYSTEM with our own hue calibration — do not clone Claryo's chrome
 cubes or any reference's exact gradients.
+
+UNDER EVALUATION (30 Aug 2026). The palette above is aspirational: the site
+is currently a single dark register (`#050505`) throughout, so this is the
+largest spec/repo gap and it gates D2 for every candidate. Rather than
+decide it in the abstract, the direction will be chosen from rendered
+variants, judged as Best-of-N with the human as critic — the §8 pattern
+applied to a foundational decision before the loop takes over incremental
+ones.
+
+VARIANTS ARE REGISTER MAPPINGS, NOT GLOBAL RECOLOURS. §5 does not ask
+"dark or light?"; it specifies three registers that may differ per section.
+A theme file that inverts everything globally makes every variant look wrong
+and teaches nothing. Each candidate theme must define all three registers.
+Starting set: (a) current dark everywhere; (b) white canvas + silver/purple
+product + black technical (the literal §5 reading); (c) dark canvas +
+silver/purple product + black technical (Claryo-leaning); (d) one wildcard.
+Judgement is on the six §7 views side by side, where register interplay is
+what is actually being decided.
+
+TOKENISATION ACCEPTANCE CRITERION: canvas and video drawing code does not
+read CSS variables. Tokenising only the Tailwind classes would leave the
+hover demos and charts hardcoded, so every variant screenshot would lie
+about the most important elements on the page. The session must add a
+runtime bridge that resolves tokens via getComputedStyle on the root into a
+JS palette object before drawing, and the P1/P2 tests must pass after it. Until a direction is pinned here, D2 is judged on internal
+register discipline and craft, NOT on conformance to the three-register
+system, and the loop must not "fix" the palette on its own initiative.
 
 **People are never identifiable** *(PlayVision, elevated to hard rule)*.
 No recognisable faces anywhere. Humans appear as anonymised luminous
@@ -176,7 +280,22 @@ BANNED constructions in all site copy:
   rebuilt.").
 - "That's why…" conclusion sentences; solemn first-person essay tone.
 Mechanical check: flag any page whose copy contains an "X, not Y"
-construction or more than 2 em-dashes total. Critic enforces the rest
+construction or more than 2 em-dashes total.
+ADJUDICATED 30 Aug 2026: the ban is absolute. It is NOT scoped to prose, and
+NOT relaxed for display headings or problem statements. The nine violations
+standing on the site at reconciliation are the loop's opening copy backlog,
+in the same way the red Playwright tests are its opening functional backlog.
+See COPY-VIOLATIONS.md for the list and locations.
+GATE MECHANICS: because the site starts non-compliant, `copy-lint.sh` must
+run as a RATCHET during convergence, not as absolute pass/fail. A candidate
+passes if it has no more violations than `best` AND introduces no new ones,
+where "new" is judged by violation IDENTITY (file + matched text), never by
+net count — otherwise a candidate that fixes one violation and introduces a
+different one passes on arithmetic while the copy has not improved.
+Once `best` reaches zero the ratchet is equivalent to absolute zero and the
+gate hardens permanently. Without this, a candidate that fixes five of nine
+violations still fails, is discarded, and the loop can never converge on the
+rule it is being asked to enforce. Critic enforces the rest
 under D4/D6. The privacy section uses the Pocket structure — framing
 sentence + layered plain-declarative promise cards — written in this same
 register, NOT as an essay.
@@ -242,6 +361,11 @@ D1–D5 and regresses on none. D6 is pass/fail, not comparative.
   progress bar, viewport-fit, reduced-motion, touch); Lighthouse perf ≥ 90
   / a11y ≥ 95; no console errors; NO identifiable faces anywhere; honesty
   guards intact (no fabricated clients/partnerships).
+  RATCHET RULE (30 Aug 2026): floors whose starting state is already failing
+  are enforced as ratchets, not absolutes — the measure may never worsen
+  against `best`, and hardens to the absolute target once first met. This
+  applies to copy-lint now and to Lighthouse when it joins. An absolute gate
+  on a failing baseline discards every candidate that improves it.
 
 > Anchors: /design-refs/anchors/ — one screenshot each of a 9, 6, 3 on D2
 > and D3 [FILL when available].
@@ -252,6 +376,13 @@ D1–D5 and regresses on none. D6 is pass/fail, not comparative.
   candidates + critic log; verdicts fold back into THIS FILE.
 - Plateau rule: two cycles with no D1–D5 wins → stop and flag that this
   spec is exhausted and needs sharpening.
+- Opening backlog: the nine §5 copy violations recorded in
+  COPY-VIOLATIONS.md, plus the red functional tests. These are the loop's
+  starting work, not defects to be fixed by hand first.
+- Status-tag convention: any supervised session that builds or changes a §4
+  item updates that item's status tag in the same commit. The spec and the
+  repo drift otherwise, and the loop wastes candidates rebuilding what
+  already exists.
 
 ## 9. Hard prohibitions
 

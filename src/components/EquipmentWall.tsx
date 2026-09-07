@@ -332,6 +332,12 @@ export default function EquipmentWall({
               zinc-950/30 panel (~rgb(6,6,7)) and a 65% black shadow both read as
               a rectangle of a slightly different black against the page. */}
           <div
+            // Mirrors PaintingWall: static cards are the Insight leaderboard,
+            // live cards are the hero demo, and only the visible vertical's
+            // live cards are tagged.
+            data-testid={
+              isStatic ? "insight-card" : active ? "exhibit-card" : undefined
+            }
             className={`relative flex flex-col items-center ${
               isMini
                 ? "w-[260px] rounded-[12px] p-2 md:w-[280px]"
@@ -390,7 +396,10 @@ export default function EquipmentWall({
                   {rankingInGym != null && (
                     <div className="flex items-center justify-between">
                       <span className="whitespace-nowrap">Ranking in Gym</span>
-                      <span className="flex items-center gap-1">
+                      <span
+                        data-testid="ranking-value"
+                        className="flex items-center gap-1"
+                      >
                         #{rankingInGym}
                         {rankingChange != null && rankingChange !== 0 && (
                           <span
@@ -430,13 +439,19 @@ export default function EquipmentWall({
                 <>
                   <div className="flex items-center justify-between">
                     <span className="whitespace-nowrap">Workout Time (s)</span>
-                    <span style={{ opacity: 0.45 + reveal * 0.55 }}>
+                    <span
+                      data-testid="attention-value"
+                      style={{ opacity: 0.45 + reveal * 0.55 }}
+                    >
                       {workoutSeconds.toFixed(1)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="whitespace-nowrap">Utilisation</span>
-                    <span style={{ opacity: 0.45 + reveal * 0.55 }}>
+                    <span
+                      data-testid="engagement-value"
+                      style={{ opacity: 0.45 + reveal * 0.55 }}
+                    >
                       {Math.round(reveal * 100)}%
                     </span>
                   </div>
