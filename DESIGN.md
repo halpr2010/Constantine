@@ -203,12 +203,23 @@ silver/purple product + black technical (Claryo-leaning); (d) one wildcard.
 Judgement is on the six §7 views side by side, where register interplay is
 what is actually being decided.
 
-TOKENISATION ACCEPTANCE CRITERION: canvas and video drawing code does not
-read CSS variables. Tokenising only the Tailwind classes would leave the
-hover demos and charts hardcoded, so every variant screenshot would lie
-about the most important elements on the page. The session must add a
-runtime bridge that resolves tokens via getComputedStyle on the root into a
-JS palette object before drawing, and the P1/P2 tests must pass after it. Until a direction is pinned here, D2 is judged on internal
+TOKENISATION SESSION — EXIT CRITERIA. Canvas and video drawing code cannot
+read CSS variables, so tokenising only the Tailwind classes would leave the
+hover demos and charts hardcoded and every variant screenshot would lie
+about the most important elements on the page. The session is done when all
+four hold:
+1. All ~130 colour references (104 Tailwind utilities, 24 rgba() literals,
+   4 hex) resolve to tokens.
+2. ZERO rgba()/hex colour literals remain in canvas or chart drawing code.
+   Stated as an absence, not as "a bridge exists" — otherwise the bridge
+   lands alongside the 24 literals and the demos still do not re-theme.
+   The bridge (getComputedStyle on the root into a JS palette object before
+   drawing) becomes the single path by which drawing code receives colour.
+3. Suite green, with the four standing reds permitted as pre-existing
+   backlog under the ratchet: no NEW reds.
+4. Variant zero: the current dark theme renders pixel-identical to its
+   pre-tokenisation screenshots, proving the refactor changed structure and
+   not appearance. Until a direction is pinned here, D2 is judged on internal
 register discipline and craft, NOT on conformance to the three-register
 system, and the loop must not "fix" the palette on its own initiative.
 
@@ -267,6 +278,17 @@ Calibrate. Measure. Insight.
 static, complete page (all content visible, nothing trapped behind
 triggers); demos work via tap on touch devices; WCAG AA contrast; visible
 keyboard focus; alt text everywhere.
+
+SCOPE (30 Aug 2026) — the distinction the tests enforce is AMBIENT vs
+INTERACTION, and it matters because a candidate could otherwise pass the
+reduced-motion test by killing the demos, breaching §3 P1/P2:
+- Ambient and idle motion MUST freeze under `prefers-reduced-motion`. That
+  covers the liquid background and any canvas or chart that keeps redrawing
+  while nobody is touching it. The test samples a demo canvas twice, 500ms
+  apart, with no interaction, and requires identical pixels.
+- User-initiated response MAY still animate. Hover or tap driving the
+  attention/utilisation timers is interaction feedback, not ambient motion.
+  Disabling it to pass the test is a §3 failure, not a fix.
 
 **Copy register** (founder-rejected the essay/manifesto register — copy
 must not read like AI writing). Target: plain, concrete, benefit-led

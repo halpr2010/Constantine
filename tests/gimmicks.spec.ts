@@ -16,6 +16,7 @@
  */
 
 import { test, expect, Page } from "@playwright/test";
+import { createHash } from "crypto";
 
 const BASE = process.env.SITE_URL ?? "http://localhost:3000";
 
@@ -159,6 +160,7 @@ test.describe("§5 design floors (v2 constitution)", () => {
     await page.goto(BASE);
     const sections = page.getByTestId("viewport-section");
     const n = await sections.count();
+    expect(n).toBeGreaterThan(0); // rule must actually be adopted
     for (let i = 0; i < n; i++) {
       const h = await sections.nth(i).evaluate((el) => el.getBoundingClientRect().height);
       expect(h, `viewport-section[${i}] exceeds 844px on mobile`).toBeLessThanOrEqual(844);
@@ -170,12 +172,29 @@ test.describe("§5 design floors (v2 constitution)", () => {
     const ctx = await browser.newContext({ reducedMotion: "reduce" });
     const page = await ctx.newPage();
     await page.goto(BASE, { waitUntil: "networkidle" });
-    // No running ambient animation (liquid background must freeze)
+    // Covers the future liquid background, which will be Web-Animations
+    // visible. It cannot see canvas work, hence the pixel check below.
     expect(
       await page.evaluate(
         () => document.getAnimations().filter((a) => a.playState === "running").length
       )
     ).toBe(0);
+
+    // The demos are requestAnimationFrame driving a canvas, invisible to
+    // getAnimations(). Sample the same canvas twice with no interaction: if
+    // ambient/idle drawing is still running the bytes differ.
+    // SCOPE: this asserts IDLE motion freezes. User-initiated response
+    // (hover/tap driving the timer) is interaction feedback and may still
+    // animate — see §5. A candidate must not kill the demos to pass this.
+    const demoCanvas = page.getByTestId("exhibit-card").first().locator("canvas").first();
+    const hashOf = async () =>
+      createHash("sha256").update(await demoCanvas.screenshot()).digest("hex");
+    const first = await hashOf();
+    await page.waitForTimeout(500);
+    expect(
+      await hashOf(),
+      "idle canvas animation must freeze under prefers-reduced-motion"
+    ).toBe(first);
     // Scrollytelling degrades: key content reachable by plain scroll
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     for (const t of [/Integrate/i, /no facial recognition/i]) {
