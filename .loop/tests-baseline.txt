@@ -1,4 +1,3 @@
 gimmicks.spec.ts › §5 design floors (v2 constitution) › reduced motion: page is static and complete
-gimmicks.spec.ts › §5 design floors (v2 constitution) › scroll progress bar exists, starts empty, completes at page end
 gimmicks.spec.ts › §5 design floors (v2 constitution) › viewport-fit: tagged sections compose within one screen (desktop)
 gimmicks.spec.ts › §5 design floors (v2 constitution) › viewport-fit: tagged sections compose within one screen (mobile)
