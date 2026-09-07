@@ -204,7 +204,7 @@ export default function HowItWorks() {
             >
               <div className="flex-1">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-xl font-semibold text-instrument-fg">
+                  <span className="text-xl font-semibold text-fg-secondary">
                     {step.n}
                   </span>
                   <h3 className="text-xl font-semibold">{step.title}</h3>

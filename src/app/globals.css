@@ -22,7 +22,9 @@
   --text-primary: var(--color-zinc-50);
   --text-secondary: var(--color-zinc-400);
   --text-muted-list: var(--color-zinc-400);
-  --text-muted: var(--color-zinc-500);
+  /* Raised off zinc-500, which measures ~4.2:1 on this ground: still a
+     distinct step below body copy, but clear of the AA floor. */
+  --text-muted: color-mix(in oklab, var(--color-zinc-400) 80%, var(--color-zinc-500));
   --text-emphasis: var(--color-zinc-300);
   --text-emphasis-strong: var(--color-zinc-200);
   --text-subtle: var(--color-zinc-600);
@@ -265,12 +267,14 @@ body {
   --c-surf: #050505; --c-card: color-mix(in oklab, var(--color-zinc-900) 40%, transparent);
   --c-line: color-mix(in oklab, var(--color-zinc-800) 50%, transparent);
   --c-edge: var(--color-zinc-800);
-  --c-fg: var(--color-zinc-50); --c-fg2: var(--color-zinc-400); --c-fg3: var(--color-zinc-500);
+  --c-fg: var(--color-zinc-50); --c-fg2: var(--color-zinc-400);
+  --c-fg3: color-mix(in oklab, var(--color-zinc-400) 80%, var(--color-zinc-500)); /* zinc-500 measured 4.02:1 on the canvas card */
   --p-surf: #0a0a0d; --p-card: color-mix(in oklab, #2a2a35 30%, transparent);
   --p-line: color-mix(in oklab, #8a8aa0 18%, transparent); --p-edge: color-mix(in oklab, #8a8aa0 28%, transparent);
   --p-fg: #f4f4f7; --p-fg2: #b6b6c4; --p-fg3: #8c8c9c;
   --t-surf: #ffffff; --t-card: #f4f4f5; --t-line: var(--color-zinc-300);
-  --t-edge: var(--color-zinc-400); --t-fg: #000000; --t-fg2: var(--color-zinc-700); --t-fg3: var(--color-zinc-500);
+  --t-edge: var(--color-zinc-400); --t-fg: #000000; --t-fg2: var(--color-zinc-700);
+  --t-fg3: var(--color-zinc-600); /* on a light ground the muted step darkens */
   /* accents per register: AA against that register's own ground */
   --c-pos: var(--color-emerald-500); --c-neg: var(--color-red-500);
   --p-pos: var(--color-emerald-400); --p-neg: var(--color-red-400);
@@ -285,7 +289,10 @@ body {
   --p-surf: #0c0912; --p-card: color-mix(in oklab, #3a2f5c 34%, transparent);
   --p-line: color-mix(in oklab, #b9a8ff 22%, transparent); --p-edge: color-mix(in oklab, #b9a8ff 34%, transparent);
   --p-fg: #f6f3ff; --p-fg2: #c3badd; --p-fg3: #9a90b8;
-  --t-surf: #ffffff; --t-card: #ffffff; --t-line: #000000; --t-edge: #000000;
+  /* Technical inverts canvas: a pale steel band with white cards lifting off
+     it, so the two light registers read as different ground rather than the
+     same white twice. */
+  --t-surf: #eceff3; --t-card: #ffffff; --t-line: #000000; --t-edge: #000000;
   --t-fg: #000000; --t-fg2: #1c1c1c; --t-fg3: #3f3f3f;
 }
 [data-theme="dark-canvas"] {
@@ -315,6 +322,7 @@ body {
 
 [data-register="canvas"] {
   --surface-page: var(--c-surf); --surface-card: var(--c-card);
+  --surface-control: var(--c-card);
   --border-hairline: var(--c-line); --border-card: var(--c-edge);
   --text-primary: var(--c-fg); --text-secondary: var(--c-fg2);
   --text-muted-list: var(--c-fg2); --text-muted: var(--c-fg3);
@@ -328,6 +336,7 @@ body {
 }
 [data-register="product"] {
   --surface-page: var(--p-surf); --surface-card: var(--p-card);
+  --surface-control: var(--p-card);
   --border-hairline: var(--p-line); --border-card: var(--p-edge);
   --text-primary: var(--p-fg); --text-secondary: var(--p-fg2);
   --text-muted-list: var(--p-fg2); --text-muted: var(--p-fg3);
@@ -341,6 +350,7 @@ body {
 }
 [data-register="technical"] {
   --surface-page: var(--t-surf); --surface-card: var(--t-card);
+  --surface-control: var(--t-card);
   --border-hairline: var(--t-line); --border-card: var(--t-edge);
   --text-primary: var(--t-fg); --text-secondary: var(--t-fg2);
   --text-muted-list: var(--t-fg2); --text-muted: var(--t-fg3);
