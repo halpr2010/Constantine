@@ -27,7 +27,7 @@ export default function ProblemSection() {
   const copy = vertical === "gyms" ? GYM : MUSEUM;
 
   return (
-    <section id="problem" className="border-t border-line-hairline px-6 py-24">
+    <section id="problem" data-register="canvas" className="border-t border-line-hairline px-6 py-24">
       <div className="mx-auto max-w-6xl">
         <div className="text-xs font-semibold uppercase tracking-wider text-fg-muted">
           The problem

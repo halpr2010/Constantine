@@ -173,7 +173,7 @@ export default function HowItWorks() {
   const steps = isGym ? GYM_STEPS : MUSEUM_STEPS;
 
   return (
-    <section id="how" className="border-t border-line-hairline px-6 pt-12 pb-24">
+    <section id="how" data-register="technical" className="border-t border-line-hairline px-6 pt-12 pb-24">
       <div className="mx-auto max-w-6xl">
         <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
           How it Works…
@@ -199,6 +199,7 @@ export default function HowItWorks() {
           {steps.map((step) => (
             <div
               key={step.n + step.title}
+              data-register={step.paintings || step.equipment ? "product" : undefined}
               className="flex flex-col gap-6 rounded-xl border border-line-card bg-surface-card p-6 md:flex-row md:items-center md:gap-8 md:p-8"
             >
               <div className="flex-1">

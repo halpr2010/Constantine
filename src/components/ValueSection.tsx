@@ -57,7 +57,7 @@ export default function ValueSection() {
   const copy = vertical === "gyms" ? GYM : MUSEUM;
 
   return (
-    <section id="value" className="border-t border-line-hairline px-6 py-24">
+    <section id="value" data-register="canvas" className="border-t border-line-hairline px-6 py-24">
       <div className="mx-auto max-w-6xl">
         {/* Mirrors ProblemSection's "The problem" eyebrow. The spec's eyebrow
             text was identical to the museum heading, which rendered the same

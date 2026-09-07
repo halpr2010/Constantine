@@ -10,6 +10,7 @@ import { chromium } from "@playwright/test";
 import fs from "node:fs";
 
 const label = process.argv[2] ?? "current";
+const theme = process.argv[3] ?? "";   // "" = variant zero (dark)
 const BASE = process.env.SITE_URL ?? "http://localhost:3000";
 const OUT = `shots/${label}`;
 const VIEWS = [
@@ -29,6 +30,10 @@ for (const [w, h] of [[1440, 900], [390, 844]]) {
     const ctx = await browser.newContext({ viewport: { width: w, height: h } });
     const page = await ctx.newPage();
     await page.goto(BASE, { waitUntil: "networkidle" });
+    if (theme) {
+      await page.evaluate((t) => document.documentElement.setAttribute("data-theme", t), theme);
+      await page.waitForTimeout(250);
+    }
     if (vertical === "gyms") {
       await page.getByTestId("hero-tab-gyms").click();
       await page.waitForTimeout(1400);

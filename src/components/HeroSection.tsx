@@ -41,6 +41,7 @@ export default function HeroSection() {
 
   return (
     <section
+      data-register="product"
       className="relative flex min-h-screen w-full flex-col justify-center overflow-x-clip"
       // A wall's card is wider than its column by design (up to ~140px each
       // side). Clip generously so that overhang still shows exactly as it did

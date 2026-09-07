@@ -49,7 +49,7 @@ export default function UseCases() {
   const cards = isGym ? GYM_CARDS : MUSEUM_CARDS;
 
   return (
-    <section id="use" className="border-t border-line-hairline px-6 py-24">
+    <section id="use" data-register="canvas" className="border-t border-line-hairline px-6 py-24">
       <div className="mx-auto max-w-6xl">
         <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
           {isGym ? "Fitness Space Use Cases" : "Museum & Gallery Use Cases"}

@@ -13,7 +13,7 @@ export default function PrivacySection() {
   const person = vertical === "gyms" ? "member" : "visitor";
 
   return (
-    <section id="privacy" className="border-t border-line-hairline px-6 py-24">
+    <section id="privacy" data-register="technical" className="border-t border-line-hairline px-6 py-24">
       <div className="mx-auto max-w-6xl">
         <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
           Privacy by design
