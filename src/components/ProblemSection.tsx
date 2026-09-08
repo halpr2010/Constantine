@@ -3,21 +3,21 @@
 import { useVertical } from "@/components/VerticalContext";
 
 const MUSEUM = {
-  heading: "You can measure who came in. Not what held them.",
+  heading: "Your visitor numbers stop at the gallery door.",
   lede: "Ticketing and footfall tell you how many people walked through. They can't tell you which works held attention, which rooms lost it, or where a layout quietly fails. That signal lives in the space itself, and today it goes unrecorded.",
   points: [
-    "Footfall counts visits, not engagement.",
+    "Footfall counts visits and leaves engagement unmeasured.",
     "Surveys are sparse, late, and self-reported.",
     "The room's own behaviour is never captured.",
   ],
 };
 
 const GYM = {
-  heading: "Your CRM records who cancelled. Not the friction that made them.",
+  heading: "Your CRM records the cancellation and none of the friction behind it.",
   lede: "Turnstiles and CRM tell you who joined and who left. They can't see the full floor at 6pm, the equipment members queue for, the machine that's been dead for days, or the friction that quietly pushes people towards cancelling. That signal lives on the floor, and today it goes unrecorded.",
   points: [
-    "Turnstile counts entries, not what happens inside.",
-    "Churn models see the outcome, not the cause.",
+    "Turnstile data ends at the door and never reaches the floor.",
+    "Churn models flag the outcome once the cause has already happened.",
     "Floor friction is invisible until it shows up as cancellations.",
   ],
 };

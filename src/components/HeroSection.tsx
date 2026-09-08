@@ -18,7 +18,7 @@ export default function HeroSection() {
   // is what changes with the vertical.
   const headline = "AI-powered Behavioural Analytics for Physical Spaces";
   const subtitle =
-    "Measure how people actually use your space: attention, engagement and movement, not just footfall.";
+    "Measure how people actually use your space: attention, engagement and movement, beyond the footfall you already count.";
   // One chip set across every vertical, per the copy spec.
   const chips = [
     "Anonymous by design",
