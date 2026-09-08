@@ -44,11 +44,28 @@ while IFS=$'\t' read -r N TASK; do
   echo
   echo "████ task $i (N=$N) — $SHORT…"
   echo "     $(date '+%H:%M')"
-  ./scripts/loop.sh "$N" "$TASK" 2>&1 | sed 's/^/     /'
+  # Mark the ledger before the cycle so the summary reports THIS task's rows.
+  # Reading "the last N rows" reported task 1's verdict under all eight
+  # headings on the first run.
+  BEFORE=$(grep -c '^| 20' experiments.md 2>/dev/null || echo 0)
+
+  if ! ./scripts/loop.sh "$N" "$TASK" 2>&1 | sed 's/^/     /'; then
+    echo "     !! task $i did not complete cleanly — continuing"
+  fi
+
+  # A dirty tree stops every later task dead (loop.sh refuses to start), so
+  # never carry one forward. Anything left uncommitted here is a bug worth
+  # seeing in the morning, not worth losing the night to.
+  if ! git diff --quiet || ! git diff --cached --quiet; then
+    echo "     !! tree left dirty by task $i — committing so later tasks can run"
+    git add -A && git commit -q -m "overnight: salvage uncommitted state after task $i" || true
+  fi
+
   {
     echo "## Task $i — $SHORT…"
     echo
-    tail -20 experiments.md | grep -E '^\| 20' | tail -"$N" || echo "_no rows recorded_"
+    ROWS=$(grep '^| 20' experiments.md 2>/dev/null | tail -n +$((BEFORE + 1)))
+    [ -n "$ROWS" ] && printf '%s\n' "$ROWS" || echo "_no candidate completed_"
     echo
   } >> "$SUMMARY"
 done <<< "$TASKS"

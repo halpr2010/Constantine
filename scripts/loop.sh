@@ -69,7 +69,7 @@ genuinely different one rather than repeating it." \
   if ! ./scripts/floors.sh > "$LOG/floors-$i.txt" 2>&1; then
     echo "DISCARDED — floors failed"
     tail -12 "$LOG/floors-$i.txt" | sed 's/^/    /'
-    echo "| $CYCLE-$i | $BRANCH | FAIL | – | – | – | – | – | discarded | $(grep -m1 -E '✗|FAIL —' "$LOG/floors-$i.txt" | sed 's/|/;/g') |" >> experiments.md
+    echo "| $CYCLE-$i | $BRANCH | FAIL | – | – | – | – | – | discarded | $(grep -m1 -E '✗|FAIL —' "$LOG/floors-$i.txt" | sed 's/|/;/g') |" >> "$LOG/rows.md"
     continue
   fi
   echo "floors passed"
@@ -91,24 +91,34 @@ shots/best. Write .loop/verdict.json and nothing else." \
 
   if [ -f .loop/verdict.json ]; then
     cp .loop/verdict.json "$LOG/verdict-$i.json"
-    node -e '
+    ROWS="$LOG/rows.md" node -e '
       const v = require("./.loop/verdict.json"), d = v.dimensions ?? {};
       const c = (k) => (d[k]?.winner ?? "?").replace("candidate","cand");
       const row = ["'"$CYCLE-$i"'", "'"$BRANCH"'", "pass",
         c("D1"), c("D2"), c("D3"), c("D4"), c("D5"),
         v.verdict ?? "?", (v.next_experiment ?? "").replace(/\|/g, ";")];
-      require("fs").appendFileSync("experiments.md", "| " + row.join(" | ") + " |\n");
+      require("fs").appendFileSync(process.env.ROWS, "| " + row.join(" | ") + " |\n");
       console.log("  verdict:", v.verdict, "—", v.reason ?? "");
       console.log("  next:", v.next_experiment ?? "(none)");
     '
     [ "$(node -pe 'require("./.loop/verdict.json").verdict' 2>/dev/null)" = "promote" ] && WINNERS+=("$BRANCH")
   else
     echo "  critic produced no verdict — see $LOG/critic-$i.log"
-    echo "| $CYCLE-$i | $BRANCH | pass | – | – | – | – | – | no verdict | critic failed to write verdict.json |" >> experiments.md
+    echo "| $CYCLE-$i | $BRANCH | pass | – | – | – | – | – | no verdict | critic failed to write verdict.json |" >> "$LOG/rows.md"
   fi
 done
 
 git checkout -q "$START"
+
+# Land the cycle's ledger rows in one commit, on the branch we came from. The
+# tree must be clean when this returns: the next loop.sh refuses to start
+# otherwise, which is how an eight-task overnight run once became a one-task
+# run.
+if [ -s "$LOG/rows.md" ]; then
+  cat "$LOG/rows.md" >> experiments.md
+  git add experiments.md
+  git commit -q -m "experiments: cycle $CYCLE" || true
+fi
 echo
 echo "══ cycle $CYCLE complete ═════════════════════════════"
 if [ ${#WINNERS[@]} -eq 0 ]; then
