@@ -98,6 +98,20 @@ only `[UNBUILT]` and `[PARTIAL]` items. `[SLOT-BUILT — awaiting media]`
   concrete numeric example — `[UNBUILT]`. ADJUDICATION NEEDED: the numeric
   example conflicts with the standing instruction that case-study figures
   stay off the public marketing site.
+- **Vertical selector — the site's entry view** *(Claryo, 10/10)* —
+  `[UNBUILT]`. CONFIRMED by founder 08 Sep 2026: this is the FIRST thing a
+  visitor sees, ahead of the hero. Reference:
+  `design-refs/strips/Clary_Selector.png`. "Are you a…" centred on a clean
+  light ground, one pill per vertical (Museums & Galleries / Gyms); hover
+  colourises the pill; on selection the tab **drifts to the top right** and the
+  chosen view **fades in cleanly**, the tab remaining there as the control for
+  switching.
+  Three decisions attached, for adjudication if a candidate disagrees:
+  the choice is remembered locally so returning visitors are not re-gated;
+  the existing in-hero switcher is retired so there is one control, not two;
+  and deep links (`#privacy`) and crawlers must never land behind an
+  unanswered question — the selector cannot gate content from a direct link,
+  which is also what keeps the existing floors meaningful.
 - **Depth dial** *(Claryo's autonomy dial, adapted)* — `[UNBUILT]`.
 - **Outputs** — the data → insight → action three-beat *(PlayVision)* —
   `[UNBUILT]`.
@@ -305,36 +319,53 @@ bar, not a prohibition: motion must feel authored and sequenced, carrying the
 argument forward, rather than a uniform fade-and-slide applied indiscriminately
 to every block. Sections may pin while content advances.
 
+TWO REQUIREMENTS ADDED 08 Sep 2026 from founder-scored video
+(`Claryo_Scroll_Functionality_2.png`, 10/10):
+
+1. NO VISIBLE DIVIDING LINE between grounds. Scrolling far enough leaves the
+   page simply having become white, or black. Today each register change lands
+   as a hard colour edge, which is the specific thing rejected.
+2. A REVEAL ENDS IN A READABLE STATE. Measured on the first scroll-flow
+   candidate: 44 text elements never reached full opacity while sitting 80px
+   clear of both viewport edges after a 700ms settle — headings at 0.14, body
+   copy at 0.28. Scroll-linked opacity must be a transition INTO readability,
+   never a permanent dimmer that peaks at one exact scroll position. Enforced
+   by tests/reveal.spec.ts.
+
+ANTI-REFERENCE (`Slingshot_Scroll.png`, 2/10): sections merging with no clear
+boundary; stretches that are nothing but a quote or a block of prose; no
+interactive features below the hero; a closing CTA so low-contrast it blends
+into the background. Do not reproduce any of these.
+
 User-triggered motion (the hover demos) is still the star and still gets the
 budget. All scroll motion freezes under prefers-reduced-motion, with every
 element in its final revealed state.
 
-**Ambient background** *(Slingshot mechanism, our hues)*. A liquid gradient
-field in the product/atmosphere register. REWRITTEN 08 Sep 2026 after both
-candidates built to the previous wording were rejected as "completely static".
+**Ambient background** *(Claryo — 10/10; Slingshot — 8/10)*. REWRITTEN AGAIN
+08 Sep 2026 from founder-scored video. Reference:
+`design-refs/strips/Claryo_Ambiance_and_Scroll_Functionality_3.png`.
 
-The effect comes FIRST: the field must visibly, continuously move of its own
-accord — slow fluid drift, lobes crossing and separating, the surface never
-still. Cursor reactivity is a modulation ON TOP of that autonomous motion, not
-a replacement for it. A field that only moves when the cursor moves has not
-built this.
+Bright purple blooms on **pure black**, large and soft, continuously moving and
+plainly visible — not a wash over a dark-grey ground. A white technical
+wireframe may sit on top and augment per scroll step. THE FIELD IS UNBOUNDED:
+Slingshot scores 8 rather than 10 solely because its field has visible edges
+where it starts and stops, so a candidate reproducing the swirl AND the
+boundaries has copied the defect.
 
-It must also be seen. "Low intensity" previously produced two fields that were
-imperceptible and indistinguishable from each other; the field should be
-clearly present as atmosphere while the hero demo stays the brightest and most
-detailed thing on screen. If a reviewer has to be told the field is there, it
-is too weak.
+Slingshot's implementation is a WebGL2 fragment shader — noise-driven flow
+field with a ping-pong feedback buffer for advection (source captured in
+design-refs/). Claryo's target look does not require that machinery, and
+Claryo scores higher; do not reach for a fluid simulation to hit it.
 
-Standing constraints, which remain but are subordinate to the effect: never
-behind the technical register; no measurable FPS cost to the demo timers
-(a compositor-only animation satisfies this — continuous motion is NOT a
-violation); and fully static under prefers-reduced-motion, where the
-composition must still read as a still image.
+PARKED 08 Sep 2026 by founder instruction: no candidate is to work on the
+ambient background until this is explicitly reopened. Two prior attempts were
+rejected as static, and the founder wants it reworked significantly later.
 
-PRIOR-WORDING NOTE: "low intensity", "zero FPS impact" and "fully static under
-reduced motion" were listed as three hard constraints with no statement of the
-intended effect, so both candidates optimised for the constraints and produced
-nothing. State the effect first; constraints bound it, they do not define it.
+Standing constraints: product/atmosphere register only, never behind the
+technical register; the hero demo stays the brightest, most detailed thing on
+screen; no measurable FPS cost to the demo timers (continuous
+compositor-driven animation is NOT a violation); fully static under
+prefers-reduced-motion.
 
 **Scroll progress bar** *(Slingshot)*. A single hairline on the header's
 bottom edge, growing left to right as the page scrolls. See
@@ -430,7 +461,18 @@ terracotta AI-brand look, uniform rounded-card grids with grey shadows,
 
 ## 6. References — annotated, attribute-specific
 
-Screenshots in /design-refs/, cropped to the attribute named.
+**`design-refs/REFERENCES.md` is the authority and outranks this list.** It
+carries the founder's score per attribute, the frame strip to open, and — where
+a reference is not a 10 — exactly what stops it being one. This section says
+what to take in the abstract; the registry says how hard to chase it.
+
+Score attributes, not sites: Slingshot's hero is an 8 and everything below it
+is a 2. Anti-references are binding — a candidate exhibiting a named defect
+from a low-scored row is a regression however tidy it looks.
+
+Stills in /design-refs/, cropped to the attribute named. Motion references are
+`.mov` (gitignored — several exceed GitHub's 100MB file limit) with 12-frame
+strips in /design-refs/strips/, which is what the loop reads.
 
 - **Claryo (claryo.co + /world-model + /solutions)** — PRIMARY STRUCTURAL.
   Take: scroll-as-argument progressive disclosure; persona gate with
