@@ -26,6 +26,29 @@ if ! npm run build > .loop/build.log 2>&1; then
 fi
 echo "build ok"
 
+# A server left over from a previous cycle serves that cycle's build, and
+# playwright.config.ts has reuseExistingServer: true, so the whole suite would
+# run against the wrong candidate. That produced nine phantom failures and
+# discarded a candidate that had cleared every copy violation. Always serve the
+# build we just made.
+echo "── serve ─────────────────────────────────────────────"
+pkill -f 'next-server' 2>/dev/null
+for i in $(seq 1 20); do pgrep -f 'next-server' >/dev/null || break; sleep 1; done
+nohup npx next start -p 3000 > .loop/server.log 2>&1 &
+UP=0
+for i in $(seq 1 60); do
+  curl -sf -m 5 -o /dev/null http://localhost:3000/ && { UP=1; break; }
+  sleep 1
+done
+[ "$UP" -eq 1 ] || { echo "floors: FAIL — server did not come up"; tail -5 .loop/server.log; exit 1; }
+# Prove it is OUR build: a stale server 404s the fresh CSS chunk.
+CSS=$(curl -sS -m 10 http://localhost:3000/ | grep -oE '/_next/static/[^"]*\.css' | head -1)
+DISK=$(find .next/static -name '*.css' -exec basename {} \; 2>/dev/null | head -1)
+case "$CSS" in
+  *"$DISK") echo "serving this build ($DISK)" ;;
+  *) echo "floors: FAIL — server is serving $CSS, build on disk is $DISK"; exit 1 ;;
+esac
+
 echo "── tests ─────────────────────────────────────────────"
 PLAYWRIGHT_JSON_OUTPUT_NAME="$RESULTS" \
   npx playwright test --reporter=json > /dev/null 2>&1

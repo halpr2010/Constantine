@@ -68,3 +68,26 @@ reference; interpretation belongs in the candidate.
 | 20260907-213539-1 | cand-20260907-213539-1 | pass | cand | cand | cand | cand | tie | promote | The Use Cases block is now the flattest thing on the page: at 1440w "Museum & Gallery Use Cases" is three text-only cards about 90px tall with no visual at all, sitting directly above an Outputs section that gives every beat a ghost-silhouette panel with a floating UI fragment. Rebuild it on the same module — keep the three category cards, but give the section one panel showing the fragment that category would actually produce (a floor plan with zone counts for Museums & Galleries, a run-of-show timeline for Temporary Exhibitions, an arrivals curve for Cultural Venues) — and reuse GhostScene rather than authoring new artwork, since it is static SVG and already reads correctly in all four palettes. |
 | 20260907-220250-1 | cand-20260907-220250-1 | pass | cand | cand | tie | tie | cand | promote | Close the two viewport-fit reds by tagging the right unit: museums-how at 390 is 3113px tall because all four numbered steps live in one section, so tagging the section can never fit 844px — tag each Integrate/Calibrate/Measure/Insight step as its own data-testid="viewport-section" so the unit that must compose is one step's heading + copy + visual, and cap each step's visual so the tallest (Insight, which carries two ranked cards side by side) still clears 844px at 390 and 900px at 1440. |
 | 20260907-224009-1 | cand-20260907-224009-1 | pass | cand | cand | tie | cand | cand | promote | Adopt viewport-fit on #how, which §4b names as the section the rule was written for: it is 3113px tall at 390 and it also leaks horizontally — the Insight step's `w-[280px] shrink-0` card rail places its second card at x=345..625, so document.scrollWidth is 625 against a 390 viewport and the whole page scrolls sideways. Rebuild step 4 as a single-card-per-screen rail clipped inside its own overflow-x container, then tag each of the four steps data-testid="viewport-section" so heading, copy and visual land together at both widths. |
+
+### Overnight 07 Sep 2026 — two harness defects, both found by disbelieving a result
+
+**False negative discarded good work.** Task 4 (copy backlog) was gated FAIL
+with nine phantom failures, including every protected demo test and console
+errors — from a commit that touched only copy strings. `loop.sh` leaves a
+server running after its capture step, and `playwright.config.ts` sets
+`reuseExistingServer: true`, so the next candidate's suite ran against the
+PREVIOUS candidate's build. `floors.sh` now kills any existing server, starts
+one on the build it just made, and refuses to run unless the served CSS chunk
+matches the chunk on disk. Re-gated: PASS, with all nine violations cleared.
+
+The same failure mode could as easily produce a false PASS, which no one would
+have investigated.
+
+**The critic cannot see behavioural work.** Task 3 closed the reduced-motion
+floor and was REJECTED — correctly under §7 as written. All 96 palette captures
+were byte-identical, so D1-D5 were five ties, and D6 is defined as pass/fail
+rather than comparative. A candidate whose entire value is invisible in a
+screenshot can therefore never win. That rules out accessibility, performance
+and behaviour — a large share of the remaining backlog. §7 needs a route for
+work that is correct and invisible; flagged for adjudication, not fixed
+unilaterally.
