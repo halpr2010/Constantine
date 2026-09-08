@@ -309,6 +309,28 @@ User-triggered motion (the hover demos) is still the star and still gets the
 budget. All scroll motion freezes under prefers-reduced-motion, with every
 element in its final revealed state.
 
+BUILT 08 Sep 2026. `src/components/ScrollStage.tsx` (the driver),
+`Reveal.tsx` (the grammar vocabulary), `SectionSeam.tsx` (register
+transitions), and the disclosure block in `globals.css`. Progress is bound to
+SCROLL POSITION rather than to a timer started by an intersection: the page
+answers the visitor's own movement, holds still when they do, and the
+`motion-strip.mjs` frames — which are indexed by position for exactly this
+reason — become reproducible evidence rather than a race with a transition.
+
+FROM THE REFERENCE, not from this prose: in Claryo-scroll-2.png the
+un-revealed item ("Orchestrate") is DIM, not absent — legible as shape before
+it resolves. No grammar here fades from zero. That keeps the page from reading
+as empty mid-scroll, and it is also what keeps the content inside
+`copy.spec.ts`'s visible-text walk, which drops anything at opacity 0.
+
+Two consequences worth stating so they are not re-discovered:
+- Reveals LATCH. Scrolling back up must not un-tell the argument.
+- The §7 sheets and the full-page strips must SCROLL the page before capturing
+  it (`scripts/settle.mjs`), because `fullPage` and element screenshots
+  capture past the fold without ever going there. The motion strip
+  deliberately does not settle: composition evidence and motion evidence are
+  different jobs.
+
 **Ambient background** *(Slingshot mechanism, our hues)*. A liquid gradient
 field in the product/atmosphere register. REWRITTEN 08 Sep 2026 after both
 candidates built to the previous wording were rejected as "completely static".

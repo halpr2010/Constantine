@@ -329,6 +329,131 @@ body {
   --t-fg: #04070a; --t-fg2: #23343d; --t-fg3: #4d626e;
 }
 
+/* ---------------------------------------------------------------------------
+   SCROLL-DRIVEN DISCLOSURE (§5 "Motion carries information", amended 08 Sep
+   2026 — the entrance-animation ban was lifted and replaced by a quality bar).
+   Progress arrives from src/components/ScrollStage.tsx as --r, one number per
+   element, computed from where that element sits in the viewport. Nothing here
+   is a transition or a keyframe: the scroll IS the timeline, so the page
+   answers the visitor's own movement and holds still when they do.
+   --------------------------------------------------------------------------- */
+
+/* Registering the property is what lets --r be interpolated inside calc() and
+   multiplied by a length. The initial value is 1, so the page is FAIL-OPEN:
+   with no JS, before hydration, and under reduced motion everything is already
+   in its final revealed state. */
+@property --r {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+/* No grammar below ever reaches opacity 0. An un-revealed element is dim, not
+   absent — that is what Claryo actually does (design-refs/Claryo-scroll-2.png,
+   where "Orchestrate" is legible as shape before it resolves), it keeps the
+   page from reading as empty mid-scroll, and it keeps content inside
+   tests/copy.spec.ts's visible-text walk, which drops anything at opacity 0
+   and would otherwise report the privacy claims as missing from the page. */
+
+/* focus — the claim resolving out of a defocused frame. Headings only. */
+[data-reveal="focus"] {
+  opacity: calc(0.22 + 0.78 * var(--r));
+  filter: blur(calc((1 - var(--r)) * 9px));
+}
+
+/* ghost — dim to full, in place. Body copy and list items never travel: text
+   that slides is the generic tell the old ban existed to keep out. */
+[data-reveal="ghost"] {
+  opacity: calc(0.16 + 0.84 * var(--r));
+}
+
+/* ink — drawn left to right. Rules and eyebrows. */
+[data-reveal="ink"] {
+  opacity: calc(0.12 + 0.88 * var(--r));
+  clip-path: inset(0 calc((1 - var(--r)) * 100%) 0 0);
+}
+
+/* settle — arrive and come to rest. Cards and panels only. */
+[data-reveal="settle"] {
+  opacity: calc(0.14 + 0.86 * var(--r));
+  transform: translate3d(0, calc((1 - var(--r)) * 26px), 0)
+             scale(calc(0.978 + 0.022 * var(--r)));
+}
+
+/* advance — step forward off the spine. The #how sequence only. */
+[data-reveal="advance"] {
+  opacity: calc(0.14 + 0.86 * var(--r));
+  transform: translate3d(calc((1 - var(--r)) * -30px), 0, 0);
+}
+
+/* spine — the rule that threads the #how sequence, inked top-down as the block
+   passes through the viewport (data-reveal-mode="span"), so it advances in step
+   with the steps it connects rather than finishing while the first one is still
+   arriving.
+   The fill is a gradient on the rule itself rather than a child element: --r
+   does not inherit, and the driver measures the element it writes to — a child
+   whose own height IS the progress would feed its measurement back into itself
+   and latch on the first frame. */
+[data-reveal="spine"] {
+  opacity: 1;
+  background-color: var(--border-hairline);
+  background-image: linear-gradient(
+    to bottom,
+    var(--text-primary) 0%,
+    var(--text-primary) calc(var(--r) * 100%),
+    transparent calc(var(--r) * 100%),
+    transparent 100%
+  );
+}
+
+/* Resolved. The driver drops its inline --r once an element latches, and this
+   clears the composited layers with it rather than leaving a blur(0px) filter
+   and an identity transform on forty elements for the rest of the session. */
+[data-reveal][data-revealed] {
+  opacity: 1;
+  filter: none;
+  clip-path: none;
+  transform: none;
+}
+
+/* §5: "All scroll motion freezes under prefers-reduced-motion, with every
+   element in its final revealed state." ScrollStage never starts, so --r stays
+   at its initial 1; this pins the outcome even if an inline value survives a
+   preference change mid-session. */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    filter: none !important;
+    clip-path: none !important;
+    transform: none !important;
+  }
+}
+
+/* The register seam — see src/components/SectionSeam.tsx. */
+.section-seam {
+  --seam-h: clamp(7rem, 12vw, 11rem);
+  --seam-glow: var(--p-edge);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--seam-h);
+  pointer-events: none;
+  /* The ramp is shaped by an interpolation hint (the bare 42%) rather than by
+     hand-placed stops: explicit stops leave a visible shoulder where the last
+     one meets the flat ground, which on the dark theme's #050505 → #ffffff
+     join is the worst pair on the site to band. The bloom's own falloff is
+     stepped down twice for the same reason. */
+  background:
+    radial-gradient(
+      62% 130% at 50% 38%,
+      var(--seam-glow),
+      color-mix(in oklab, var(--seam-glow) 45%, transparent) 46%,
+      transparent 80%
+    ),
+    linear-gradient(to bottom, var(--seam-a) 0%, 42%, var(--seam-b) 100%);
+}
+
 [data-register="canvas"] {
   --surface-page: var(--c-surf); --surface-card: var(--c-card);
   --surface-control: var(--c-card);
