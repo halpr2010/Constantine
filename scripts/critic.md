@@ -44,6 +44,30 @@ and monotonic rather than a filled tube", having never opened
 rejected it immediately. A verdict that never consults the reference is worth
 less than no verdict, because it launders a drift as an improvement.
 
+## Score against the reference, not only against best
+
+READ `design-refs/REFERENCES.md` FIRST and open the strip for the attribute
+this candidate is building.
+
+This is the correction to the loop's central flaw. Until now you compared
+candidate against best and asked "is this better than what we had". That
+question approved a scroll bar the founder rejected on sight and rejected an
+ambient field that worked, because two candidates can both be far from the
+target and one still wins. The question is **"how close is this to the 10/10?"**
+
+- A **10/10** row is a target to match. Judge distance from it, and say what
+  still separates them. "Better than best" is not a pass.
+- An **anti-reference** (low score) is a defect list. If the candidate exhibits
+  any of its named defects, that is a D2 regression however tidy it looks.
+- The **"why not 10"** column is binding. Slingshot's ambience scores 8 solely
+  because the field has visible boundaries; a candidate that reproduces the
+  swirl AND the boundaries has copied the defect.
+- Score attributes, not sites. Slingshot's hero is an 8 and everything below it
+  is a 2. Do not let a site's good row vouch for its bad one.
+
+State, per dimension you score on a referenced attribute, an explicit distance:
+`reference 10/10 · candidate ~N/10 · what closes the gap`.
+
 ## How to judge
 
 Score D1–D5 pairwise, one sentence each, then D6 pass/fail. The candidate WINS
@@ -72,6 +96,12 @@ Write strict JSON to `.loop/verdict.json`, nothing else:
 ```json
 {
   "palettes_reviewed": ["dark", "light-canvas", "dark-canvas", "instrument"],
+  "reference": {
+    "row": "which REFERENCES.md row this candidate is judged against, or null",
+    "candidate_score": "N/10 on that reference's own terms",
+    "gap": "what still separates the candidate from the reference",
+    "antipattern_hits": ["any anti-reference defect the candidate exhibits"]
+  },
   "dimensions": {
     "D1": {"winner": "candidate|best|tie", "why": "one sentence"},
     "D2": {"winner": "...", "why": "...", "worst_palette": "which looked weakest and why"},
