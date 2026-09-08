@@ -14,5 +14,6 @@ for t in "" light-canvas dark-canvas instrument; do
   node scripts/screenshot.mjs "$LABEL/${t:-dark}" "$t" > /dev/null
 done
 node scripts/strip.mjs > /dev/null
+node scripts/motion-strip.mjs "$LABEL" 3000 > /dev/null
 mkdir -p "shots/$LABEL/strips" && cp shots/strips/*.png "shots/$LABEL/strips/"
 echo "captured → shots/$LABEL ($(find "shots/$LABEL" -name '*.png' | wc -l | tr -d ' ') images)"

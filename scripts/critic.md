@@ -10,6 +10,16 @@ how either was built; judge only what you see. Read `DESIGN.md` §2, §5, §6 an
   vertical, named `<vertical>-<view>-<width>.png`. Each puts BEST above
   CANDIDATE with all four palettes across, which is exactly the comparison
   this rubric asks for. Read these first and read all of them.
+- **`shots/best/motion/` and `shots/candidate/motion/` — REQUIRED whenever the
+  change involves movement.** `drift.png` is six frames over six seconds with
+  no input at all, so a field that animates on its own differs frame to frame
+  and a frozen one does not. `scroll.png` is nine frames indexed by scroll
+  POSITION, so staged reveals, fades and register transitions are visible as
+  change between cells.
+  Judge motion from these under D2 and D3. Do NOT score a motion feature a tie
+  because the still captures match — they always will. A candidate that turned
+  a red motion floor green and looks identical in stills has almost certainly
+  changed something you can see here.
 - `shots/best/` and `shots/candidate/` — the same captures as individual PNGs
   (`<palette>/<vertical>-<view>-<width>.png`), plus `strips/` (full-page, one
   per palette). Go here only when a sheet leaves you unsure about a detail, or
