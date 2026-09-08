@@ -6,6 +6,7 @@ import HowItWorks from "@/components/HowItWorks";
 import ValueSection from "@/components/ValueSection";
 import PrivacySection from "@/components/PrivacySection";
 import UseCases from "@/components/UseCases";
+import OutputsSection from "@/components/OutputsSection";
 import FaqSection from "@/components/FaqSection";
 import PilotForm from "@/components/PilotForm";
 import ScrollProgress from "@/components/ScrollProgress";
@@ -100,6 +101,10 @@ export default function Home() {
         <PrivacySection />
 
         <UseCases />
+
+        {/* §1's commercial order is use cases -> outputs -> the ask, so the
+            three-beat sits between the last argument and the CTA. */}
+        <OutputsSection />
 
         {/* Last objections get answered on the page the buyer is already on,
             immediately above the one CTA that follows from them. Inherits the
