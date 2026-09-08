@@ -8,6 +8,7 @@
  */
 import { chromium } from "@playwright/test";
 import fs from "node:fs";
+import { settleReveals } from "./settle.mjs";
 
 const label = process.argv[2] ?? "current";
 const theme = process.argv[3] ?? "";   // "" = variant zero (dark)
@@ -59,6 +60,9 @@ for (const [w, h] of [[1440, 900], [390, 844]]) {
       await page.getByTestId("hero-tab-gyms").click();
       await page.waitForTimeout(1400);
     }
+    // After the tab click: the switcher rebuilds the sections below the hero,
+    // so settling before it would settle DOM that no longer exists.
+    await settleReveals(page);
     const mask = [page.locator("canvas"), page.locator("video")];
     for (const [name, sel] of VIEWS) {
       const el = page.locator(sel).first();

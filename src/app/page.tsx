@@ -6,6 +6,8 @@ import PrivacySection from "@/components/PrivacySection";
 import UseCases from "@/components/UseCases";
 import PilotForm from "@/components/PilotForm";
 import ScrollProgress from "@/components/ScrollProgress";
+import ScrollStage from "@/components/ScrollStage";
+import Reveal from "@/components/Reveal";
 import { VerticalProvider } from "@/components/VerticalContext";
 import Image from "next/image";
 
@@ -16,6 +18,10 @@ export default function Home() {
           vertical from this provider. Only those pieces are client components;
           this page stays server-rendered. */}
       <VerticalProvider>
+        {/* One driver for every [data-reveal] below. Mounted inside the
+            provider so it re-scans when the switcher rebuilds the page. */}
+        <ScrollStage />
+
         {/* Header */}
         <header className="pointer-events-none fixed left-0 right-0 top-0 z-50 border-b border-line-hairline bg-surface-page/80 backdrop-blur-xl">
           <div className="pointer-events-auto mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
@@ -67,20 +73,31 @@ export default function Home() {
 
         <UseCases />
 
-        {/* Pilot */}
-        <section id="pilot" className="border-t border-line-hairline px-6 py-24">
+        {/* Pilot. Claims the canvas register EXPLICITLY, and so does the footer
+            below it. Both used to inherit the root theme's ground while Use
+            cases above them painted canvas, which put an undeclared register
+            change — the one genuine hard edge left on the page — between the
+            last section and the closing CTA. No seam is needed now because
+            nothing changes: the canvas runs straight through to the bottom.
+            The form itself is never wrapped in a reveal — a control that is
+            dimmed while it holds focus is a trap. */}
+        <section id="pilot" data-register="canvas" className="px-6 pb-24 pt-32">
           <div className="mx-auto max-w-xl">
-            <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
-              Request a pilot
-            </h2>
-            <p className="mt-4 text-fg-secondary">
-              We&apos;ll reply with a 15-minute pilot checklist.
-            </p>
+            <Reveal grammar="focus">
+              <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
+                Request a pilot
+              </h2>
+            </Reveal>
+            <Reveal grammar="ghost" lag={0.14} className="mt-4">
+              <p className="text-fg-secondary">
+                We&apos;ll reply with a 15-minute pilot checklist.
+              </p>
+            </Reveal>
             <PilotForm />
           </div>
         </section>
 
-        <footer className="border-t border-line-hairline px-6 py-8">
+        <footer data-register="canvas" className="px-6 pb-10 pt-16">
           <div className="mx-auto flex max-w-6xl items-center justify-between">
             <div className="flex items-center gap-6 text-sm text-fg-muted">
               <a href="/" className="hover:text-fg-secondary">

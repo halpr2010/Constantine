@@ -1,6 +1,7 @@
 // One full-page strip per theme, so the register rhythm down the scroll is visible.
 import { chromium } from "@playwright/test";
 import fs from "node:fs";
+import { settleReveals } from "./settle.mjs";
 fs.mkdirSync("shots/strips", { recursive: true });
 const browser = await chromium.launch();
 for (const [label, theme] of [["A-dark",""],["B-light-canvas","light-canvas"],["C-dark-canvas","dark-canvas"],["D-instrument","instrument"]]) {
@@ -8,6 +9,9 @@ for (const [label, theme] of [["A-dark",""],["B-light-canvas","light-canvas"],["
   const page = await ctx.newPage();
   await page.goto("http://localhost:3000", { waitUntil: "networkidle" });
   if (theme) { await page.evaluate(t => document.documentElement.setAttribute("data-theme", t), theme); await page.waitForTimeout(300); }
+  // fullPage captures past the fold without scrolling there; the reveals are
+  // scroll-linked, so the strip has to be walked before it can be shot.
+  await settleReveals(page);
   await page.screenshot({ path: `shots/strips/${label}.png`, fullPage: true,
     mask: [page.locator("canvas"), page.locator("video")], maskColor: "#1b1b1f", animations: "disabled" });
   await ctx.close();

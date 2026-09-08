@@ -1,5 +1,7 @@
 "use client";
 
+import Reveal from "@/components/Reveal";
+import SectionSeam from "@/components/SectionSeam";
 import { useVertical } from "@/components/VerticalContext";
 
 type Card = {
@@ -49,20 +51,31 @@ export default function UseCases() {
   const cards = isGym ? GYM_CARDS : MUSEUM_CARDS;
 
   return (
-    <section id="use" data-register="canvas" className="border-t border-line-hairline px-6 py-24">
-      <div className="mx-auto max-w-6xl">
-        <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
-          {isGym ? "Fitness Space Use Cases" : "Museum & Gallery Use Cases"}
-        </h2>
-        <p className="mt-4 max-w-2xl text-fg-secondary">
-          {isGym
-            ? "Three ways an operator turns floor-level behaviour into decisions: inside a club, across the estate, and in members' hands."
-            : "From permanent collections to temporary exhibitions and cultural venues."}
-        </p>
+    <section
+      id="use"
+      data-register="canvas"
+      className="relative px-6 pb-40 pt-40 md:pb-52 md:pt-48"
+    >
+      <SectionSeam from="technical" to="canvas" />
+      <div className="relative mx-auto max-w-6xl">
+        <Reveal grammar="focus">
+          <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
+            {isGym ? "Fitness Space Use Cases" : "Museum & Gallery Use Cases"}
+          </h2>
+        </Reveal>
+        <Reveal grammar="ghost" lag={0.14} className="mt-4 max-w-2xl">
+          <p className="text-fg-secondary">
+            {isGym
+              ? "Three ways an operator turns floor-level behaviour into decisions: inside a club, across the estate, and in members' hands."
+              : "From permanent collections to temporary exhibitions and cultural venues."}
+          </p>
+        </Reveal>
         <div className="mt-12 grid gap-8 md:grid-cols-3">
-          {cards.map((item) => (
-            <div
+          {cards.map((item, i) => (
+            <Reveal
               key={item.title}
+              grammar="settle"
+              lag={0.15 * i}
               className="rounded-xl border border-line-card bg-surface-card p-6"
             >
               {item.tag && (
@@ -78,7 +91,7 @@ export default function UseCases() {
                   {item.signals}
                 </p>
               )}
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>
