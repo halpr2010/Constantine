@@ -1,5 +1,7 @@
 "use client";
 
+import Reveal from "@/components/Reveal";
+import SectionSeam from "@/components/SectionSeam";
 import { useVertical } from "@/components/VerticalContext";
 
 /**
@@ -13,26 +15,40 @@ export default function PrivacySection() {
   const person = vertical === "gyms" ? "member" : "visitor";
 
   return (
-    <section id="privacy" data-register="technical" className="border-t border-line-hairline px-6 py-24">
-      <div className="mx-auto max-w-6xl">
-        <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
-          Privacy by design
-        </h2>
-        <p className="mt-4 max-w-2xl text-fg-secondary">
-          Constantine is built so that personal data cannot exist in the system.
-        </p>
+    <section
+      id="privacy"
+      data-register="technical"
+      className="relative px-6 pb-40 pt-40 md:pb-52 md:pt-48"
+    >
+      <SectionSeam from="canvas" to="technical" />
+      <div className="relative mx-auto max-w-6xl">
+        <Reveal grammar="focus">
+          <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
+            Privacy by design
+          </h2>
+        </Reveal>
+        <Reveal grammar="ghost" lag={0.14} className="mt-4 max-w-2xl">
+          <p className="text-fg-secondary">
+            Constantine is built so that personal data cannot exist in the
+            system.
+          </p>
+        </Reveal>
+        {/* The three guarantees are the section's whole claim, so they are
+            counted off one at a time rather than presented as a set. */}
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {CHIPS.map((item) => (
-            <div
+          {CHIPS.map((item, i) => (
+            <Reveal
               key={item}
+              grammar="settle"
+              lag={0.16 * i}
               className="flex items-center gap-3 rounded-lg border border-line-card bg-surface-card px-4 py-3"
             >
               <span className="text-accent-positive/80">✓</span>
               <span className="text-sm text-fg-emphasis">{item}</span>
-            </div>
+            </Reveal>
           ))}
         </div>
-        <div className="mt-8 max-w-2xl">
+        <Reveal grammar="ghost" className="mt-8 max-w-2xl">
           <h3 className="text-base font-semibold text-fg-emphasis">
             How does video processing work with Constantine?
           </h3>
@@ -46,8 +62,8 @@ export default function PrivacySection() {
               Once processed, the raw footage is immediately destroyed.
             </span>
           </p>
-        </div>
-        <div className="mt-8 max-w-2xl">
+        </Reveal>
+        <Reveal grammar="ghost" lag={0.12} className="mt-8 max-w-2xl">
           <h3 className="text-base font-semibold text-fg-emphasis">
             What leaves the device?
           </h3>
@@ -60,7 +76,7 @@ export default function PrivacySection() {
               data, because it does not exist.
             </span>
           </p>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

@@ -341,6 +341,45 @@ User-triggered motion (the hover demos) is still the star and still gets the
 budget. All scroll motion freezes under prefers-reduced-motion, with every
 element in its final revealed state.
 
+BUILT 08 Sep 2026, REBUILT the same day against the two requirements above.
+`src/components/ScrollStage.tsx` (the driver), `Reveal.tsx` (the grammar
+vocabulary), `SectionSeam.tsx` (register transitions), and the disclosure block
+in `globals.css`.
+
+The first build bound opacity CONTINUOUSLY to where an element sat in the
+viewport, on the reasoning that the page should answer the visitor's own
+movement. That is what produced requirement 2: a continuous binding is a
+dimmer, and it peaks at one scroll offset. Scroll position now decides only
+WHEN a reveal starts; the transition then runs to completion on its own clock
+and latches. The measured floor went from 29 elements stranded between 0.16 and
+0.97 to none.
+
+FROM THE REFERENCE, not from this prose: in Claryo-scroll-2.png the
+un-revealed item ("Orchestrate") is DIM, not absent — legible as shape before
+it resolves. No grammar here fades from zero. That keeps the page from reading
+as empty mid-scroll, and it is also what keeps the content inside
+`copy.spec.ts`'s visible-text walk, which drops anything at opacity 0.
+
+Register transitions are a DISSOLVE STRADDLING THE BOUNDARY, not a band laid
+after it. Each section's seam starts most of a viewport above its own top edge
+and reaches full opacity some way inside it, holding the outgoing ground
+underneath the lower half so the crossing has something to dissolve out of.
+Measured down a content-free column, the worst single-row luminance step at any
+register change is under 1% of the range it traverses; the same measurement on
+the band version reads 48%. Use cases, the pilot form and the footer now all
+declare the canvas register, which removes the last undeclared change on the
+page — the one between the last section and the closing CTA.
+
+Three consequences worth stating so they are not re-discovered:
+- Reveals LATCH. Scrolling back up must not un-tell the argument.
+- The driver only ever dims an element that is BELOW the fold when it first
+  sees it. Anything already on screen at hydration is marked revealed
+  untouched, so the page cannot darken what the visitor is looking at.
+- The §7 sheets and the full-page strips must SCROLL the page before capturing
+  it (`scripts/settle.mjs`), and then wait out the longest reveal, because the
+  pass only starts them. The motion strip deliberately does not settle:
+  composition evidence and motion evidence are different jobs.
+
 **Ambient background** *(Claryo — 10/10; Slingshot — 8/10)*. REWRITTEN AGAIN
 08 Sep 2026 from founder-scored video. Reference:
 `design-refs/strips/Claryo_Ambiance_and_Scroll_Functionality_3.png`.

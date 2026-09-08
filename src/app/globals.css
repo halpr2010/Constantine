@@ -329,6 +329,216 @@ body {
   --t-fg: #04070a; --t-fg2: #23343d; --t-fg3: #4d626e;
 }
 
+/* ---------------------------------------------------------------------------
+   SCROLL-DRIVEN DISCLOSURE (§5 "Motion carries information", amended 08 Sep
+   2026 — the entrance-animation ban was lifted and replaced by a quality bar).
+   Progress arrives from src/components/ScrollStage.tsx as --r, one number per
+   element. Scroll position decides WHEN a reveal starts; the transition below
+   decides how it runs, and it always runs all the way to 1.
+
+   REVISED 08 Sep 2026. --r used to be written continuously from the element's
+   position in the viewport, which made every grammar here a scroll-linked
+   dimmer: the page read correctly at one exact offset and was grey either side
+   of it. §5 now states that a reveal is a transition INTO a readable state, and
+   tests/reveal.spec.ts measures it.
+   --------------------------------------------------------------------------- */
+
+/* Registering the property is what lets --r be interpolated inside calc(),
+   multiplied by a length, and — the part this rewrite depends on —
+   TRANSITIONED, so one declaration animates the opacity, blur, travel and clip
+   of every grammar together. The initial value is 1, so the page is FAIL-OPEN:
+   with no JS, before hydration, and under reduced motion everything is already
+   in its final revealed state. */
+@property --r {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+/* Mirrors DUR in src/components/ScrollStage.tsx, which schedules the latch
+   from the same number. The reveal floor settles for 700ms after a scroll
+   lands, so duration plus the longest authored lag has to clear that. */
+:root {
+  --reveal-dur: 420ms;
+}
+
+/* The transition is attached only once the driver has armed an element, one
+   frame after it writes --r: 0. Arming and dimming in the same style recalc
+   would leave the transition nothing to run from and the element would snap.
+   --reveal-delay carries Reveal's authored `lag`, which is what turns a row of
+   cards sharing one top edge into a wipe across the row. */
+[data-reveal][data-reveal-armed] {
+  transition: --r var(--reveal-dur) cubic-bezier(0.22, 0.61, 0.36, 1)
+    var(--reveal-delay, 0ms);
+}
+
+/* No grammar below ever reaches opacity 0. An un-revealed element is dim, not
+   absent — that is what Claryo actually does (design-refs/Claryo-scroll-2.png,
+   where "Orchestrate" is legible as shape before it resolves), it keeps the
+   page from reading as empty mid-scroll, and it keeps content inside
+   tests/copy.spec.ts's visible-text walk, which drops anything at opacity 0
+   and would otherwise report the privacy claims as missing from the page. */
+
+/* focus — the claim resolving out of a defocused frame. Headings only. */
+[data-reveal="focus"] {
+  opacity: calc(0.22 + 0.78 * var(--r));
+  filter: blur(calc((1 - var(--r)) * 9px));
+}
+
+/* ghost — dim to full, in place. Body copy and list items never travel: text
+   that slides is the generic tell the old ban existed to keep out. */
+[data-reveal="ghost"] {
+  opacity: calc(0.16 + 0.84 * var(--r));
+}
+
+/* ink — drawn left to right. Rules and eyebrows. */
+[data-reveal="ink"] {
+  opacity: calc(0.12 + 0.88 * var(--r));
+  clip-path: inset(0 calc((1 - var(--r)) * 100%) 0 0);
+}
+
+/* settle — arrive and come to rest. Cards and panels only. */
+[data-reveal="settle"] {
+  opacity: calc(0.14 + 0.86 * var(--r));
+  transform: translate3d(0, calc((1 - var(--r)) * 26px), 0)
+             scale(calc(0.978 + 0.022 * var(--r)));
+}
+
+/* advance — step forward off the spine. The #how sequence only. */
+[data-reveal="advance"] {
+  opacity: calc(0.14 + 0.86 * var(--r));
+  transform: translate3d(calc((1 - var(--r)) * -30px), 0, 0);
+}
+
+/* spine — the rule that threads the #how sequence, inked top-down as the block
+   passes through the viewport (data-reveal-mode="span"), so it advances in step
+   with the steps it connects rather than finishing while the first one is still
+   arriving.
+   The fill is a gradient on the rule itself rather than a child element: --r
+   does not inherit, and the driver measures the element it writes to — a child
+   whose own height IS the progress would feed its measurement back into itself
+   and latch on the first frame. */
+[data-reveal="spine"] {
+  opacity: 1;
+  background-color: var(--border-hairline);
+  background-image: linear-gradient(
+    to bottom,
+    var(--text-primary) 0%,
+    var(--text-primary) calc(var(--r) * 100%),
+    transparent calc(var(--r) * 100%),
+    transparent 100%
+  );
+}
+
+/* Resolved. The driver drops its inline --r once an element latches, and this
+   clears the composited layers with it rather than leaving a blur(0px) filter
+   and an identity transform on forty elements for the rest of the session. */
+[data-reveal][data-revealed] {
+  opacity: 1;
+  filter: none;
+  clip-path: none;
+  transform: none;
+}
+
+/* §5: "All scroll motion freezes under prefers-reduced-motion, with every
+   element in its final revealed state." ScrollStage never starts, so --r stays
+   at its initial 1; this pins the outcome even if an inline value survives a
+   preference change mid-session. */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    filter: none !important;
+    clip-path: none !important;
+    transform: none !important;
+  }
+}
+
+/* The register transition — see src/components/SectionSeam.tsx.
+
+   It sits ABOVE its own section, in the closing space of the section before,
+   and composites its register's ground over whatever is painted there. At the
+   section boundary it is fully opaque and hands off to the section's own
+   background, so the two agree by construction rather than by a declared
+   colour that can drift out of step. */
+.section-seam {
+  /* Nearly half a viewport. The point is not softness for its own sake: at
+     this length the fully ambiguous middle of the crossing — the part where
+     neither register's text colour would be legible — is about 160px, which
+     fits inside the closing and opening padding either side of the boundary,
+     so no copy is ever read through it. */
+  --seam-h: clamp(16rem, 46vh, 30rem);
+  /* How much of the crossing happens BEFORE the boundary. Weighted upward so
+     the page has mostly become its new colour by the time the new section's
+     first line arrives, which is the Claryo behaviour: in
+     design-refs/strips/Claryo_Scroll_Functionality.png frames 4→5 the dark
+     ground has climbed the white section well before any dark content shows. */
+  --seam-up: calc(var(--seam-h) * 0.56);
+  --seam-down: calc(var(--seam-h) - var(--seam-up));
+  --seam-glow: var(--p-edge);
+  position: absolute;
+  top: calc(-1 * var(--seam-up));
+  left: 0;
+  right: 0;
+  height: var(--seam-h);
+  pointer-events: none;
+  background-repeat: no-repeat;
+  /* Three layers, back to front: the outgoing ground held under the lower half
+     of the crossing, the incoming ground dissolving in over the whole of it,
+     and the bloom on top. The hold is what lets the crossing continue PAST the
+     boundary — the section's own background-color is the incoming ground and
+     would otherwise assert itself at y=0, which is precisely the point at which
+     a transition turns back into an edge. It ends where the dissolve reaches
+     full opacity, so its own bottom edge is covered. */
+  background-position:
+    0 0,
+    0 0,
+    0 var(--seam-up);
+  background-size:
+    100% var(--seam-h),
+    100% var(--seam-h),
+    100% var(--seam-down);
+  background-image:
+    /* Wider than the viewport and pushed off-centre, so no part of its falloff
+       resolves into a horizontal. It fades out at 85% of the crossing and in at
+       19%, both well short of the ends — a bloom still carrying alpha where the
+       ground has finished is itself a visible step, which is what put a line
+       across the first version of this. Its job is to tint the middle: black to
+       white then crosses through the product register's own hue instead of
+       through neutral grey, the "fog bank" both previous seams were rejected
+       for. */
+    radial-gradient(
+      120% 44% at 36% 52%,
+      var(--seam-glow),
+      color-mix(in oklab, var(--seam-glow) 38%, transparent) 44%,
+      transparent 76%
+    ),
+    /* An eased alpha curve rather than a straight ramp: a linear fade holds its
+       steepest slope right through the middle. These stops spend the change at
+       the ends, where the grounds being left and arrived at hide it. */
+      linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--seam-b) 0%, transparent) 0,
+        color-mix(in srgb, var(--seam-b) 2%, transparent)
+          calc(var(--seam-h) * 0.12),
+        color-mix(in srgb, var(--seam-b) 7%, transparent)
+          calc(var(--seam-h) * 0.24),
+        color-mix(in srgb, var(--seam-b) 17%, transparent)
+          calc(var(--seam-h) * 0.36),
+        color-mix(in srgb, var(--seam-b) 33%, transparent)
+          calc(var(--seam-h) * 0.48),
+        color-mix(in srgb, var(--seam-b) 54%, transparent)
+          calc(var(--seam-h) * 0.6),
+        color-mix(in srgb, var(--seam-b) 74%, transparent)
+          calc(var(--seam-h) * 0.72),
+        color-mix(in srgb, var(--seam-b) 89%, transparent)
+          calc(var(--seam-h) * 0.82),
+        color-mix(in srgb, var(--seam-b) 97%, transparent)
+          calc(var(--seam-h) * 0.92),
+        var(--seam-b) var(--seam-h)
+      ),
+    linear-gradient(var(--seam-a), var(--seam-a));
+}
+
 [data-register="canvas"] {
   --surface-page: var(--c-surf); --surface-card: var(--c-card);
   --surface-control: var(--c-card);

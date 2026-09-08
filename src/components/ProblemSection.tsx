@@ -1,5 +1,7 @@
 "use client";
 
+import Reveal from "@/components/Reveal";
+import SectionSeam from "@/components/SectionSeam";
 import { useVertical } from "@/components/VerticalContext";
 
 const MUSEUM = {
@@ -27,26 +29,44 @@ export default function ProblemSection() {
   const copy = vertical === "gyms" ? GYM : MUSEUM;
 
   return (
-    <section id="problem" data-register="canvas" className="border-t border-line-hairline px-6 py-24">
-      <div className="mx-auto max-w-6xl">
-        <div className="text-xs font-semibold uppercase tracking-wider text-fg-muted">
+    <section
+      id="problem"
+      data-register="canvas"
+      className="relative px-6 pb-40 pt-40 md:pb-52 md:pt-48"
+    >
+      <SectionSeam from="product" to="canvas" />
+      {/* Top-down cascade: the claim resolves first, then its evidence lands a
+          line at a time. The section argues that a signal exists and goes
+          unrecorded, so the copy surfaces the way the signal would. */}
+      <div className="relative mx-auto max-w-6xl">
+        <Reveal
+          grammar="ink"
+          className="w-fit text-xs font-semibold uppercase tracking-wider text-fg-muted"
+        >
           The problem
-        </div>
-        <h2 className="mt-4 max-w-3xl text-3xl font-semibold leading-tight md:text-4xl">
-          {copy.heading}
-        </h2>
-        <p className="mt-4 max-w-2xl text-fg-secondary">{copy.lede}</p>
+        </Reveal>
+        <Reveal grammar="focus" lag={0.06} className="mt-4 max-w-3xl">
+          <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
+            {copy.heading}
+          </h2>
+        </Reveal>
+        <Reveal grammar="ghost" lag={0.18} className="mt-4 max-w-2xl">
+          <p className="text-fg-secondary">{copy.lede}</p>
+        </Reveal>
         <ul className="mt-8 space-y-3">
-          {copy.points.map((point) => (
-            <li
-              key={point}
-              className="flex items-start gap-3 text-sm text-fg-muted-list"
-            >
-              <span
-                aria-hidden
-                className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-marker-weak"
-              />
-              {point}
+          {copy.points.map((point, i) => (
+            <li key={point}>
+              <Reveal
+                grammar="ghost"
+                lag={0.14 * i}
+                className="flex items-start gap-3 text-sm text-fg-muted-list"
+              >
+                <span
+                  aria-hidden
+                  className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-marker-weak"
+                />
+                {point}
+              </Reveal>
             </li>
           ))}
         </ul>

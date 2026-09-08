@@ -1,5 +1,7 @@
 "use client";
 
+import Reveal from "@/components/Reveal";
+import SectionSeam from "@/components/SectionSeam";
 import { useVertical } from "@/components/VerticalContext";
 
 type Card = { title: string; desc: string };
@@ -57,29 +59,46 @@ export default function ValueSection() {
   const copy = vertical === "gyms" ? GYM : MUSEUM;
 
   return (
-    <section id="value" data-register="canvas" className="border-t border-line-hairline px-6 py-24">
-      <div className="mx-auto max-w-6xl">
+    <section
+      id="value"
+      data-register="canvas"
+      className="relative px-6 pb-40 pt-40 md:pb-52 md:pt-48"
+    >
+      <SectionSeam from="technical" to="canvas" />
+      <div className="relative mx-auto max-w-6xl">
         {/* Mirrors ProblemSection's "The problem" eyebrow. The spec's eyebrow
             text was identical to the museum heading, which rendered the same
             line twice. */}
-        <div className="text-xs font-semibold uppercase tracking-wider text-fg-muted">
+        <Reveal
+          grammar="ink"
+          className="w-fit text-xs font-semibold uppercase tracking-wider text-fg-muted"
+        >
           The value
-        </div>
-        <h2 className="mt-4 text-3xl font-semibold leading-tight md:text-4xl">
-          {copy.heading}
-        </h2>
+        </Reveal>
+        <Reveal grammar="focus" lag={0.06} className="mt-4">
+          <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
+            {copy.heading}
+          </h2>
+        </Reveal>
+        {/* Four answers on one baseline have no natural stagger, so the lag
+            supplies one: the row wipes left to right, which reads as results
+            landing rather than as four blocks appearing together. */}
         <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {copy.cards.map((item) => (
-            <div
+          {copy.cards.map((item, i) => (
+            <Reveal
               key={item.title}
+              grammar="settle"
+              lag={0.13 * i}
               className="rounded-xl border border-line-card bg-surface-card p-6"
             >
               <h3 className="text-lg font-semibold">{item.title}</h3>
               <p className="mt-2 text-sm text-fg-muted">{item.desc}</p>
-            </div>
+            </Reveal>
           ))}
         </div>
-        <p className="mt-8 max-w-2xl text-fg-secondary">{copy.closer}</p>
+        <Reveal grammar="ghost" lag={0.2} className="mt-8 max-w-2xl">
+          <p className="text-fg-secondary">{copy.closer}</p>
+        </Reveal>
       </div>
     </section>
   );
