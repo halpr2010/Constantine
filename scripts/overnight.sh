@@ -17,12 +17,11 @@ SKIP="${1:-0}"
 SUMMARY=".loop/overnight-$(date +%Y%m%d-%H%M).md"
 START_TIME=$(date +%s)
 
-# "N<TAB>task". N>1 only where variety is worth more than breadth.
-TASKS=$(cat <<'EOF'
-2	Make the page flow rather than stack. Read the AMENDED "Motion carries information" entry in DESIGN.md §5 - the previous ban on entrance animation was LIFTED on 08 Sep because the founder asked for exactly that mechanism: "when you scroll, features go from hidden to appearing in turn, or changing colour, or fading in... at the moment you get block colours at each new section". Look at shots/best/motion/scroll.png before you start: nine frames indexed by scroll position, every one a hard block of colour with sections simply swapping. That is the problem, and the same strip is how your work will be judged. Build scroll-driven progressive disclosure across the page: content arriving in sequence rather than all at once, and register changes reading as transitions instead of hard colour edges. Open design-refs/Claryo-scroll-1.png, -2.png and -3.png first. Motion must feel authored and sequenced, carrying the argument forward - not one uniform fade-and-slide stamped on every block, which is what the old ban was protecting against. Everything must freeze under prefers-reduced-motion with every element in its final revealed state. Do not touch the hero demos (§3).
-1	Rework the Outputs section figures. The section itself was praised - do not redesign it. The single problem is that the people read as flat icons. Open design-refs/Playvision-design-anoymous-player.png and the CLARIFIED "People are never identifiable" entry in DESIGN.md §5. The reference figures are VOLUMETRIC: real human proportion and pose, visible musculature and depth, a grainy luminous grey-white surface with soft glowing edges, like depth-sensor output. They read as a real person rendered anonymous, not as a pictogram. No facial detail may resolve - that rule is absolute and is what makes the anonymity real. Build this in code (SVG/CSS/canvas) against tokens; if you conclude it genuinely cannot be reached without a produced image asset, say so explicitly in your commit message rather than shipping a weak approximation. NOTE: the Outputs section lives on branch cand-20260907-213539-1, not on best - start by merging that branch into yours, then rework its figures.
-EOF
-)
+# The queue lives in scripts/tasks.tsv, not here. bash 3.2 (what macOS ships)
+# mishandles heredocs inside $( ), and a task string containing quotes and
+# parentheses silently broke the whole script's parse. Task text is data; it has
+# no business being shell source.
+TASKS=$(grep -v '^#' scripts/tasks.tsv | grep -v '^[[:space:]]*$')
 
 {
   echo "# Overnight run — $(date '+%Y-%m-%d %H:%M')"
