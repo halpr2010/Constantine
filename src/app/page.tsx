@@ -4,6 +4,7 @@ import HowItWorks from "@/components/HowItWorks";
 import ValueSection from "@/components/ValueSection";
 import PrivacySection from "@/components/PrivacySection";
 import UseCases from "@/components/UseCases";
+import OutputsSection from "@/components/OutputsSection";
 import PilotForm from "@/components/PilotForm";
 import ScrollProgress from "@/components/ScrollProgress";
 import { VerticalProvider } from "@/components/VerticalContext";
@@ -66,6 +67,10 @@ export default function Home() {
         <PrivacySection />
 
         <UseCases />
+
+        {/* §1's commercial order is use cases -> outputs -> the ask, so the
+            three-beat sits between the last argument and the CTA. */}
+        <OutputsSection />
 
         {/* Pilot */}
         <section id="pilot" className="border-t border-line-hairline px-6 py-24">

@@ -100,7 +100,17 @@ only `[UNBUILT]` and `[PARTIAL]` items. `[SLOT-BUILT — awaiting media]`
   stay off the public marketing site.
 - **Depth dial** *(Claryo's autonomy dial, adapted)* — `[UNBUILT]`.
 - **Outputs** — the data → insight → action three-beat *(PlayVision)* —
-  `[UNBUILT]`.
+  `[BUILT]` 07 Sep 2026. `src/components/OutputsSection.tsx`, with the
+  silhouette treatment in `src/components/GhostScene.tsx`; sits at `#outputs`
+  between use cases and the pilot form, per §1's use cases → outputs → the ask
+  order. Three alternating rows, each a canvas-register copy column against a
+  nested product-register stage carrying anonymised silhouettes with a
+  translucent output fragment over them. Each beat shows a different artefact
+  (a live zone feed, a ranked week, a Monday brief) so the three-beat is an
+  argument rather than three restatements. Every figure is illustrative and
+  says so on its own panel; ranked works are numbered rather than named. The
+  "Outputs capture" media slot below is still `[UNBUILT]` — the section ships
+  with drawn figures instead of a pending player.
 - **"Your Stack" integrations** *(Pocket hub-and-spoke)* — `[UNBUILT]`.
 - **Edge unit spec** *(Pocket annotated-callout treatment)* — `[UNBUILT]`.
 - **Edge pipeline trust architecture** — `[UNBUILT]`.
@@ -441,10 +451,19 @@ Screenshots in /design-refs/, cropped to the attribute named.
   don't clone the chrome-cube hero.
 - **PlayVision (withplayvision.ai)** — CONTENT TREATMENTS. Take: anonymised
   ghost-silhouette rendering of people (site-wide rule, generate via own
-  pipeline); hero stat + annotated real footage + capability bullets proof
-  pattern; data → insight → action three-beat; insight-panel UI fragments.
+  pipeline); data → insight → action three-beat; insight-panel UI fragments.
   Ignore: page palette, orange accent, mono-caps labels, bullet-heavy
   styling.
+  CORRECTED 07 Sep 2026, against workflow-{1,2,3} and
+  design-anoymous-player.png. This entry previously read "hero stat +
+  annotated real footage + capability bullets proof pattern". None of the
+  three workflow frames shows annotated real footage, a hero stat, or a
+  bullet: each is a two-column row of eyebrow + short display heading + one
+  prose paragraph, set against a dark panel of ghost silhouettes with a
+  translucent UI fragment floating over them, and the rows alternate side.
+  The fragment is the payload and it differs per row (a result list, bars
+  plus stat tiles, a tagged timeline), which is what makes the three-beat
+  read as a sequence.
 - **Slingshot AI (slingshotai.com)** — MECHANISMS + VOICE. Take: scroll
   progress bar; cursor-reactive liquid background (mechanism only, our
   hues, subordinated to hero demo); single-CTA discipline. Ignore:
