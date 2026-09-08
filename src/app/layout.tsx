@@ -50,6 +50,21 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* §4: a returning visitor is not re-gated, and a deep link never
+            lands behind an unanswered question. Both have to be settled
+            BEFORE first paint or the entry view flashes up and jumps away,
+            and localStorage does not exist on the server — so this runs ahead
+            of the markup and VerticalContext reconciles React with it a frame
+            later. Silent on failure: a blocked origin just gets asked again. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var d=document.documentElement,v=localStorage.getItem('constantine:vertical');" +
+              "if(v==='museums'||v==='gyms'){d.setAttribute('data-vertical',v);d.setAttribute('data-entry','answered');}" +
+              "else if(location.hash){d.setAttribute('data-entry','answered');}" +
+              "else{d.setAttribute('data-entry','asking');}}catch(e){}",
+          }}
+        />
         {children}
       </body>
     </html>

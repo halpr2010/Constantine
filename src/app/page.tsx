@@ -1,4 +1,6 @@
+import EntryView from "@/components/EntryView";
 import HeroSection from "@/components/HeroSection";
+import VerticalSwitcher from "@/components/VerticalSwitcher";
 import ProblemSection from "@/components/ProblemSection";
 import HowItWorks from "@/components/HowItWorks";
 import ValueSection from "@/components/ValueSection";
@@ -13,8 +15,10 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-surface-page text-fg-primary">
-      {/* The hero's switcher and every section that swaps copy read one shared
+    // `relative` is load-bearing: the vertical switcher is positioned against
+    // main while the entry question stands, so it scrolls with the entry view.
+    <main className="relative min-h-screen bg-surface-page text-fg-primary">
+      {/* The entry selector and every section that swaps copy read one shared
           vertical from this provider. Only those pieces are client components;
           this page stays server-rendered. */}
       <VerticalProvider>
@@ -48,18 +52,41 @@ export default function Home() {
                 Use cases
               </a>
             </nav>
-            <a
-              href="#pilot"
-              className="rounded-lg bg-action px-4 py-2 text-sm font-semibold text-on-action transition-colors hover:bg-action-hover"
-            >
-              Request a pilot
-            </a>
+            <div className="flex items-center gap-5">
+              {/* Where the vertical track lands after the drift (§4). Empty
+                  until then: VerticalSwitcher sizes it at the moment of
+                  selection, so the header carries no gap while the entry
+                  question is still standing. The wide slot is the reference's
+                  top-right corner; below lg the header gives it its own row,
+                  because logo + pilot CTA + a 300px track do not share 720px. */}
+              <div
+                data-dock-slot="wide"
+                aria-hidden
+                className="hidden shrink-0 lg:block"
+              />
+              <a
+                href="#pilot"
+                className="rounded-lg bg-action px-4 py-2 text-sm font-semibold text-on-action transition-colors hover:bg-action-hover"
+              >
+                Request a pilot
+              </a>
+            </div>
+          </div>
+          <div className="flex justify-end px-6 lg:hidden">
+            <div data-dock-slot="narrow" aria-hidden />
           </div>
           {/* The §5 rule rides the header's own bottom hairline, so page
               position is read off the edge that is already there rather than
               off a second band of chrome. */}
           <ScrollProgress />
         </header>
+
+        {/* The one control, and the question it answers. The track is a
+            sibling of the entry view rather than a child: on selection the
+            view unmounts and the track has to survive it. */}
+        <VerticalSwitcher />
+
+        <EntryView />
 
         <HeroSection />
 

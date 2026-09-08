@@ -84,12 +84,13 @@ Status tags reconciled against the codebase on 30 Aug 2026. The loop targets
 only `[UNBUILT]` and `[PARTIAL]` items. `[SLOT-BUILT — awaiting media]`
 (see §4d) counts as complete and is NOT a target.
 
-- **Persona gate** *(Claryo)* — `[PARTIAL — gap]`. A persistent two-way
-  switcher exists and reconfigures every section of the page per vertical,
-  but there is no full-screen "Are you running a…" gate moment, there are
-  two personas (Museums & Galleries / Gyms) rather than three, and the
-  per-persona skeleton has no outputs step.
-  `src/components/VerticalContext.tsx`, `HeroSection.tsx` (switcher UI).
+- **Persona gate** *(Claryo)* — `[PARTIAL — gap]`. UPDATED 08 Sep 2026: the
+  full-screen "Are you a…" moment now exists (see the Vertical selector item
+  below), and the switcher that reconfigures every section is the same
+  control. Remaining gap: two personas (Museums & Galleries / Gyms) rather
+  than three, and the per-persona skeleton has no outputs step.
+  `src/components/VerticalContext.tsx`, `EntryView.tsx`,
+  `VerticalSwitcher.tsx`.
 - **Gym use cases** in parallel structure to museums — `[PARTIAL — gap]`.
   Three cards cover equipment utilisation, layout configuration and fault
   detection. Peak-load staffing and member experience are absent; the
@@ -99,7 +100,21 @@ only `[UNBUILT]` and `[PARTIAL]` items. `[SLOT-BUILT — awaiting media]`
   example conflicts with the standing instruction that case-study figures
   stay off the public marketing site.
 - **Vertical selector — the site's entry view** *(Claryo, 10/10)* —
-  `[UNBUILT]`. CONFIRMED by founder 08 Sep 2026: this is the FIRST thing a
+  `[BUILT]` 08 Sep 2026. `src/components/EntryView.tsx` (the question),
+  `VerticalSwitcher.tsx` (the track and its drift), `VerticalContext.tsx`
+  (the answer, remembered), the entry block in `src/app/globals.css`, and the
+  dock slots in `src/app/page.tsx`.
+  HOW IT WAS BUILT, for the next candidate: the track is ONE DOM node in both
+  places rather than two that hand off. It is absolutely positioned in the
+  document while the question stands, so it scrolls like content; on selection
+  it is re-anchored to the viewport at the pixel it already occupies and
+  transitions to the header dock slot's measured rect. Measuring the slot is
+  what makes the landing correct at 390, where the header gives the track its
+  own row, and at 1440, where it lands between the nav and the pilot CTA. The
+  entry view unmounts rather than hiding, because `scripts/screenshot.mjs`
+  captures `section` first and a hidden-but-present entry section makes that
+  frame the gate instead of the hero.
+  ORIGINAL BRIEF, kept for the record. CONFIRMED by founder 08 Sep 2026: this is the FIRST thing a
   visitor sees, ahead of the hero. Reference:
   `design-refs/strips/Clary_Selector.png`. "Are you a…" centred on a clean
   light ground, one pill per vertical (Museums & Galleries / Gyms); hover
@@ -136,9 +151,12 @@ only `[UNBUILT]` and `[PARTIAL]` items. `[SLOT-BUILT — awaiting media]`
 Sections that exist on the site but were absent from this spec. Recorded so
 the loop does not rebuild them, and so their §5 conflicts are visible.
 
-- **Hero: vertical switcher + dual interactive demos** — `[BUILT]`. The
-  site's strongest asset and the subject of P1/P2.
-  `src/components/HeroSection.tsx` and the four wall components.
+- **Hero: dual interactive demos** — `[BUILT]`. The site's strongest asset
+  and the subject of P1/P2. `src/components/HeroSection.tsx` and the four
+  wall components. CORRECTED 08 Sep 2026: the in-hero switcher is retired per
+  the §4 decision, so the hero is now nothing but its demos and the one
+  control lives in the header. `hero-tab-museums` / `hero-tab-gyms` moved
+  with it and still drive the same state.
 - **Problem section (`#problem`)** — `[BUILT]`. Eyebrow, pain heading, lede
   and three supporting points; switches per vertical. Sits between hero and
   How it works. `src/components/ProblemSection.tsx`.
