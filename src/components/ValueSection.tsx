@@ -13,7 +13,7 @@ const MUSEUM = {
     },
     {
       title: "Is the new layout working?",
-      desc: "Measure a re-hang or exhibition change against a real before-and-after, not a hunch.",
+      desc: "Measure a re-hang or exhibition change against a real before-and-after, so you know whether it worked.",
     },
     {
       title: "Where do we lose people?",
@@ -33,7 +33,7 @@ const GYM = {
   cards: [
     {
       title: "Which equipment earns its floor space?",
-      desc: "See what members actually use, so refresh and buying decisions follow real demand, not guesswork.",
+      desc: "See what members actually use, so refresh and buying decisions follow real demand.",
     },
     {
       title: "Where does the floor create friction?",
@@ -41,7 +41,7 @@ const GYM = {
     },
     {
       title: "Is a machine down before members complain?",
-      desc: "Catch equipment whose usage drops out of pattern the same day, not a week later.",
+      desc: "Catch equipment whose usage drops out of pattern on the same day it happens.",
     },
     {
       title: "Did the refit actually work?",

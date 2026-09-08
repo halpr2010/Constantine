@@ -20,6 +20,9 @@ Opening backlog — this is the work, not a list of defects to clear by hand:
   reduced-motion) asserting §5 features not yet built.
 - 9 `X, not Y` copy violations (`COPY-VIOLATIONS.md`). The ban is absolute;
   the ratchet exists only because the site starts non-compliant.
+  CLEARED — all nine rewritten, `copy-lint.sh` is at 0. Once this promotes and
+  `--baseline` runs on `best`, the ratchet becomes the absolute §5 ban and any
+  new construction is a hard fail.
 
 ## References — look at them
 
