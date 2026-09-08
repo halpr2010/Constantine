@@ -74,7 +74,12 @@ test("no section is a bare wall of prose", async ({ page }) => {
     const bad: string[] = [];
     for (const sec of Array.from(document.querySelectorAll("main > section, section"))) {
       const text = (sec.textContent ?? "").replace(/\s+/g, " ").trim();
-      if (text.length < 900) continue; // only judge genuinely copy-heavy sections
+      // 300, not 900. The original threshold was set high enough that every
+      // offending section slipped under it — privacy at 811 chars with no
+      // visual at all passed, which is precisely the "block text and words
+      // with no diagrams" the founder scored 2/10 on Slingshot. A section with
+      // a real paragraph of argument needs something to look at.
+      if (text.length < 300) continue;
       const visual = sec.querySelector("img,svg,canvas,video,figure,table,[data-visual]");
       if (!visual) bad.push(`${sec.id || sec.className.toString().slice(0, 30)} — ${text.length} chars, no visual`);
     }

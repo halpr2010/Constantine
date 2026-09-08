@@ -451,9 +451,17 @@ field with a ping-pong feedback buffer for advection (source captured in
 design-refs/). Claryo's target look does not require that machinery, and
 Claryo scores higher; do not reach for a fluid simulation to hit it.
 
-PARKED 08 Sep 2026 by founder instruction: no candidate is to work on the
-ambient background until this is explicitly reopened. Two prior attempts were
-rejected as static, and the founder wants it reworked significantly later.
+REOPENED 08 Sep 2026. It was parked after the founder said "ambient should be
+reverted as we need to work on that significantly in future changes" — read as
+"shelve the feature" when it meant "discard these two attempts". Founder has
+since asked where the ambience is. It is live work again, and it is the
+highest-priority item on the list.
+
+Also still missing, and never tasked: the CUSTOM OBJECTS. The reference is not
+only a colour field — a white technical wireframe sits over the blooms and
+augments per scroll step (Claryo_Ambiance_and_Scroll_Functionality_3.png, and
+the hero line-work in Claryo_Ambient_Hero_Page.png). The registers exist as
+colour; the objects and their motion do not exist at all.
 
 Standing constraints: product/atmosphere register only, never behind the
 technical register; the hero demo stays the brightest, most detailed thing on

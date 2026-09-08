@@ -38,6 +38,31 @@ How to use it:
 Note the split verdict on Slingshot: **the hero is an 8, everything after it is a 2.**
 Score attributes, not domains — a site can be a target and an anti-reference at once.
 
+## This file is a work plan, not a reading list
+
+RULE ADDED 08 Sep 2026, after the founder found his own 10/10 notes absent from
+the site. Nine rows scored 10/10; only three were ever queued as tasks. The
+registry was written, cited by the critic, and then not converted into work.
+
+**Every 10/10 row that is not built yet is an open task, and must appear in
+`scripts/tasks.tsv` until it is.** Before starting any cycle, walk this table
+and check each target either exists on `best` or is in the queue. A reference
+nobody was tasked with is the same as a reference nobody wrote down.
+
+Status, 08 Sep 2026:
+
+| Reference | Built? |
+|---|---|
+| Claryo Selector | on `best`, refinements queued |
+| Claryo Hero (purple/steel ↔ technical) | NOT BUILT — queued |
+| Claryo Scroll | partially — cross-fade behaviour queued |
+| Claryo Scroll 2 | partially — same |
+| Claryo Ambience + custom objects | NOT BUILT — queued, highest priority |
+| Claryo Interactive (card raise on hover) | NOT BUILT — queued |
+| PlayVision People | on `best` (Outputs figures) |
+| PlayVision Hero Stat | NOT BUILT |
+| Slingshot Ambience (8/10, unbounded correction) | folded into the ambience task |
+
 ## What the loop still needs from a new reference
 
 1. A **score**, and if it is not 10, **what stops it**. The "why not 10" is worth
