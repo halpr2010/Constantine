@@ -44,11 +44,46 @@ const browser = await chromium.launch();
   fs.rmSync(`${TMP}/${v}`);
 }
 
-// 2 · scroll-indexed reveal
+// 2 · the entry selection transition, if a selector exists. The reference's
+//     defining behaviour is the tab drifting to the top right while the chosen
+//     view fades in, and neither a still nor a scroll strip can show it.
+{
+  const ctx = await browser.newContext({
+    viewport: { width: 1280, height: 760 },
+    recordVideo: { dir: TMP, size: { width: 1280, height: 760 } },
+  });
+  const p = await ctx.newPage();
+  await p.goto(`http://localhost:${port}`, { waitUntil: "networkidle" });
+  const gate = p.getByTestId("vertical-selector");
+  let recorded = false;
+  if (await gate.count()) {
+    await p.waitForTimeout(700);
+    const pick = p.getByTestId("select-museums");
+    if (await pick.count()) { await pick.hover(); await p.waitForTimeout(500); await pick.click(); }
+    await p.waitForTimeout(2600);
+    recorded = true;
+  }
+  await ctx.close();
+  const v = fs.readdirSync(TMP).find((f) => f.endsWith(".webm"));
+  if (v && recorded) {
+    execFileSync("ffmpeg", ["-y", "-v", "error", "-i", `${TMP}/${v}`,
+      "-vf", "fps=12/4,scale=420:-1,tile=3x4:padding=6:margin=6:color=0x232327",
+      "-frames:v", "1", `${OUT}/select.png`]);
+  }
+  if (v) fs.rmSync(`${TMP}/${v}`);
+}
+
+// 3 · scroll-indexed reveal
 {
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 760 } });
   const p = await ctx.newPage();
   await p.goto(`http://localhost:${port}`, { waitUntil: "networkidle" });
+  const g = p.getByTestId("vertical-selector");
+  if (await g.count()) {
+    const pick = p.getByTestId("select-museums");
+    if (await pick.count()) await pick.click();
+    await p.waitForTimeout(1600);
+  }
   const shots = [];
   for (const pct of [0, 12, 24, 36, 48, 60, 72, 84, 96]) {
     await p.evaluate((q) => {

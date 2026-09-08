@@ -13,6 +13,7 @@ const label = process.argv[2] ?? "current";
 const theme = process.argv[3] ?? "";   // "" = variant zero (dark)
 const BASE = process.env.SITE_URL ?? "http://localhost:3000";
 const OUT = `shots/${label}`;
+const name0 = "entry"; // capture the gate screen alongside the six §7 views
 const VIEWS = [
   ["hero", "section"],
   ["problem", "#problem"],
@@ -34,7 +35,27 @@ for (const [w, h] of [[1440, 900], [390, 844]]) {
       await page.evaluate((t) => document.documentElement.setAttribute("data-theme", t), theme);
       await page.waitForTimeout(250);
     }
-    if (vertical === "gyms") {
+    // The entry selector (§4) sits ahead of the hero, so every view below it is
+    // unreachable until a vertical is chosen. Capture the gate itself once,
+    // then answer it — otherwise the critic sees one screen and scores the
+    // whole site on it, which is what happened on the first attempt.
+    const gate = page.getByTestId("vertical-selector");
+    if (await gate.count()) {
+      if (name0 === "entry") {
+        await page.screenshot({ path: `${OUT}/${vertical}-entry-${w}.png`,
+          maskColor: "#1b1b1f", animations: "disabled" });
+      }
+      const pick = page.getByTestId(`select-${vertical}`);
+      if (await pick.count()) {
+        await pick.click();
+      } else {
+        // A candidate may name its controls differently; fall back to the
+        // hero tabs so an unconventional selector still yields captures.
+        const alt = page.getByTestId(`hero-tab-${vertical}`);
+        if (await alt.count()) await alt.click();
+      }
+      await page.waitForTimeout(1600); // drift + fade must finish
+    } else if (vertical === "gyms") {
       await page.getByTestId("hero-tab-gyms").click();
       await page.waitForTimeout(1400);
     }

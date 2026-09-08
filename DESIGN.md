@@ -106,6 +106,12 @@ only `[UNBUILT]` and `[PARTIAL]` items. `[SLOT-BUILT — awaiting media]`
   colourises the pill; on selection the tab **drifts to the top right** and the
   chosen view **fades in cleanly**, the tab remaining there as the control for
   switching.
+  REQUIRED TESTIDS (the capture harness drives these; without them the critic
+  cannot see past the gate and scores the whole site on one screen, which is
+  what happened on the first attempt): `vertical-selector` on the gate itself,
+  and `select-museums` / `select-gyms` on the two choices. The existing
+  `hero-tab-museums` / `hero-tab-gyms` must keep working wherever the switch
+  control ends up, because the floors drive them.
   Three decisions attached, for adjudication if a candidate disagrees:
   the choice is remembered locally so returning visitors are not re-gated;
   the existing in-hero switcher is retired so there is one control, not two;
@@ -517,6 +523,15 @@ D1–D5 and regresses on none. D6 is pass/fail, not comparative.
   spacing; absence of rejected tells.
 - **D3. Brand character** — demos intact and MORE prominent; silhouette
   rule respected; still unmistakably Constantine?
+  SELECTOR CARVE-OUT, 08 Sep 2026. The founder-confirmed entry view (§4) puts
+  a selection screen AHEAD of the hero by design. That is not a D3 regression
+  and must never be scored as one: judge the demos' prominence WITHIN the view
+  they occupy once a vertical is chosen, not by how far down the page they sit
+  on first load. Two candidates split on this exact point — one critic reasoned
+  correctly that "its existence is not a demotion", the other applied the
+  blanket rule and rejected it — which means the rubric, not the work, was at
+  fault. A candidate that shrinks, quietens or slows the demos inside the
+  post-selection view is still a regression.
 - **D4. Content persuasiveness** — problem → mechanism → outcome; does each
   persona find their path; is the stack/integration story credible?
 - **D5. Consistency** — new sections use the §5 card module and register

@@ -87,7 +87,17 @@ Three things that specifically apply here:
 
 3. **The demos are the protagonist** (§3). Anything that makes them smaller,
    quieter or slower is a D3 regression regardless of how much tidier the page
-   becomes.
+   becomes. EXCEPT the entry selector: §4's selection screen sits ahead of the
+   hero by founder decision, so judge the demos within the view they occupy
+   after a vertical is chosen, never by their distance from the top of the
+   document on first load.
+
+4. **If you cannot see it, say so — do not score it.** When the captures do not
+   answer a dimension, record that dimension as unjudged and say which capture
+   is missing. Do not convert missing evidence into a low score: a selector
+   candidate was marked ~5/10 partly because three of the reference's five
+   assertions "could not be checked at all from the captures supplied", which
+   is a harness failure being charged to the candidate.
 
 ## Output
 
