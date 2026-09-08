@@ -6,6 +6,7 @@ import HowItWorks from "@/components/HowItWorks";
 import ValueSection from "@/components/ValueSection";
 import PrivacySection from "@/components/PrivacySection";
 import UseCases from "@/components/UseCases";
+import FaqSection from "@/components/FaqSection";
 import PilotForm from "@/components/PilotForm";
 import ScrollProgress from "@/components/ScrollProgress";
 import ScrollStage from "@/components/ScrollStage";
@@ -99,6 +100,11 @@ export default function Home() {
         <PrivacySection />
 
         <UseCases />
+
+        {/* Last objections get answered on the page the buyer is already on,
+            immediately above the one CTA that follows from them. Inherits the
+            canvas register running unbroken to the footer, so it needs no seam. */}
+        <FaqSection />
 
         {/* Pilot. Claims the canvas register EXPLICITLY, and so does the footer
             below it. Both used to inherit the root theme's ground while Use

@@ -144,7 +144,12 @@ only `[UNBUILT]` and `[PARTIAL]` items. `[SLOT-BUILT — awaiting media]`
   qualitatively (funder reporting, equipment ROI, measuring a refit), but
   there is no donor/sponsor or exhibition-pricing depth and no pricing.
   `src/components/ValueSection.tsx`.
-- **Categorised FAQ** *(Pocket)* — `[UNBUILT]`.
+- **Categorised FAQ** *(Pocket)* — `[BUILT]` 07 Sep 2026.
+  `src/components/FaqSection.tsx`, between `#use` and `#pilot`. Four
+  categories (privacy, deployment, integration, commercial) on a rail, each
+  opening a panel of three answers over a chip row of the category's claims,
+  per the Pocket privacy module. Tagged `viewport-section`; it composes
+  within 1440×900 and 390×844 in every state a reader can reach.
 
 ### 4a. Already built, added by reconciliation
 
@@ -198,8 +203,10 @@ the loop does not rebuild them, and so their §5 conflicts are visible.
   `pointerover` as well as `pointermove` and a tap fires it. That is
   incidental rather than designed, and there is no explicit touch affordance.
   There is NO `prefers-reduced-motion` handling anywhere in the codebase.
-- **Viewport-fit discipline.** No sections are tagged (`viewport-section`
-  count is 0) and no section currently composes within one viewport.
+- **Viewport-fit discipline.** CORRECTED 07 Sep 2026: the rule is adopted.
+  `#faq` carries `data-testid="viewport-section"` and both floors are green.
+  Every other section is still untagged, and `#how` in particular (3113px at
+  390) is the scroll-step section the rule was really written for.
 
 ### 4c. Floors that pass without asserting anything (fix before relying on them)
 
