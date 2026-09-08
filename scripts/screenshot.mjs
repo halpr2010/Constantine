@@ -20,6 +20,7 @@ const VIEWS = [
   ["value", "#value"],
   ["privacy", "#privacy"],
   ["use", "#use"],
+  ["faq", "#faq"],
 ];
 
 fs.mkdirSync(OUT, { recursive: true });

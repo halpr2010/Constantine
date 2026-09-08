@@ -4,6 +4,7 @@ import HowItWorks from "@/components/HowItWorks";
 import ValueSection from "@/components/ValueSection";
 import PrivacySection from "@/components/PrivacySection";
 import UseCases from "@/components/UseCases";
+import FaqSection from "@/components/FaqSection";
 import PilotForm from "@/components/PilotForm";
 import ScrollProgress from "@/components/ScrollProgress";
 import { VerticalProvider } from "@/components/VerticalContext";
@@ -66,6 +67,10 @@ export default function Home() {
         <PrivacySection />
 
         <UseCases />
+
+        {/* Last objections get answered on the page the buyer is already on,
+            immediately above the one CTA that follows from them. */}
+        <FaqSection />
 
         {/* Pilot */}
         <section id="pilot" className="border-t border-line-hairline px-6 py-24">
