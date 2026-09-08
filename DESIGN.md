@@ -100,11 +100,13 @@ only `[UNBUILT]` and `[PARTIAL]` items. `[SLOT-BUILT — awaiting media]`
   stay off the public marketing site.
 - **Depth dial** *(Claryo's autonomy dial, adapted)* — `[UNBUILT]`.
 - **Outputs** — the data → insight → action three-beat *(PlayVision)* —
-  `[BUILT]` 07 Sep 2026. `src/components/OutputsSection.tsx`, with the
-  silhouette treatment in `src/components/GhostScene.tsx`; sits at `#outputs`
+  `[BUILT]` 07 Sep 2026, figures rebuilt 08 Sep 2026.
+  `src/components/OutputsSection.tsx`, with scene composition in
+  `src/components/GhostScene.tsx` and the figure renderer in
+  `src/components/GhostFigure.tsx`; sits at `#outputs`
   between use cases and the pilot form, per §1's use cases → outputs → the ask
   order. Three alternating rows, each a canvas-register copy column against a
-  nested product-register stage carrying anonymised silhouettes with a
+  nested product-register stage carrying anonymised figures with a
   translucent output fragment over them. Each beat shows a different artefact
   (a live zone feed, a ranked week, a Monday brief) so the three-beat is an
   argument rather than three restatements. Every figure is illustrative and
@@ -294,9 +296,21 @@ depth, a grainy luminous grey-white surface with soft glowing edges, like the
 output of a depth sensor. They read as a real person rendered anonymous, not as
 a pictogram. Identity is absent because no facial detail is resolved, not
 because the body is abstracted away.
-Humans appear as anonymised luminous grey-white tracked silhouettes — ideally rendered by the Constantine
-pipeline itself (masks, pose skeletons, engagement heat), so imagery is a
-true product output. This is the brand's privacy claim as visual language.
+Humans appear as anonymised luminous grey-white tracked figures — ideally
+rendered by the Constantine pipeline itself (masks, pose skeletons, engagement
+heat), so imagery is a true product output. This is the brand's privacy claim
+as visual language.
+
+IMPLEMENTED 08 Sep 2026, in code, with no produced image asset —
+`src/components/GhostFigure.tsx`. A figure is a posed skeleton in head-heights
+grown into overlapping anatomical masses at partial alpha; the accumulated
+alpha is a height field, and an SVG filter lights it, grains it and blooms its
+edge. Anyone extending this should read that file's header before authoring
+new artwork: the two things that make it volumetric rather than flat are the
+NESTED SHELLS (a mass emitted at 100/66/34% radius so its cross-section is a
+dome and not a plateau) and clipping BOTH lighting passes to the height field.
+The word "silhouette" is retired from this entry because it is what produced
+the pictogram.
 
 **Motion carries information** *(Claryo)*. AMENDED 08 Sep 2026 — founder
 verdict: "the website feels too segmented rather than flowing as it should".

@@ -1,6 +1,7 @@
 "use client";
 
 import GhostScene, { SceneVariant } from "@/components/GhostScene";
+import { GhostSprite } from "@/components/GhostFigure";
 import { useVertical } from "@/components/VerticalContext";
 
 /**
@@ -8,7 +9,7 @@ import { useVertical } from "@/components/VerticalContext";
  *
  * The reference pattern, read off design-refs/Playvision-workflow-{1,2,3}.png
  * rather than off prose about them: alternating rows, a short copy column on
- * one side, and on the other a dark stage carrying anonymised silhouettes with
+ * one side, and on the other a dark stage carrying anonymised figures with
  * a translucent fragment of the product UI floating over them. Each beat shows
  * a DIFFERENT artefact, because that is what makes the three-beat an argument
  * instead of three restatements: a live count, a ranking, a brief.
@@ -285,6 +286,7 @@ function Stage({
   idPrefix,
   label,
   side,
+  cast,
   children,
 }: {
   variant: SceneVariant;
@@ -292,6 +294,8 @@ function Stage({
   label: string;
   /** Which edge the fragment hangs off at md+; the field mirrors to match. */
   side: "left" | "right";
+  /** Which beat this is; the scene rotates its cast so the three differ. */
+  cast: number;
   children: React.ReactNode;
 }) {
   return (
@@ -301,7 +305,7 @@ function Stage({
       aria-label={label}
       className="relative h-[340px] w-full overflow-hidden rounded-xl border border-line-card md:h-[400px]"
     >
-      <GhostScene variant={variant} idPrefix={idPrefix} mirror={side === "right"} />
+      <GhostScene variant={variant} idPrefix={idPrefix} mirror={side === "right"} cast={cast} />
       {/* At md+ the fragment takes ~2/3 of the width so a whole figure stands
           clear of it; below that it goes near-full-width and the figures read
           in the bands above and below instead. */}
@@ -368,6 +372,8 @@ export default function OutputsSection() {
       data-register="canvas"
       className="border-t border-line-hairline px-6 py-24"
     >
+      {/* Three poses, serialised once for all three stages. */}
+      <GhostSprite />
       <div className="mx-auto max-w-6xl">
         <div className="text-xs font-medium tracking-wide text-fg-muted">Outputs</div>
         <h2 className="mt-4 text-3xl font-semibold leading-tight md:text-4xl">
@@ -385,7 +391,8 @@ export default function OutputsSection() {
                 variant="tracks"
                 idPrefix="out-data"
                 side="left"
-                label={`Illustration: anonymised silhouettes on a synthetic ${place} with detection boxes, behind a sample live zone feed`}
+                cast={0}
+                label={`Illustration: anonymised depth-rendered figures on a synthetic ${place} with detection boxes, behind a sample live zone feed`}
               >
                 <FeedFragment c={c.data} />
               </Stage>
@@ -401,7 +408,8 @@ export default function OutputsSection() {
                 variant="heat"
                 idPrefix="out-insight"
                 side="right"
-                label={`Illustration: anonymised silhouettes on a synthetic ${place} with engagement heat, behind a sample weekly ranking`}
+                cast={1}
+                label={`Illustration: anonymised depth-rendered figures on a synthetic ${place} with engagement heat, behind a sample weekly ranking`}
               >
                 <RankFragment c={c.insight} />
               </Stage>
@@ -416,7 +424,8 @@ export default function OutputsSection() {
                 variant="zones"
                 idPrefix="out-action"
                 side="left"
-                label={`Illustration: anonymised silhouettes on a synthetic ${place} with a marked zone, behind a sample Monday brief`}
+                cast={2}
+                label={`Illustration: anonymised depth-rendered figures on a synthetic ${place} with a marked zone, behind a sample Monday brief`}
               >
                 <BriefFragment c={c.action} />
               </Stage>

@@ -1,157 +1,201 @@
 /**
- * GhostScene — the §5 silhouette treatment, drawn rather than filmed.
+ * GhostScene — the stage behind each Outputs beat: a few anonymised people in
+ * one room, with the pipeline's own overlay for that beat drawn over them.
  *
- * PlayVision's people are luminous grey-white ghosts on black with no facial
- * detail (design-refs/Playvision-design-anoymous-player.png). §5 elevates that
- * to a hard site rule, so this is the one place the Outputs section shows a
- * person: an abstract mask, no features, no photography.
+ * The figures themselves are GhostFigure's volumetric depth-render; read that
+ * file's header for what "anonymised" means here and why it is built the way
+ * it is. This file is composition only — where the people stand, how big they
+ * are, and which overlay belongs to which beat.
  *
- * It is deliberately a diagram and not footage. §9 forbids anything implying
- * pilot footage exists, so the shapes stay obviously synthetic and the panel
- * that hosts them carries an "Illustrative" marker.
+ * COMPOSITION. The reference (design-refs/Playvision-design-anoymous-player.png)
+ * puts its subject close enough that the frame cuts through the head and the
+ * arm, with the UI fragment lying across the chest. That crop is the whole
+ * reason the volume reads: at pictogram scale a deltoid is three pixels. So
+ * each stage has ONE near figure at roughly reference scale, cropped by the
+ * frame, plus two figures further into the room for depth and for the overlays
+ * to attach to. The old build's five same-size figures in a row is what made
+ * it a sign field.
  *
- * Static by construction: no animation, so nothing here has to be switched
- * off under prefers-reduced-motion.
+ * Static by construction: no animation, so nothing here has to be switched off
+ * under prefers-reduced-motion.
  */
+
+import { GhostBody, GhostFilter, PoseId, feet } from "@/components/GhostFigure";
 
 export type SceneVariant = "tracks" | "heat" | "zones";
 
-/** Local figure height, in viewBox units, for the shared body path below. */
-const H = 106;
-
 /**
- * Layout is composed against the fragment that floats over it, because a
- * centred panel hides whatever sits behind it. Measured at both widths:
- * the panel covers roughly y 70–191 at 1440 and y 53–206 at 390, so the two
- * tall figures are scaled to clear it at BOTH ends (head above, feet below)
- * and the small ones deliberately show only a head or only legs. `x` is the
- * figure's centre; 390 crops the field to x 70–330, which is why the hero
- * figure at 340 is the one allowed to fall off the mobile edge.
+ * Who is standing where, per beat. Three stages running the same figure in the
+ * same spot reads as one image stamped three times; rotating the cast and
+ * nudging the marks keeps them three views of one room. The offsets are small
+ * on purpose — the near mark is constrained on both axes at both widths (see
+ * the placement note below) and there is little room to move.
  */
-const FIGURES = [
-  { id: "t-04", x: 340, y: 28, s: 1.95, o: 1 },
-  { id: "t-11", x: 206, y: 24, s: 1.86, o: 0.6 },
-  { id: "t-07", x: 96, y: 28, s: 1.78, o: 0.78 },
-  { id: "t-02", x: 272, y: 4, s: 0.8, o: 0.4 },
-  { id: "t-09", x: 150, y: 150, s: 0.95, o: 0.45 },
+const CAST: { poses: [PoseId, PoseId, PoseId]; dx: number; dy: number }[] = [
+  { poses: ["gf-stand", "gf-walk", "gf-regard"], dx: 0, dy: 0 },
+  { poses: ["gf-regard", "gf-stand", "gf-walk"], dx: -8, dy: 3 },
+  { poses: ["gf-walk", "gf-regard", "gf-stand"], dx: 7, dy: -2 },
 ];
 
-/**
- * One closed outline: shoulders, arms hanging at the sides, torso, two legs.
- * A single path rather than a union of shapes, because every fill here is a
- * translucent token and overlapping shapes would seam where they cross.
- * No features, by rule and by design — under the blur it reads as the
- * segmentation mask the pipeline actually produces.
- */
-const BODY =
-  "M -8,21 C -13,23 -16,28 -17.5,36 L -20,62 L -15.5,63 L -12.8,40 L -12,44 " +
-  "C -12.4,56 -12.6,70 -12,84 L -10,106 L -2.6,106 L 0,80 L 2.6,106 L 10,106 " +
-  "L 12,84 C 12.6,70 12.4,56 12,44 L 12.8,40 L 15.5,63 L 20,62 L 17.5,36 " +
-  "C 16,28 13,23 8,21 Z";
+const W = 400;
+const H = 260;
 
-function Figure({ x, y, s, o }: { x: number; y: number; s: number; o: number }) {
-  return (
-    <g transform={`translate(${x} ${y}) scale(${s})`} opacity={o}>
-      <circle cx={0} cy={11} r={8} />
-      <path d={BODY} />
-    </g>
-  );
-}
+/**
+ * Head-heights in viewBox units per depth layer.
+ *
+ * Placement is worked against what the frame actually shows, which is not the
+ * viewBox. `slice` at 1440 maps this 400x260 box into a 740x400 panel at 1.85x
+ * and crops the top and bottom, so only y 22..238 is ever visible; the
+ * fragment then covers x 13..277, y 76..184. That leaves ONE column clear
+ * across the full height — x 277..400, mirrored to 0..123 when the fragment
+ * sits on the right — and two thin bands above and below the fragment.
+ *
+ * The near figure owns the clear column at 46u: head, shoulders, chest and
+ * hips inside the frame, legs running off the bottom edge. That is the
+ * reference's crop rather than a shrunken copy of it. The other two stand
+ * further into the room and read through the bands, head above and feet below,
+ * which is what gives the panel any depth at all.
+ *
+ * 390 crops the other axis: 1.31x scale leaves only x 69..331 visible. The
+ * near figure therefore sits at 306 rather than in the middle of the desktop
+ * clear column — the overlap of "clear at 1440" and "on screen at 390" is
+ * x 277..331, and the previous build put its largest figure outside it, so
+ * mobile got a sliver of one arm.
+ */
+const NEAR = 46;
+const MID = 27;
+const FAR = 19;
 
 export default function GhostScene({
   variant,
   idPrefix,
   mirror = false,
+  cast = 0,
 }: {
   variant: SceneVariant;
   idPrefix: string;
-  /** Flip the field so the full-height figure lands opposite the fragment. */
+  /** Flip the room so the near figure lands opposite the fragment. */
   mirror?: boolean;
+  /** Which beat this is; picks the arrangement from CAST. */
+  cast?: number;
 }) {
-  // Filter ids are document-global, so three scenes on one page would
-  // otherwise all resolve to the first one's blur radius.
-  const halo = `${idPrefix}-halo`;
-  const core = `${idPrefix}-core`;
+  const c = CAST[cast % CAST.length];
+  // Filter and mask ids are document-global; three scenes on one page would
+  // otherwise all resolve to the first one's blur radius and lamp.
+  const fNear = `${idPrefix}-near`;
+  const fFar = `${idPrefix}-far`;
+  const mask = `${idPrefix}-mask`;
   const wash = `${idPrefix}-wash`;
-  const body = `${idPrefix}-body`;
-  // Mirrored by coordinate rather than by transform: a scaleX(-1) on the root
-  // would reverse the track ids and the zone label with it.
-  const figures = FIGURES.map((f) => ({ ...f, x: mirror ? 400 - f.x : f.x }));
+
+  // Mirrored by coordinate rather than by transform: scaleX(-1) on the root
+  // would reverse the track ids and the zone label with them.
+  const mx = (x: number) => (mirror ? W - x : x);
+
+  // Base coordinates assume the fragment on the LEFT; mirror flips the room.
+  const near = { x: mx(306 + c.dx), y: 24 + c.dy, u: NEAR };
+  const mid = { x: mx(118 - c.dx), y: 30 - c.dy, u: MID };
+  const far = { x: mx(206 + c.dx), y: 46, u: FAR };
+  // One lamp for the whole room, above and inboard of the near figure so the
+  // light direction agrees across the depth layers and the three read as being
+  // in the same space. z is deliberately low relative to the frame: a lamp
+  // directly overhead lights every surface head-on and flattens the modelling
+  // back out, so it rakes across instead.
+  const lamp: [number, number, number] = [mx(210), -60, 150];
 
   return (
     <svg
-      viewBox="0 0 400 260"
-      preserveAspectRatio="xMidYMid slice"
+      viewBox={`0 0 ${W} ${H}`}
+      /* At 1440 the panel's aspect makes `slice` crop the y axis only, so this
+         alignment does nothing there. At 390 it crops 158 units off the x axis
+         instead, and centring that crop cuts the near figure in half at the
+         frame edge. Biasing the crop toward the figure's own side keeps its
+         head and shoulders in the one band the fragment does not cover. */
+      preserveAspectRatio={mirror ? "xMinYMid slice" : "xMaxYMid slice"}
       className="absolute inset-0 h-full w-full"
       aria-hidden="true"
       focusable="false"
     >
       <defs>
-        <filter id={halo} x="-40%" y="-40%" width="180%" height="180%">
-          <feGaussianBlur stdDeviation="3.2" />
-        </filter>
-        <filter id={core} x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="0.9" />
-        </filter>
+        <GhostFilter id={fNear} u={NEAR} light={lamp} seed={7} />
+        <GhostFilter id={fFar} u={MID} light={lamp} seed={19} />
         <radialGradient id={wash}>
-          <stop offset="0%" stopColor="var(--instrument-fg-weak)" stopOpacity="0.55" />
+          <stop offset="0%" stopColor="var(--instrument-fg-weak)" stopOpacity="0.5" />
           <stop offset="100%" stopColor="var(--instrument-fg-weak)" stopOpacity="0" />
         </radialGradient>
-        {/* userSpaceOnUse resolves inside each figure's own transform, so 0–106
-            is that figure's height: the mask is brightest at the head and falls
-            away toward the feet rather than sitting as one flat cut-out. */}
-        <linearGradient
-          id={body}
-          gradientUnits="userSpaceOnUse"
-          x1="0"
-          y1="0"
-          x2="0"
-          y2={H}
-        >
-          <stop offset="0%" stopColor="var(--instrument-fg-strong)" stopOpacity="0.95" />
-          <stop offset="55%" stopColor="var(--instrument-fg-weak)" stopOpacity="0.8" />
-          <stop offset="100%" stopColor="var(--instrument-fg-faint)" stopOpacity="0.45" />
-        </linearGradient>
+
+        {/* The depth render, consumed as luminance. Opacity is applied to each
+            filtered group AFTER lighting, so a distant figure is dimmer
+            without its surface also being flatter. */}
+        <mask id={mask} maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
+          <g filter={`url(#${fFar})`} opacity={0.45}>
+            <GhostBody pose={c.poses[2]} {...far} />
+          </g>
+          <g filter={`url(#${fFar})`} opacity={0.72}>
+            <GhostBody pose={c.poses[1]} {...mid} />
+          </g>
+          <g filter={`url(#${fNear})`}>
+            <GhostBody pose={c.poses[0]} {...near} />
+          </g>
+        </mask>
       </defs>
 
       {/* Engagement heat pools at the feet, the way the pipeline layers it. */}
-      {variant === "heat" &&
-        figures.map((f) => (
+      {variant === "heat" && (
+        <g>
           <ellipse
-            key={`h-${f.id}`}
-            cx={f.x}
-            cy={f.y + H * f.s}
-            rx={40 * f.s}
-            ry={11 * f.s}
+            cx={near.x}
+            cy={feet(near.y, near.u)}
+            rx={2.1 * near.u}
+            ry={0.5 * near.u}
             fill={`url(#${wash})`}
-            opacity={f.o}
+            opacity={0.85}
           />
-        ))}
+          <ellipse
+            cx={mid.x}
+            cy={feet(mid.y, mid.u)}
+            rx={2.1 * mid.u}
+            ry={0.5 * mid.u}
+            fill={`url(#${wash})`}
+            opacity={0.6}
+          />
+          <ellipse
+            cx={far.x}
+            cy={feet(far.y, far.u)}
+            rx={2.1 * far.u}
+            ry={0.5 * far.u}
+            fill={`url(#${wash})`}
+            opacity={0.4}
+          />
+        </g>
+      )}
 
-      <g filter={`url(#${halo})`} fill="var(--instrument-fg-faint)" opacity={0.45}>
-        {figures.map((f) => (
-          <Figure key={`a-${f.id}`} {...f} />
-        ))}
-      </g>
-      {/* Held well below full white: §5 makes the hero demo the protagonist,
-          and a bright cut-out here would out-shout the fragment it sits under. */}
-      <g filter={`url(#${core})`} fill={`url(#${body})`} opacity={0.72}>
-        {figures.map((f) => (
-          <Figure key={`b-${f.id}`} {...f} />
-        ))}
-      </g>
+      {/* One rect, one token. Every visible pixel of every figure is
+          --instrument-fg-strong at some luminance, so the whole treatment
+          re-themes with the instrument scale and cannot drift to a literal. */}
+      <rect
+        x="0"
+        y="0"
+        width={W}
+        height={H}
+        fill="var(--instrument-fg-strong)"
+        mask={`url(#${mask})`}
+      />
 
-      {/* Detection boxes: the raw stage, so only the three nearest figures
-          carry one and the ids are anonymous counters. */}
+      {/* Detection boxes: the raw stage. Only the two figures standing clear of
+          the frame edge carry one, since a box round a cropped body is a box
+          round nothing. Ids are anonymous counters. */}
       {variant === "tracks" && (
         <g opacity={0.85}>
-          {figures.slice(0, 3).map((f) => (
-            <g key={`r-${f.id}`}>
+          {[
+            { id: "t-11", ...mid },
+            { id: "t-07", ...far },
+          ].map((t) => (
+            <g key={t.id}>
               <rect
-                x={f.x - 21 * f.s}
-                y={f.y - 3}
-                width={42 * f.s}
-                height={H * f.s + 6}
+                x={t.x - 1.5 * t.u}
+                y={t.y - 0.2 * t.u}
+                width={3 * t.u}
+                height={7.9 * t.u}
                 rx={2}
                 fill="none"
                 stroke="var(--instrument-fg-faint)"
@@ -159,39 +203,53 @@ export default function GhostScene({
                 strokeDasharray="4 4"
               />
               <text
-                x={f.x - 21 * f.s}
-                y={f.y - 7}
+                x={t.x - 1.5 * t.u}
+                y={t.y - 0.2 * t.u - 4}
                 fill="var(--instrument-fg)"
                 fontSize={8}
                 fontFamily="var(--font-mono)"
               >
-                {f.id}
+                {t.id}
               </text>
             </g>
           ))}
+          {/* The near figure is tracked too. Its box would be larger than the
+              frame, so the id alone sits under it — y 228 is the one strip
+              clear of the fragment at BOTH widths (below 218 at 390, above the
+              238 crop line at 1440). */}
+          <text
+            x={near.x}
+            textAnchor="middle"
+            y={228}
+            fill="var(--instrument-fg)"
+            fontSize={9}
+            fontFamily="var(--font-mono)"
+          >
+            t-04
+          </text>
         </g>
       )}
 
       {/* Zone outline: where a count turns into a decision about a room. */}
       {variant === "zones" && (
         <g opacity={0.9}>
-          {/* Kept inside y 6–248: at 1440 the panel is wider than the field's
-              aspect, so slice crops roughly four units off each edge. */}
           <path
-            d="M 18 240 L 150 198 L 384 236 L 384 248 L 18 248 Z"
+            d="M 18 238 L 150 200 L 384 234 L 384 250 L 18 250 Z"
             fill="none"
             stroke="var(--instrument-fg-faint)"
             strokeWidth="0.8"
           />
           <path
-            d="M 150 198 L 162 200 M 150 198 L 150 206"
+            d="M 150 200 L 164 202 M 150 200 L 150 210"
             stroke="var(--instrument-fg)"
             strokeWidth="1.4"
             fill="none"
           />
+          {/* Below the corner, not above it: at 1440 the fragment's bottom edge
+              lands on y 184 and a label set above the corner is clipped by it. */}
           <text
-            x={156}
-            y={194}
+            x={158}
+            y={216}
             fill="var(--instrument-fg)"
             fontSize={8}
             fontFamily="var(--font-mono)"
