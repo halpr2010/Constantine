@@ -203,6 +203,44 @@ test.describe("§5 design floors (v2 constitution)", () => {
     await ctx.close();
   });
 
+  test("ambient field moves on its own, with no cursor input", async ({ page }) => {
+    // The floor that was missing. Two candidates satisfied every stated §5
+    // constraint and were rejected as "completely static": one had no
+    // autonomous animation at all, the other drifted too slowly to see. The
+    // gate could not tell either from a working field, so it passed both.
+    //
+    // Sample the field twice, 900ms apart, touching nothing. A field that is
+    // genuinely drifting changes; one that only answers the cursor does not.
+    await page.goto(BASE, { waitUntil: "networkidle" });
+    const field = page.getByTestId("ambient-field").first();
+    await expect(field).toBeAttached();
+    const hashOf = async () =>
+      createHash("sha256").update(await field.screenshot()).digest("hex");
+    const first = await hashOf();
+    await page.waitForTimeout(900);
+    expect(
+      await hashOf(),
+      "ambient field is static: §5 requires continuous autonomous drift, " +
+        "with cursor reactivity modulating it rather than replacing it"
+    ).not.toBe(first);
+  });
+
+  test("ambient field is visible, not imperceptible", async ({ page }) => {
+    // "Low intensity" produced two fields indistinguishable from each other
+    // and from no field at all. §5 now requires the field to be clearly
+    // present as atmosphere, so assert it actually paints a spread of tones
+    // rather than one flat ground colour.
+    await page.goto(BASE, { waitUntil: "networkidle" });
+    const field = page.getByTestId("ambient-field").first();
+    await expect(field).toBeAttached();
+    const spread = await field.screenshot().then((buf) => {
+      // Cheap proxy for "there is a gradient here": distinct byte values
+      // across the PNG. A flat fill compresses to very few.
+      return new Set(buf).size;
+    });
+    expect(spread, "ambient field renders as a flat fill").toBeGreaterThan(64);
+  });
+
   test("touch: demos start via tap (hover is not the only path)", async ({ browser }) => {
     const ctx = await browser.newContext({
       viewport: { width: 390, height: 844 },

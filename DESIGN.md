@@ -276,22 +276,65 @@ register discipline and craft, NOT on conformance to the three-register
 system, and the loop must not "fix" the palette on its own initiative.
 
 **People are never identifiable** *(PlayVision, elevated to hard rule)*.
-No recognisable faces anywhere. Humans appear as anonymised luminous
-grey-white tracked silhouettes — ideally rendered by the Constantine
+No recognisable faces anywhere. CLARIFIED 08 Sep 2026: "silhouette" has been
+read as a flat icon-like cut-out, which is wrong and was rejected on the
+Outputs section. See design-refs/Playvision-design-anoymous-player.png — the
+figures are VOLUMETRIC: real human proportion and pose, visible musculature and
+depth, a grainy luminous grey-white surface with soft glowing edges, like the
+output of a depth sensor. They read as a real person rendered anonymous, not as
+a pictogram. Identity is absent because no facial detail is resolved, not
+because the body is abstracted away.
+Humans appear as anonymised luminous grey-white tracked silhouettes — ideally rendered by the Constantine
 pipeline itself (masks, pose skeletons, engagement heat), so imagery is a
 true product output. This is the brand's privacy claim as visual language.
 
-**Motion carries information** *(Claryo)*. Scroll-driven progressive
-disclosure is encouraged where each step adds semantic content — a new
-stage, annotation, or metric; sections may pin while content advances.
-Decorative entrance animation (per-section fade-and-slide) stays banned.
-User-triggered motion (the hover demos) is the star and gets the budget.
+**Motion carries information** *(Claryo)*. AMENDED 08 Sep 2026 — founder
+verdict: "the website feels too segmented rather than flowing as it should".
 
-**Ambient background** *(Slingshot mechanism, our hues)*. A cursor-reactive
-liquid gradient field is welcome in the product/atmosphere register under
-hard constraints: low intensity (the hero demo remains the obvious
-protagonist), zero measurable FPS impact on demo timers, fully static under
-prefers-reduced-motion, never behind the technical register.
+The page must read as one continuous journey, not a stack of blocks. As the
+visitor scrolls, content should arrive: elements appearing in turn rather than
+all at once, fading in, changing state, revealing in sequence. Register changes
+must be transitions rather than hard colour edges — today each new section
+lands as an abrupt block of colour, which is the specific thing being
+rejected.
+
+THE PREVIOUS BAN IS LIFTED. This section used to read "Decorative entrance
+animation (per-section fade-and-slide) stays banned", which forbade the very
+mechanism now being asked for. The intent behind the ban survives as a quality
+bar, not a prohibition: motion must feel authored and sequenced, carrying the
+argument forward, rather than a uniform fade-and-slide applied indiscriminately
+to every block. Sections may pin while content advances.
+
+User-triggered motion (the hover demos) is still the star and still gets the
+budget. All scroll motion freezes under prefers-reduced-motion, with every
+element in its final revealed state.
+
+**Ambient background** *(Slingshot mechanism, our hues)*. A liquid gradient
+field in the product/atmosphere register. REWRITTEN 08 Sep 2026 after both
+candidates built to the previous wording were rejected as "completely static".
+
+The effect comes FIRST: the field must visibly, continuously move of its own
+accord — slow fluid drift, lobes crossing and separating, the surface never
+still. Cursor reactivity is a modulation ON TOP of that autonomous motion, not
+a replacement for it. A field that only moves when the cursor moves has not
+built this.
+
+It must also be seen. "Low intensity" previously produced two fields that were
+imperceptible and indistinguishable from each other; the field should be
+clearly present as atmosphere while the hero demo stays the brightest and most
+detailed thing on screen. If a reviewer has to be told the field is there, it
+is too weak.
+
+Standing constraints, which remain but are subordinate to the effect: never
+behind the technical register; no measurable FPS cost to the demo timers
+(a compositor-only animation satisfies this — continuous motion is NOT a
+violation); and fully static under prefers-reduced-motion, where the
+composition must still read as a still image.
+
+PRIOR-WORDING NOTE: "low intensity", "zero FPS impact" and "fully static under
+reduced motion" were listed as three hard constraints with no statement of the
+intended effect, so both candidates optimised for the constraints and produced
+nothing. State the effect first; constraints bound it, they do not define it.
 
 **Scroll progress bar** *(Slingshot)*. A single hairline on the header's
 bottom edge, growing left to right as the page scrolls. See

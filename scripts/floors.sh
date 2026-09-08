@@ -32,8 +32,11 @@ echo "build ok"
 # discarded a candidate that had cleared every copy violation. Always serve the
 # build we just made.
 echo "── serve ─────────────────────────────────────────────"
-pkill -f 'next-server' 2>/dev/null
-for i in $(seq 1 20); do pgrep -f 'next-server' >/dev/null || break; sleep 1; done
+# Kill only what is on OUR port. A blanket pkill also takes down the
+# side-by-side preview servers on 3101+, which are someone's review session.
+PID=$(lsof -ti tcp:3000 2>/dev/null)
+[ -n "$PID" ] && kill $PID 2>/dev/null
+for i in $(seq 1 20); do lsof -ti tcp:3000 >/dev/null 2>&1 || break; sleep 1; done
 nohup npx next start -p 3000 > .loop/server.log 2>&1 &
 UP=0
 for i in $(seq 1 60); do
