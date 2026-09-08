@@ -51,14 +51,6 @@ while IFS=$'\t' read -r N TASK; do
     echo "     !! task $i did not complete cleanly — continuing"
   fi
 
-  # A dirty tree stops every later task dead (loop.sh refuses to start), so
-  # never carry one forward. Anything left uncommitted here is a bug worth
-  # seeing in the morning, not worth losing the night to.
-  if ! git diff --quiet || ! git diff --cached --quiet; then
-    echo "     !! tree left dirty by task $i — committing so later tasks can run"
-    git add -A && git commit -q -m "overnight: salvage uncommitted state after task $i" || true
-  fi
-
   {
     echo "## Task $i — $SHORT…"
     echo
@@ -66,6 +58,14 @@ while IFS=$'\t' read -r N TASK; do
     [ -n "$ROWS" ] && printf '%s\n' "$ROWS" || echo "_no candidate completed_"
     echo
   } >> "$SUMMARY"
+
+  # A dirty tree stops every later task dead (loop.sh refuses to start), so
+  # never carry one forward. Anything left uncommitted here is a bug worth
+  # seeing in the morning, not worth losing the night to.
+  if ! git diff --quiet || ! git diff --cached --quiet; then
+    echo "     !! tree left dirty by task $i — committing so later tasks can run"
+    git add -A && git commit -q -m "overnight: salvage uncommitted state after task $i" || true
+  fi
 done <<< "$TASKS"
 
 MINS=$(( ($(date +%s) - START_TIME) / 60 ))

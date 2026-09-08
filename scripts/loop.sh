@@ -32,7 +32,7 @@ git rev-parse --verify -q "$BEST" >/dev/null || { echo "loop: no '$BEST' branch"
 echo "══ capturing best ═══════════════════════════════════"
 git checkout -q "$BEST"
 npm run build > /dev/null 2>&1
-pkill -f 'next-server' 2>/dev/null; sleep 1
+{ P=$(lsof -ti tcp:3000 2>/dev/null); [ -n "$P" ] && kill $P 2>/dev/null; }; sleep 1
 nohup npx next start -p 3000 > /dev/null 2>&1 &
 for i in $(seq 1 60); do curl -sf -m 5 -o /dev/null http://localhost:3000/ && break; sleep 1; done
 ./scripts/capture.sh best
@@ -76,7 +76,7 @@ genuinely different one rather than repeating it." \
   cp "$LOG/floors-$i.txt" .loop/floors.txt
 
   echo "── capture ──────────────────────────────────────────"
-  pkill -f 'next-server' 2>/dev/null; sleep 1
+  { P=$(lsof -ti tcp:3000 2>/dev/null); [ -n "$P" ] && kill $P 2>/dev/null; }; sleep 1
   nohup npx next start -p 3000 > /dev/null 2>&1 &
   for j in $(seq 1 60); do curl -sf -m 5 -o /dev/null http://localhost:3000/ && break; sleep 1; done
   rm -rf shots/candidate && ./scripts/capture.sh candidate

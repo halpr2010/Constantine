@@ -51,11 +51,9 @@ playwright-report/
 shots/best/
 shots/candidate/
 shots/compare/
-.loop/cycle-*/
-.loop/last-run.json
-.loop/build.log
-.loop/floors.txt
-.loop/verdict.json
+.loop/*
+!.loop/copy-baseline.txt
+!.loop/tests-baseline.txt
 test-results/
 
 # Live preview worktrees
