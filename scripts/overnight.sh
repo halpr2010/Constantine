@@ -12,6 +12,8 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p .loop
 
+# overnight.sh [SKIP] — skip the first SKIP tasks, to resume an interrupted run.
+SKIP="${1:-0}"
 SUMMARY=".loop/overnight-$(date +%Y%m%d-%H%M).md"
 START_TIME=$(date +%s)
 
@@ -40,6 +42,7 @@ i=0
 while IFS=$'\t' read -r N TASK; do
   [ -z "${TASK:-}" ] && continue
   i=$((i+1))
+  [ "$i" -le "$SKIP" ] && { echo "──── task $i skipped (resume)"; continue; }
   SHORT="$(printf '%s' "$TASK" | cut -c1-70)"
   echo
   echo "████ task $i (N=$N) — $SHORT…"
