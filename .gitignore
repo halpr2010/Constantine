@@ -57,3 +57,6 @@ shots/compare/
 .loop/floors.txt
 .loop/verdict.json
 test-results/
+
+# Live preview worktrees
+.preview/
