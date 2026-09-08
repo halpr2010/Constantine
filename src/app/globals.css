@@ -264,6 +264,124 @@ body {
 
 
 /* ---------------------------------------------------------------------------
+   ENTRY VIEW (§4 "Vertical selector — the site's entry view", Claryo 10/10).
+   Reference: design-refs/strips/Clary_Selector.png. Frames 1-2 are a clean
+   ground with the question high on the screen and the track just below it;
+   frame 3 is the track drifting to the top right while the ground empties;
+   frame 4 is the chosen view with the track parked in the header.
+
+   Structure is here rather than in the components because three elements have
+   to agree on one line: the question at 34vh, the track at 48vh, the hint at
+   60vh. The track is a sibling of the entry view, not a child, so that it
+   survives the view being unmounted.
+   --------------------------------------------------------------------------- */
+
+/* The inline boot script in layout.tsx stamps this before first paint for a
+   visitor whose answer is remembered, so the gate never flashes. React
+   unmounts the view a frame later; this rule covers the frame in between. */
+html[data-entry="answered"] [data-entry-view] {
+  display: none;
+}
+
+.entry-view {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.entry-view > * {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding-inline: 1.5rem;
+  text-align: center;
+  transition: opacity 260ms ease;
+}
+
+/* The whole view leaves as one, so the question does not outlive its answer. */
+.entry-view[data-state="leaving"] > * {
+  opacity: 0;
+}
+
+.entry-question {
+  top: 34vh;
+  transform: translateY(-50%);
+}
+
+.entry-hint {
+  top: 57vh;
+  margin-inline: auto;
+  max-width: 34rem;
+}
+
+/* The one vertical control. Absolutely positioned in the document while the
+   question stands, so it scrolls with the entry view; VerticalSwitcher
+   re-anchors it to the viewport on selection and drives the drift from there. */
+.vsel-tab {
+  position: absolute;
+  top: 48vh;
+  left: 50%;
+  z-index: 60;
+  transform: translate(-50%, -50%);
+}
+
+/* Inset to the track's own padding, so the raised pill reads as a label
+   lifting out of the track rather than as a second capsule on top of it. */
+.vsel-pill {
+  position: absolute;
+  top: 0.375rem;
+  bottom: 0.375rem;
+  left: 0;
+  border-radius: 9999px;
+  transition:
+    transform 320ms cubic-bezier(0.3, 0, 0.2, 1),
+    width 320ms cubic-bezier(0.3, 0, 0.2, 1),
+    opacity 180ms ease;
+}
+
+.vsel-dot {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border-radius: 2px;
+}
+
+/* The chosen view fades in as the track drifts. The delay is the entry view's
+   fade-out, so the two never overlap and the ground is briefly nothing but
+   itself — the clean cut frames 3-4 of the reference make. Armed only for the
+   one transition after a click: a permanent scroll-linked dimmer is what
+   tests/reveal.spec.ts exists to catch. */
+@keyframes entry-chosen-view {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+html[data-entry="entering"] [data-entry-target] {
+  animation: entry-chosen-view 620ms cubic-bezier(0.33, 0, 0.2, 1) 280ms both;
+}
+
+/* §5: the whole entry freezes. The choice still lands, it just lands at once.
+   !important because VerticalSwitcher writes the drift transition inline. */
+@media (prefers-reduced-motion: reduce) {
+  .entry-view > *,
+  .vsel-pill,
+  .vsel-tab {
+    transition: none !important;
+  }
+  html[data-entry="entering"] [data-entry-target] {
+    animation: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
    REGISTER SCOPING. §5's three registers vary by SECTION, not by site — that
    is where Claryo's white -> purple -> steel rhythm comes from. Each theme
    below declares three register palettes; a section picks one with
