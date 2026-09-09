@@ -100,7 +100,8 @@ only `[UNBUILT]` and `[PARTIAL]` items. `[SLOT-BUILT — awaiting media]`
   example conflicts with the standing instruction that case-study figures
   stay off the public marketing site.
 - **Vertical selector — the site's entry view** *(Claryo, 10/10)* —
-  `[BUILT]` 08 Sep 2026, REFINED the same day against three founder notes.
+  `[BUILT]` 08 Sep 2026, REFINED the same day against three founder notes, and
+  again 09 Sep 2026 (see THE SECOND REFINEMENT PASS below).
   `src/components/EntryView.tsx` (the question),
   `VerticalSwitcher.tsx` (the track, its markers and its drift),
   `VerticalContext.tsx` (the answer, remembered), the entry block in
@@ -148,15 +149,59 @@ only `[UNBUILT]` and `[PARTIAL]` items. `[SLOT-BUILT — awaiting media]`
      X and Y on different easings from two nested transforms, so the track
      rises to the header band first and then runs along it to the corner
      instead of cutting a straight diagonal across the hero demo.
-  ONE THING DELIBERATELY NOT DONE, and it is the next candidate's: in reference
-  frame 3 the greyed question is STILL STANDING as the tab reaches the corner.
-  Ours leaves at ENTRY_FADE_MS (280ms) while the drift runs 1000ms, so there is
-  a blank beat. Holding it means delaying the entry view's unmount past the
-  drift, and the unmount removes a 100vh block from above the hero — landing
-  that inside the 1500ms hover window of `P2 — equipment hover drives the timer`
-  is what discarded candidate 20260908-173122-1. Fix the layout shift first
-  (a fixed, `pointer-events: none` entry view leaves the hero at document top
-  throughout), then the hold is free.
+  THE SECOND REFINEMENT PASS, 09 Sep 2026. The three notes above were answered;
+  this pass carried the same three further and closed the item the first pass
+  deferred.
+  1. **The question stands through the drift**, which is what the previous entry
+     left to the next candidate: reference frame 3 has the greyed question still
+     standing as the tab reaches the corner, and ours left at 280ms against a
+     1000ms drift. The blocker was named as the layout shift, and the fix is not
+     the fixed overlay suggested there — a fixed entry view an unanswered
+     visitor cannot scroll past breaks §4's "nothing here gates anything" and
+     tests/reveal.spec.ts, which walks the whole page without ever answering.
+     Instead the block stays in flow while the question stands and leaves the
+     FLOW and the SCREEN at different times: EntryView measures its own rect in
+     a layout effect and re-anchors itself, fixed and `pointer-events: none`, at
+     the pixel it already occupies. The 100vh shift therefore lands on the click,
+     when nothing is being pointed at, rather than inside the 1500ms hover
+     window that discarded candidate 20260908-173122-1. Everything else follows
+     from the hero then being laid out at document top behind an opaque ground:
+     the entry ground lifting IS the chosen view's fade-in, so the hero's own
+     `entry-chosen-view` animation is gone and there is one crossing rather than
+     two fades arranged to look like one. `answered` now flips as the tab lands
+     (1000ms), under the still-opaque ground, so the hero's crossing seam and the
+     header's return to the page register are both invisible at the instant they
+     happen. NOTE for anyone touching this: `.entry-view[data-state="leaving"]`
+     needs its `z-index: 40`. Out of flow, the sheet and the hero occupy the same
+     pixels with `z-index: auto`, and the later element in the document wins —
+     without it the ground is fully opaque and simply painted underneath, which
+     looks exactly like the fade running instantly.
+  2. **The corner is empty when the tab arrives.** Nav and the pilot CTA are laid
+     out through the drift — the dock slot's landing rect is measured against
+     them and would move if they arrived afterwards — but held at opacity 0, so
+     the tab travels across a bare band instead of over the nav links, and the
+     chrome arrives with the chosen view. The header's bottom hairline is also
+     off while the gate stands: at 8% of the entry's own ink it drew a grey line
+     straight across a white screen the reference keeps empty, and §5's first
+     scroll requirement is that grounds never meet along a visible line.
+  3. **Geometry re-measured, and the markers made tiles.** Against
+     `design-refs/Claryo-Tab-Selector.png` at its true 1410px width the track is
+     ~98px around a ~70px pill with ~21px labels; ours were 81 / 65 / 17, a
+     control the size of a form widget where the reference has the only object on
+     the screen. The desktop step is now 95 / 68 / 19, and `dockScale` is
+     per-width (0.68 desktop, 0.8 below 768) so the docked track still sits
+     inside an 88px header row with air.
+     The markers were two hairline glyphs, and hairlines of the same weight in
+     the same box carry the same visual mass — at 17px the two choices still read
+     as a pair of small dark ticks and the difference only arrived once the label
+     had been read, which is the founder note it was meant to answer. The
+     founder's word is TILE and the reference mark is a solid swatch, so they are
+     solid now, and the differentiator is the tile's own OUTLINE: a PORTRAIT tile
+     for Museums & Galleries (a hung frame), a LANDSCAPE one for Gyms (a loaded
+     bar). Each is a single `fill-rule="evenodd"` path so the interior is a true
+     hole — the mark sits on the raised pill when lit and on the track when not,
+     and a knockout painted in either ground's colour would be wrong on the
+     other.
   ORIGINAL BRIEF, kept for the record. CONFIRMED by founder 08 Sep 2026: this is the FIRST thing a
   visitor sees, ahead of the hero. Reference:
   `design-refs/strips/Clary_Selector.png`, and

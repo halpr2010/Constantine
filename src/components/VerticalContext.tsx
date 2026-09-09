@@ -15,14 +15,22 @@ export type Vertical = "museums" | "gyms";
 export const VERTICAL_KEY = "constantine:vertical";
 
 /**
- * The entry choreography, in milliseconds. The question fades, the entry view
- * unmounts on the same beat, and the hero animation (globals.css) picks up
- * exactly where it leaves off. Held here because three files have to agree on
- * the timing and the drift has to be legible in a 3fps capture strip
- * (scripts/motion-strip.mjs samples 12 frames over 4s).
+ * The entry choreography, in milliseconds. Held here because three files have
+ * to agree on the timing and the drift has to be legible in a 3fps capture
+ * strip (scripts/motion-strip.mjs samples 12 frames over 4s). The same two
+ * numbers are mirrored as --entry-drift / --entry-out in globals.css.
+ *
+ * REORDERED 09 Sep 2026, from reference frame 3 of
+ * design-refs/strips/Clary_Selector.png: the greyed question is STILL STANDING
+ * as the tab reaches the corner. The old order faded the question out at 280ms
+ * against a 1000ms drift, so two thirds of the travel ran over a screen that
+ * had already emptied. Now the question holds, dimmed, for the whole drift, and
+ * the entry ground is what fades afterwards — the sheet lifting off IS the
+ * chosen view's fade-in, so there is one crossing rather than two.
  */
-export const ENTRY_FADE_MS = 280;
 export const ENTRY_DRIFT_MS = 1000;
+/** How long the entry ground takes to lift once the tab has landed. */
+export const ENTRY_FADE_MS = 420;
 
 type VerticalContextValue = {
   vertical: Vertical;
@@ -95,15 +103,26 @@ export function VerticalProvider({ children }: { children: React.ReactNode }) {
         setAnswered(true);
         return;
       }
-      // "entering" is what arms the hero's fade-in rule. It is cleared once
-      // the animation has finished so the resting page is never a dimmer —
-      // tests/reveal.spec.ts measures exactly that.
+      // "entering" is the beat the tab is travelling in: the header keeps the
+      // entry's own register and its nav and CTA stay at zero, so the tab flies
+      // into an empty corner the way it does in reference frame 3.
       root.setAttribute("data-entry", "entering");
       setLeaving(true);
-      window.setTimeout(() => setAnswered(true), ENTRY_FADE_MS);
+      // Everything commits as the tab lands, under a still-opaque entry ground:
+      // the hero's crossing seam unmounts here, and the header crosses back to
+      // the page's register. Both are invisible at this instant, which is the
+      // point of doing them here rather than mid-drift.
+      window.setTimeout(() => {
+        setAnswered(true);
+        root.setAttribute("data-entry", "answered");
+      }, ENTRY_DRIFT_MS);
+      // Only now does the ground lift, and the chosen view is simply what was
+      // behind it. `leaving` is what keeps the entry view mounted through the
+      // hold, so it is cleared last — the resting page is never a dimmer, which
+      // is what tests/reveal.spec.ts measures.
       window.setTimeout(
-        () => root.setAttribute("data-entry", "answered"),
-        ENTRY_FADE_MS + ENTRY_DRIFT_MS + 200
+        () => setLeaving(false),
+        ENTRY_DRIFT_MS + ENTRY_FADE_MS
       );
     },
     [answered]
