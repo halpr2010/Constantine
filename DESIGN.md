@@ -246,9 +246,13 @@ the loop does not rebuild them, and so their §5 conflicts are visible.
   This is the largest spec/repo gap and affects every future candidate.
 - **Typography.** The site uses Geist and Geist Mono. §5 specifies Inter
   Display for headings and NB International for body.
-- **Ambient background** — `[UNBUILT]`. `ParticleField.tsx` was deleted in the
-  tokenisation session; §5 asks for this to be built fresh against the
-  reduced-motion floor.
+- **Ambient background** — `[BUILT]` 08 Sep 2026, both halves.
+  `src/components/AmbientField.tsx` (the field), `VenuePlan.tsx` (the object),
+  `VenueStage.tsx` (the pinned run that composes them), and
+  `src/app/atmosphere.css` (the per-register colour ramp). It sits at `#venue`
+  between the hero and `#problem`, in the product register, and both ambient
+  floors in `tests/gimmicks.spec.ts` are green. See the §5 entry for the
+  mechanism. `ParticleField.tsx` stayed deleted; nothing was revived.
 - **Scroll progress bar** — `[BUILT]` 07 Sep 2026.
   `src/components/ScrollProgress.tsx`, rendered inside the header in
   `src/app/page.tsx`. One hairline on the header's bottom edge growing left to
@@ -513,6 +517,47 @@ technical register; the hero demo stays the brightest, most detailed thing on
 screen; no measurable FPS cost to the demo timers (continuous
 compositor-driven animation is NOT a violation); fully static under
 prefers-reduced-motion.
+
+BUILT 08 Sep 2026, both halves, at `#venue` between the hero and `#problem`.
+`AmbientField.tsx`, `VenuePlan.tsx`, `VenueStage.tsx`, `atmosphere.css`.
+
+MECHANISM, stated because §5 now asks for a choice between approaches rather
+than between tunings: the field is A COARSE OCCUPANCY FIELD, MAGNIFIED. It
+rasterises a scalar density field at one pixel per 20 CSS px — roughly 3,000
+pixels for a whole 1440x900 frame — maps it through a colour ramp built from
+tokens, and lets the compositor magnify the result. There are no blobs, no
+gradient stops and no shader; the softness is the magnification. It is also
+the product's own idiom, since a density grid over a floor is what Constantine
+computes.
+
+Three things a later candidate should not have to re-derive:
+
+1. UNBOUNDEDNESS IS STRUCTURAL, not a large blur. The field is defined in
+   DOCUMENT coordinates, so an element showing it is a window onto it rather
+   than a container for it, and the pinned stage scrolls THROUGH the field.
+   Its sources repeat down the world with wrapped distance, so scrolling never
+   reaches a bottom. `--atmos-base` is defined to equal the register's own
+   ground, so empty field IS the page. And the block opens and closes by
+   STRENGTH rather than by geometry: while its top edge is still on screen the
+   field is at zero, so there is no frame in the scroll where a bright field
+   meets a dark ground along a line. That last one is the whole of Slingshot's
+   missing two points.
+2. SIZE AND SPACING ARE THE DESIGN. A first pass used seven wide sources and
+   produced one flat lilac wash with no black anywhere, which is the
+   "dark-grey ground" this entry rejects. Six narrower ones, spread down the
+   period so only two or three are in range of a screen, plus a ramp whose
+   lower half stays at the ground, is what gives bright blooms ON BLACK.
+3. THE OBJECT DRAWS, IT DOES NOT FADE. From
+   `Claryo_Ambient_Hero_Page.png` frames 4-5, which the prose above never
+   described: the line-work BUILDS — one line becomes a full wireframe with
+   small square vertex handles on it. So every augmentation here is
+   stroke-dashoffset, and the square handles are reused as camera positions.
+   The four steps are Constantine's own: footprint, zones, sightlines,
+   movement, per vertical.
+
+The hero was deliberately left untouched. §3 makes the demos the brightest and
+most detailed thing on screen, and the atmosphere opens underneath them rather
+than behind them.
 
 **Scroll progress bar** *(Slingshot)*. A single hairline on the header's
 bottom edge, growing left to right as the page scrolls. See

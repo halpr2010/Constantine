@@ -13,7 +13,8 @@ for (const [label, theme] of [["A-dark",""],["B-light-canvas","light-canvas"],["
   // scroll-linked, so the strip has to be walked before it can be shot.
   await settleReveals(page);
   await page.screenshot({ path: `shots/strips/${label}.png`, fullPage: true,
-    mask: [page.locator("canvas"), page.locator("video")], maskColor: "#1b1b1f", animations: "disabled" });
+    mask: [page.locator("canvas:not([data-ambient-canvas])"), page.locator("video")],
+    maskColor: "#1b1b1f", animations: "disabled" });
   await ctx.close();
 }
 await browser.close();

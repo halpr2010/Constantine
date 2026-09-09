@@ -1,6 +1,7 @@
 import EntryView from "@/components/EntryView";
 import HeroSection from "@/components/HeroSection";
 import VerticalSwitcher from "@/components/VerticalSwitcher";
+import VenueStage from "@/components/VenueStage";
 import ProblemSection from "@/components/ProblemSection";
 import HowItWorks from "@/components/HowItWorks";
 import ValueSection from "@/components/ValueSection";
@@ -102,6 +103,12 @@ export default function Home() {
         <EntryView />
 
         <HeroSection />
+
+        {/* §5 ambient background. It declares the product register, same as
+            the hero above it, so the atmosphere opens with no register change
+            and therefore no seam; #problem's existing product → canvas seam
+            closes it again. */}
+        <VenueStage />
 
         <ProblemSection />
 

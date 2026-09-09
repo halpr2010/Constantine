@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* §5 ambient background: its per-register colour ramp and disclosure grammar.
+   One feature, one file — see the header of atmosphere.css. */
+@import "./atmosphere.css";
 
 /* ---------------------------------------------------------------------------
    Theme layer — variant zero (dark). Values reference Tailwind's own palette

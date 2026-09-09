@@ -27,7 +27,14 @@ fs.mkdirSync(TMP, { recursive: true });
 
 const browser = await chromium.launch();
 
-// 1 · autonomous drift, no input at all
+// 1 · autonomous drift, no input at all.
+//
+//     FIXED 08 Sep 2026: this used to record six seconds of the page as
+//     loaded, which since the entry view landed is six frames of the gate —
+//     flat black by design, byte-identical between every candidate. The one
+//     capture the ambient floors point at sampled the single screen that can
+//     never show a field. It now answers the question first and parks on the
+//     ambient stage, so what it records is the field and nothing else.
 {
   const ctx = await browser.newContext({
     viewport: { width: 1280, height: 760 },
@@ -35,11 +42,25 @@ const browser = await chromium.launch();
   });
   const p = await ctx.newPage();
   await p.goto(`http://localhost:${port}`, { waitUntil: "networkidle" });
-  await p.waitForTimeout(6000);
+  const pick = p.getByTestId("select-museums");
+  if (await pick.count()) { await pick.click(); await p.waitForTimeout(1600); }
+  const venue = p.locator("#venue");
+  if (await venue.count()) {
+    await p.evaluate(() => {
+      const s = document.querySelector("#venue");
+      window.scrollTo({
+        top: s.offsetTop + (s.offsetHeight - window.innerHeight) * 0.5,
+        behavior: "instant",
+      });
+    });
+  }
+  // Six seconds of NO input at all, after everything above has settled.
+  await p.waitForTimeout(6500);
   await ctx.close();
   const v = fs.readdirSync(TMP).find((f) => f.endsWith(".webm"));
-  execFileSync("ffmpeg", ["-y", "-v", "error", "-i", `${TMP}/${v}`,
-    "-vf", "fps=6/6,scale=520:-1,crop=520:210:0:60,tile=2x3:padding=6:margin=6:color=0x232327",
+  // -ss skips the navigation and the selection: every tiled frame is drift.
+  execFileSync("ffmpeg", ["-y", "-v", "error", "-ss", "3.2", "-i", `${TMP}/${v}`,
+    "-vf", "fps=6/6,scale=520:-1,crop=520:290:0:20,tile=2x3:padding=6:margin=6:color=0x232327",
     "-frames:v", "1", `${OUT}/drift.png`]);
   fs.rmSync(`${TMP}/${v}`);
 }
@@ -92,7 +113,7 @@ const browser = await chromium.launch();
     // Long enough for a reveal to play, short enough to catch a stagger.
     await p.waitForTimeout(450);
     const f = `${TMP}/s${String(pct).padStart(3, "0")}.png`;
-    await p.screenshot({ path: f, mask: [p.locator("canvas"), p.locator("video")], maskColor: "#1b1b1f" });
+    await p.screenshot({ path: f, mask: [p.locator("canvas:not([data-ambient-canvas])"), p.locator("video")], maskColor: "#1b1b1f" });
     shots.push(f);
   }
   await ctx.close();
