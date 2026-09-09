@@ -270,10 +270,24 @@ body {
    frame 3 is the track drifting to the top right while the ground empties;
    frame 4 is the chosen view with the track parked in the header.
 
-   Structure is here rather than in the components because three elements have
-   to agree on one line: the question at 34vh, the track at 48vh, the hint at
-   60vh. The track is a sibling of the entry view, not a child, so that it
-   survives the view being unmounted.
+   Structure is here rather than in the components because two elements have to
+   agree on one line: the question at 34vh and the track at 51vh. Both numbers
+   are measured off design-refs/Claryo-Tab-Selector.png, which is the same
+   screen as strip frames 1-2 at full resolution — question centre at 34% of
+   the viewport, track centre at 51.5%. The track is a sibling of the entry
+   view, not a child, so that it survives the view being unmounted.
+
+   THE GROUND IS THE TECHNICAL REGISTER, revised 08 Sep 2026 on founder note:
+   "the reference uses a WHITE ground for the entry screen and ours is black".
+   It used to claim `canvas`, which is the register §5 describes as light — but
+   canvas is only light in one of the four live palettes, so three quarters of
+   the site opened on black. Technical is the register that is defined light in
+   ALL FOUR (#ffffff / #eceff3 / #ffffff / #f4f7f9 with black ink), and §5's
+   description of it — strict black and white, austerity as the credibility
+   signal — is a literal description of the reference frame. Answering the
+   question then crosses from the site's lightest ground to the product
+   register's darkest, which is the stronger transition the note asks for; the
+   hero renders a seam for that crossing while the gate is up.
    --------------------------------------------------------------------------- */
 
 /* The inline boot script in layout.tsx stamps this before first paint for a
@@ -309,45 +323,130 @@ html[data-entry="answered"] [data-entry-view] {
   transform: translateY(-50%);
 }
 
-.entry-hint {
-  top: 57vh;
-  margin-inline: auto;
-  max-width: 34rem;
+/* While the question stands the header is the reference's bare corner: the
+   wordmark alone, on the entry's own ground. Nav and the pilot CTA arrive with
+   the chosen view. The dock slots are inside this too — they are sized at the
+   moment of selection, by which point `data-entry` has already flipped to
+   "entering" and they are laid out again. */
+html[data-entry="asking"] [data-entry-aside] {
+  display: none;
+}
+
+/* The header takes the entry ground rather than the page's, so it disappears
+   into the white screen instead of laying a dark bar across it. It stays
+   PAINTED rather than transparent because an unanswered visitor can scroll on
+   past the gate, and a transparent header with technical ink over the dark
+   hero would be unreadable. The rule is a faint step of the header's own ink,
+   which is invisible against the entry ground and still separates the header
+   from the hero. */
+html[data-entry="asking"] [data-entry-chrome] {
+  border-bottom-color: color-mix(in oklab, var(--text-primary) 8%, transparent);
+}
+
+/* The crossing out of the entry ground, rendered by the hero only while the
+   question stands (HeroSection). The site-wide seam spends 56% of nearly half a
+   viewport ABOVE the boundary, which on a section that IS one viewport puts a
+   quarter of the entry screen under a grey wash — the reference screen is white
+   to its edges. Shorter, and weighted below the boundary: the change then reads
+   as the foot of the screen darkening rather than as a band across it, and it
+   still never resolves into the dividing line §5 forbids. */
+[data-entry-target] > .section-seam {
+  --seam-h: clamp(11rem, 26vh, 18rem);
+  --seam-up: calc(var(--seam-h) * 0.34);
 }
 
 /* The one vertical control. Absolutely positioned in the document while the
    question stands, so it scrolls with the entry view; VerticalSwitcher
-   re-anchors it to the viewport on selection and drives the drift from there. */
+   re-anchors it to the viewport on selection and drives the drift from there.
+   Two nested transforms, not one: the tab carries X and the lift carries Y, so
+   the drift can run them on DIFFERENT easings and the path to the corner bends
+   instead of cutting a straight diagonal across the hero (§4). */
 .vsel-tab {
   position: absolute;
-  top: 48vh;
+  top: 51vh;
   left: 50%;
   z-index: 60;
-  transform: translate(-50%, -50%);
+  transform: translate3d(-50%, 0, 0);
+}
+
+.vsel-lift {
+  transform: translate3d(0, -50%, 0);
+}
+
+/* The capsule, and the reason the control carries `data-register="technical"`
+   wherever it goes: in the reference it is the same light track on the white
+   entry screen and docked over the black hero. Declaring the register on the
+   track itself is what makes that true in all four palettes without the
+   component naming a colour.
+   The fill is a step of the register's OWN ink over its OWN ground, derived
+   rather than picked, so the track is a shade of its surroundings in every
+   theme and the raised pill below can simply be the ground again. */
+.vsel-track[data-register] {
+  --vsel-pad: 0.5rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: var(--vsel-pad);
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--text-primary) 6%, var(--surface-page));
 }
 
 /* Inset to the track's own padding, so the raised pill reads as a label
    lifting out of the track rather than as a second capsule on top of it. */
 .vsel-pill {
   position: absolute;
-  top: 0.375rem;
-  bottom: 0.375rem;
+  top: var(--vsel-pad);
+  bottom: var(--vsel-pad);
   left: 0;
   border-radius: 9999px;
+  background: var(--surface-page);
+  /* The reference's pill is raised by shadow alone — no border, no fill
+     colour. --card-shadow is themed, so the lift reads on every ground. */
+  box-shadow:
+    0 1px 2px color-mix(in oklab, var(--card-shadow) 45%, transparent),
+    0 6px 16px color-mix(in oklab, var(--card-shadow) 30%, transparent);
   transition:
     transform 320ms cubic-bezier(0.3, 0, 0.2, 1),
     width 320ms cubic-bezier(0.3, 0, 0.2, 1),
     opacity 180ms ease;
 }
 
-.vsel-dot {
-  position: absolute;
-  left: 0.85rem;
-  top: 50%;
-  width: 7px;
-  height: 7px;
-  margin-top: -3.5px;
-  border-radius: 2px;
+/* Padding measured off the reference still: the pill is ~63px tall inside a
+   ~93px track, with symmetric 26px flanks around the marker-plus-label pair.
+   The old asymmetric pl-9/pr-7 existed only to clear an absolutely positioned
+   dot; the marker is now inline, so the pill is symmetric like the reference. */
+.vsel-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  border-radius: 9999px;
+  padding: 0.7rem 1.05rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: color 200ms ease;
+}
+
+.vsel-mark {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+}
+
+@media (min-width: 768px) {
+  .vsel-track[data-register] {
+    --vsel-pad: 0.7rem;
+  }
+  .vsel-choice {
+    gap: 0.625rem;
+    padding: 0.95rem 1.5rem;
+    font-size: 1.0625rem;
+  }
+  .vsel-mark {
+    width: 1.0625rem;
+    height: 1.0625rem;
+  }
 }
 
 /* The chosen view fades in as the track drifts. The delay is the entry view's
@@ -373,6 +472,7 @@ html[data-entry="entering"] [data-entry-target] {
 @media (prefers-reduced-motion: reduce) {
   .entry-view > *,
   .vsel-pill,
+  .vsel-lift,
   .vsel-tab {
     transition: none !important;
   }
@@ -685,7 +785,13 @@ html[data-entry="entering"] [data-entry-target] {
   --accent-positive-soft: var(--p-pos); --accent-negative-soft: var(--p-neg);
   background: var(--p-surf); color: var(--p-fg);
 }
-[data-register="technical"] {
+/* The header joins this list while the entry question stands: the gate paints
+   the technical ground edge to edge, and chrome sitting on it has to be inked
+   for that ground rather than for the page's. Sharing the selector rather than
+   copying the block is what keeps the remap FULL — a partial one leaves text at
+   the parent theme's values and washes the header out. */
+[data-register="technical"],
+html[data-entry="asking"] [data-entry-chrome] {
   --surface-page: var(--t-surf); --surface-card: var(--t-card);
   --surface-control: var(--t-card);
   --border-hairline: var(--t-line); --border-card: var(--t-edge);

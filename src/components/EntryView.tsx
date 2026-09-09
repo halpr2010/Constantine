@@ -5,10 +5,18 @@ import { useVertical } from "@/components/VerticalContext";
 /**
  * The site's entry view (§4, Claryo 10/10 — design-refs/strips/Clary_Selector.png).
  *
- * Frames 1–2 of that strip are the whole brief: a clean ground, the question
- * sitting high on the screen, the track just under it, and nothing else. The
- * emptiness is the effect, so this component carries no product imagery — the
- * distance being judged is distance from that frame.
+ * Frames 1–2 of that strip are the whole brief, and
+ * design-refs/Claryo-Tab-Selector.png is the same screen at full resolution:
+ * a clean LIGHT ground, the question sitting high on the screen at display
+ * scale, the track just under it, and nothing else. The emptiness is the
+ * effect, so this component carries no product imagery and, since 08 Sep 2026,
+ * no explanatory subline either — the reference screen holds the question and
+ * the pills and nothing more, and the track's two labelled markers already say
+ * that a choice is being asked for.
+ *
+ * The ground is the technical register, which is the one register defined light
+ * in all four live palettes; see the entry block in globals.css for why that is
+ * the honest reading of §5 rather than a palette fix.
  *
  * The track itself is NOT a child of this element. On selection it drifts to
  * the header while this block fades out and unmounts, and a control living
@@ -28,19 +36,19 @@ export default function EntryView() {
     <div
       data-testid="vertical-selector"
       data-entry-view=""
-      data-register="canvas"
+      data-register="technical"
       data-state={leaving ? "leaving" : "asking"}
       className="entry-view"
     >
+      {/* Measured off the reference still: the question is ~64px on a 1410px
+          viewport, roughly a third larger than the 48px it was set at here,
+          and that weight is most of what made ours read as a caption over a
+          control rather than as the screen's one question. */}
       <p
         id="entry-question"
-        className="entry-question text-balance text-4xl font-semibold tracking-tight text-fg-primary md:text-5xl"
+        className="entry-question text-balance text-5xl font-semibold tracking-tight text-fg-primary md:text-6xl"
       >
         Are you a…
-      </p>
-      <p className="entry-hint text-sm text-fg-muted">
-        Choose one and every section below is set up for that space. You can
-        switch at any time.
       </p>
     </div>
   );

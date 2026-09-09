@@ -29,7 +29,15 @@ export default function Home() {
         <ScrollStage />
 
         {/* Header */}
-        <header className="pointer-events-none fixed left-0 right-0 top-0 z-50 border-b border-line-hairline bg-surface-page/80 backdrop-blur-xl">
+        {/* `data-entry-chrome` hands the header to the entry view's register
+            while the question stands, so it disappears into the light ground
+            instead of laying a dark bar across it (globals.css, entry block).
+            `data-entry-aside` marks everything the reference's entry screen
+            does not show: nav, the pilot CTA, and the two dock slots. */}
+        <header
+          data-entry-chrome=""
+          className="pointer-events-none fixed left-0 right-0 top-0 z-50 border-b border-line-hairline bg-surface-page/80 backdrop-blur-xl"
+        >
           <div className="pointer-events-auto mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
             <a href="/" className="flex items-center gap-2">
               <Image
@@ -43,7 +51,10 @@ export default function Home() {
                 CONSTANTINE
               </span>
             </a>
-            <nav className="hidden items-center gap-8 text-sm text-fg-secondary md:flex">
+            <nav
+              data-entry-aside=""
+              className="hidden items-center gap-8 text-sm text-fg-secondary md:flex"
+            >
               <a className="transition-colors hover:text-fg-primary" href="#how">
                 How it works
               </a>
@@ -54,7 +65,7 @@ export default function Home() {
                 Use cases
               </a>
             </nav>
-            <div className="flex items-center gap-5">
+            <div data-entry-aside="" className="flex items-center gap-5">
               {/* Where the vertical track lands after the drift (§4). Empty
                   until then: VerticalSwitcher sizes it at the moment of
                   selection, so the header carries no gap while the entry
@@ -74,7 +85,7 @@ export default function Home() {
               </a>
             </div>
           </div>
-          <div className="flex justify-end px-6 lg:hidden">
+          <div data-entry-aside="" className="flex justify-end px-6 lg:hidden">
             <div data-dock-slot="narrow" aria-hidden />
           </div>
           {/* The §5 rule rides the header's own bottom hairline, so page

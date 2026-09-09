@@ -100,10 +100,12 @@ only `[UNBUILT]` and `[PARTIAL]` items. `[SLOT-BUILT — awaiting media]`
   example conflicts with the standing instruction that case-study figures
   stay off the public marketing site.
 - **Vertical selector — the site's entry view** *(Claryo, 10/10)* —
-  `[BUILT]` 08 Sep 2026. `src/components/EntryView.tsx` (the question),
-  `VerticalSwitcher.tsx` (the track and its drift), `VerticalContext.tsx`
-  (the answer, remembered), the entry block in `src/app/globals.css`, and the
-  dock slots in `src/app/page.tsx`.
+  `[BUILT]` 08 Sep 2026, REFINED the same day against three founder notes.
+  `src/components/EntryView.tsx` (the question),
+  `VerticalSwitcher.tsx` (the track, its markers and its drift),
+  `VerticalContext.tsx` (the answer, remembered), the entry block in
+  `src/app/globals.css`, the seam in `HeroSection.tsx`, and the dock slots and
+  header attributes in `src/app/page.tsx`.
   HOW IT WAS BUILT, for the next candidate: the track is ONE DOM node in both
   places rather than two that hand off. It is absolutely positioned in the
   document while the question stands, so it scrolls like content; on selection
@@ -114,10 +116,53 @@ only `[UNBUILT]` and `[PARTIAL]` items. `[SLOT-BUILT — awaiting media]`
   entry view unmounts rather than hiding, because `scripts/screenshot.mjs`
   captures `section` first and a hidden-but-present entry section makes that
   frame the gate instead of the hero.
+  THE THREE REFINEMENTS, 08 Sep 2026, and what each one turned on:
+  1. **The ground is the TECHNICAL register**, not canvas. The founder note was
+     "the reference uses a WHITE ground and ours is black". Canvas is the
+     register §5 *describes* as light, but it is only light in one of the four
+     live palettes, so three quarters of the site opened on black. Technical is
+     light in all four (#ffffff / #eceff3 / #ffffff / #f4f7f9, black ink), and
+     §5's own description of it — strict black and white, austerity as the
+     credibility signal — is a literal description of the reference frame. This
+     is a register reassignment, not a palette fix, so it does not touch the
+     UNDER EVALUATION decision in §5. The header joins the same register while
+     the gate stands, and the nav and pilot CTA are hidden, because the
+     reference's entry screen holds the wordmark, the question and the pills
+     and nothing else.
+  2. **The markers differentiate the verticals.** They were one green square
+     that moved with the pill, so the two options were identical until hovered.
+     Each choice now carries its own inline mark — a hung frame for Museums &
+     Galleries, a loaded bar for Gyms — present on both labels at rest. The
+     reference differentiates by HUE; we differentiate by FORM, deliberately:
+     the entry stands in the strict black-and-white register, and a second
+     saturated accent would have to clear AA on four grounds while still
+     reading as the same brand. A shape does not, and each mark names what
+     Constantine measures in that space.
+  3. **Geometry and path measured, not guessed.**
+     `design-refs/Claryo-Tab-Selector.png` is strip frames 1–2 at full
+     resolution and is the source for every number: question centre at 34% of
+     the viewport at ~64px (it was 48px, which is most of why ours read as a
+     caption over a control), track centre at 51.5%, a ~93px track around a
+     ~63px pill with symmetric flanks. The explanatory subline is gone — the
+     reference screen holds only the question and the pills. The drift now runs
+     X and Y on different easings from two nested transforms, so the track
+     rises to the header band first and then runs along it to the corner
+     instead of cutting a straight diagonal across the hero demo.
+  ONE THING DELIBERATELY NOT DONE, and it is the next candidate's: in reference
+  frame 3 the greyed question is STILL STANDING as the tab reaches the corner.
+  Ours leaves at ENTRY_FADE_MS (280ms) while the drift runs 1000ms, so there is
+  a blank beat. Holding it means delaying the entry view's unmount past the
+  drift, and the unmount removes a 100vh block from above the hero — landing
+  that inside the 1500ms hover window of `P2 — equipment hover drives the timer`
+  is what discarded candidate 20260908-173122-1. Fix the layout shift first
+  (a fixed, `pointer-events: none` entry view leaves the hero at document top
+  throughout), then the hold is free.
   ORIGINAL BRIEF, kept for the record. CONFIRMED by founder 08 Sep 2026: this is the FIRST thing a
   visitor sees, ahead of the hero. Reference:
-  `design-refs/strips/Clary_Selector.png`. "Are you a…" centred on a clean
-  light ground, one pill per vertical (Museums & Galleries / Gyms); hover
+  `design-refs/strips/Clary_Selector.png`, and
+  `design-refs/Claryo-Tab-Selector.png` for the same screen at full resolution
+  — open the second one, it is where the geometry is legible. "Are you a…"
+  centred on a clean light ground, one pill per vertical (Museums & Galleries / Gyms); hover
   colourises the pill; on selection the tab **drifts to the top right** and the
   chosen view **fades in cleanly**, the tab remaining there as the control for
   switching.
