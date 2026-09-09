@@ -94,6 +94,40 @@ const browser = await chromium.launch();
   if (v) fs.rmSync(`${TMP}/${v}`);
 }
 
+// 2b · #stack's travelling dashes. Its own strip, because the drift strip
+//      crops a band near the top of the page and samples once a second: the
+//      connectors are far below the fold, and one dash period is 1.4s, so a
+//      second-spaced sample lands them almost back where they started and the
+//      evidence would argue the diagram is frozen.
+{
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 760 } });
+  const p = await ctx.newPage();
+  await p.goto(`http://localhost:${port}`, { waitUntil: "networkidle" });
+  const g = p.getByTestId("vertical-selector");
+  if (await g.count()) {
+    const pick = p.getByTestId("select-museums");
+    if (await pick.count()) await pick.click();
+    await p.waitForTimeout(1600);
+  }
+  const stack = p.locator("#stack");
+  if (await stack.count()) {
+    await stack.scrollIntoViewIfNeeded();
+    await p.waitForTimeout(900); // let the section's reveal settle first
+    const shots = [];
+    for (let i = 0; i < 6; i++) {
+      const f = `${TMP}/f${i}.png`;
+      await stack.screenshot({ path: f });
+      shots.push(f);
+      await p.waitForTimeout(240);
+    }
+    execFileSync("ffmpeg", ["-y", "-v", "error", "-pattern_type", "glob", "-i", `${TMP}/f*.png`,
+      "-vf", "scale=560:-1,tile=2x3:padding=6:margin=6:color=0x232327",
+      "-frames:v", "1", `${OUT}/flow.png`]);
+    for (const f of shots) fs.rmSync(f);
+  }
+  await ctx.close();
+}
+
 // 3 · scroll-indexed reveal
 {
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 760 } });

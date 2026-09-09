@@ -110,6 +110,8 @@
   --color-tech-ink: var(--tech-ink);
   --color-tech-rule: var(--tech-rule);
 
+  --color-conduit: var(--conduit);
+
   --color-action: var(--action-bg);
   --color-action-hover: var(--action-bg-hover);
   --color-on-action: var(--action-fg);
@@ -514,6 +516,17 @@ html[data-entry="entering"] [data-entry-target] {
   --c-pos: var(--color-emerald-500); --c-neg: var(--color-red-500);
   --p-pos: var(--color-emerald-400); --p-neg: var(--color-red-400);
   --t-pos: var(--color-emerald-700); --t-neg: var(--color-red-700);
+  /* --conduit — the colour a connection is drawn in (#stack's flowing dashes,
+     and its direction chips). It is the palette's blue, per founder
+     instruction, but it cannot BE --chart-2: that token is ★ on-stage-only and
+     these lines are drawn off the stage, so TOKENS.md's demotion rule requires
+     a value per theme AND per register anyway. Declaring it outright leaves
+     --chart-2's ★ intact and lets the hue answer the ground it lands on — the
+     blue that reads on #050505 is invisible on the technical register's white,
+     which is the register the diagram actually sits in. */
+  --c-conduit: #60a5fa; --p-conduit: #60a5fa; --t-conduit: #1d4ed8;
+  /* Fallback for anything drawn outside a declared register. */
+  --conduit: var(--c-conduit);
 }
 [data-theme="light-canvas"] {
   --c-pos: var(--color-emerald-700); --c-neg: var(--color-red-700); --p-pos: var(--color-emerald-400); --p-neg: var(--color-red-400);
@@ -529,6 +542,7 @@ html[data-entry="entering"] [data-entry-target] {
      same white twice. */
   --t-surf: #eceff3; --t-card: #ffffff; --t-line: #000000; --t-edge: #000000;
   --t-fg: #000000; --t-fg2: #1c1c1c; --t-fg3: #3f3f3f;
+  --c-conduit: #1d4ed8; --p-conduit: #7fb3ff; --t-conduit: #1d4ed8;
 }
 [data-theme="dark-canvas"] {
   --c-pos: var(--color-emerald-400); --c-neg: var(--color-red-400); --p-pos: var(--color-emerald-300); --p-neg: var(--color-red-300);
@@ -541,6 +555,7 @@ html[data-entry="entering"] [data-entry-target] {
   --p-fg: #f8f5ff; --p-fg2: #cabfe6; --p-fg3: #9c92bd;
   --t-surf: #ffffff; --t-card: #ffffff; --t-line: #000000; --t-edge: #000000;
   --t-fg: #000000; --t-fg2: #1c1c1c; --t-fg3: #3f3f3f;
+  --c-conduit: #7aa7ff; --p-conduit: #8ab4ff; --t-conduit: #1d4ed8;
 }
 [data-theme="instrument"] {
   --c-pos: #4ade80; --c-neg: #fb7185; --p-pos: #86efac; --p-neg: #fda4af;
@@ -553,6 +568,9 @@ html[data-entry="entering"] [data-entry-target] {
   --p-fg: #f2fbff; --p-fg2: #b9d8e8; --p-fg3: #86a6b8;
   --t-surf: #f4f7f9; --t-card: #ffffff; --t-line: #04070a; --t-edge: #04070a;
   --t-fg: #04070a; --t-fg2: #23343d; --t-fg3: #4d626e;
+  /* This theme's blue is its own cool steel rather than the indigo the other
+     three carry; --conduit follows the palette it is standing in. */
+  --c-conduit: #7fd3ff; --p-conduit: #7fd3ff; --t-conduit: #0a6d9e;
 }
 
 /* ---------------------------------------------------------------------------
@@ -765,6 +783,61 @@ html[data-entry="entering"] [data-entry-target] {
     linear-gradient(var(--seam-a), var(--seam-a));
 }
 
+/* ---------------------------------------------------------------------------
+   #stack CONNECTORS (§4 "Your Stack" integrations, Pocket hub-and-spoke).
+   Reference: design-refs/strips/Pocket_Product.png, which is a VIDEO — the
+   dashes sit at a different point on each curve in every frame, so the
+   connector is a dash TRAIN travelling the path rather than a dotted line.
+
+   Direction is carried by the path itself: a path authored from the card to
+   the hub reads as an ingest, one authored from the hub to the card reads as
+   an export, and this one animation runs them both. That is why there is no
+   "reverse" variant here — encoding direction in the geometry rather than in a
+   modifier means the arrowhead, the chip and the motion can never disagree.
+
+   The keyframe travels TWO dash periods (2 x (5+11)) so the loop is seamless
+   at any path length. 1.4s over 32 user units is ~23 units/s, which is fast
+   enough to read as flow at a glance and slow enough that a 250ms motion-strip
+   sample lands the dashes somewhere new.
+   --------------------------------------------------------------------------- */
+@keyframes stack-flow {
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+
+.flow-path {
+  fill: none;
+  stroke: var(--conduit);
+  stroke-linecap: round;
+  stroke-dasharray: 5 11;
+  animation: stack-flow 1.4s linear infinite;
+  /* Hovering one card quietens the rest of the diagram. Interaction feedback,
+     so it is allowed to animate; the information is fully present without it. */
+  transition: opacity 220ms ease, stroke-width 220ms ease;
+}
+
+/* The still line the dashes travel along, so a connector is legible as a
+   connection before any dash reaches that part of the curve. */
+.flow-rail {
+  fill: none;
+  stroke: var(--conduit);
+  opacity: 0.28;
+  transition: opacity 220ms ease;
+}
+
+/* §5: ambient motion freezes, and the diagram rests as a static dashed path
+   rather than disappearing. */
+@media (prefers-reduced-motion: reduce) {
+  .flow-path {
+    animation: none;
+    transition: none;
+  }
+  .flow-rail {
+    transition: none;
+  }
+}
+
 [data-register="canvas"] {
   --surface-page: var(--c-surf); --surface-card: var(--c-card);
   --surface-control: var(--c-card);
@@ -777,6 +850,7 @@ html[data-entry="entering"] [data-entry-target] {
   --border-input: var(--c-edge); --border-input-focus: var(--c-fg3);
   --accent-positive: var(--c-pos); --accent-negative: var(--c-neg);
   --accent-positive-soft: var(--c-pos); --accent-negative-soft: var(--c-neg);
+  --conduit: var(--c-conduit);
   background: var(--c-surf); color: var(--c-fg);
 }
 [data-register="product"] {
@@ -791,6 +865,7 @@ html[data-entry="entering"] [data-entry-target] {
   --border-input: var(--p-edge); --border-input-focus: var(--p-fg3);
   --accent-positive: var(--p-pos); --accent-negative: var(--p-neg);
   --accent-positive-soft: var(--p-pos); --accent-negative-soft: var(--p-neg);
+  --conduit: var(--p-conduit);
   background: var(--p-surf); color: var(--p-fg);
 }
 /* The header joins this list while the entry question stands: the gate paints
@@ -811,5 +886,6 @@ html[data-entry="asking"] [data-entry-chrome] {
   --border-input: var(--t-edge); --border-input-focus: var(--t-fg3);
   --accent-positive: var(--t-pos); --accent-negative: var(--t-neg);
   --accent-positive-soft: var(--t-pos); --accent-negative-soft: var(--t-neg);
+  --conduit: var(--t-conduit);
   background: var(--t-surf); color: var(--t-fg);
 }

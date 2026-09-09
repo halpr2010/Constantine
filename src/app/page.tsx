@@ -7,6 +7,7 @@ import HowItWorks from "@/components/HowItWorks";
 import ValueSection from "@/components/ValueSection";
 import PrivacySection from "@/components/PrivacySection";
 import UseCases from "@/components/UseCases";
+import StackSection from "@/components/StackSection";
 import OutputsSection from "@/components/OutputsSection";
 import FaqSection from "@/components/FaqSection";
 import PilotForm from "@/components/PilotForm";
@@ -117,6 +118,14 @@ export default function Home() {
         <ValueSection />
 
         <PrivacySection />
+
+        {/* Fit follows trust. A buyer who has just been told the video never
+            leaves the building asks next where the numbers go, so the stack
+            diagram answers that before the commercial argument starts. It
+            declares the technical register, same as #privacy above it, which
+            is why neither carries a seam: nothing changes across that
+            boundary and the two read as one continuous ground. */}
+        <StackSection />
 
         <UseCases />
 
