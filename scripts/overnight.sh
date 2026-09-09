@@ -45,7 +45,11 @@ while IFS=$'\t' read -r N TASK; do
   # headings on the first run.
   BEFORE=$(grep -c '^| 20' experiments.md 2>/dev/null || echo 0)
 
-  if ! ./scripts/loop.sh "$N" "$TASK" 2>&1 | sed 's/^/     /'; then
+  # N>=4 means the founder wants options to choose between, not one survivor,
+  # so those go to burst.sh (gate hard, rank, show all). Small N stays pairwise.
+  if [ "$N" -ge 4 ]; then RUNNER=./scripts/burst.sh; else RUNNER=./scripts/loop.sh; fi
+  echo "     runner: $RUNNER"
+  if ! "$RUNNER" "$N" "$TASK" 2>&1 | sed 's/^/     /'; then
     echo "     !! task $i did not complete cleanly — continuing"
   fi
 
