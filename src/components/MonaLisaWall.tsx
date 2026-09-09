@@ -332,7 +332,13 @@ export default function PaintingWall({
               data-testid={
                 isStatic ? "insight-card" : active ? "exhibit-card" : undefined
               }
-              className={`relative flex flex-col items-center rounded-[20px] bg-surface-inset-soft shadow-[0_40px_90px_var(--card-shadow)] ${
+              // No panel tint or drop shadow, matching EquipmentWall. A painting
+              // covers its own card, so the tint only ever showed as a rim
+              // around the art — invisible against flat #050505, an obvious
+              // mismatched border once the ambience and registers changed what
+              // sits behind it. The two walls must agree: they are the same
+              // module showing different subjects.
+              className={`relative flex flex-col items-center rounded-[20px] ${
                 isMini ? "w-[260px] p-2 rounded-[12px] md:w-[280px]" : "p-5"
               }`}
             >

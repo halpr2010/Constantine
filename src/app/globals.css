@@ -41,7 +41,12 @@
   --instrument-fg-strong: color-mix(in oklab, var(--color-white) 80%, transparent);
   --instrument-fg-weak: color-mix(in oklab, var(--color-white) 70%, transparent);
   --instrument-fg-faint: color-mix(in oklab, var(--color-white) 50%, transparent);
-  --instrument-well: color-mix(in oklab, var(--color-zinc-950) 60%, transparent);
+  /* Aliased, never a copy: defined once as a fixed zinc-950 fill, this was
+     the last theme-specific token still painting inside components. It read
+     as a dark rectangle on every light ground and every light register.
+     --surface-inset-soft is remapped per theme and per register, so the
+     chart well now follows whatever it sits on. */
+  --instrument-well: var(--surface-inset-soft);
   --chart-label: rgba(255, 255, 255, 0.75);
   --chart-1: rgba(239, 68, 68, 0.8);
   --chart-2: rgba(59, 130, 246, 0.8);
