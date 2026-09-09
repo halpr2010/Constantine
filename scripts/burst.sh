@@ -29,6 +29,12 @@ ROOT="$(pwd)"
 # model rather than on CPU, so the limit is memory and the odd overlapping
 # `next build`, not cores.
 LANES="${BURST_LANES:-4}"
+# Guarantee at least two waves. With N=4 and 4 lanes the whole burst ran blind
+# and three of four converged on "cards grow upward off a shared datum", which
+# defeats the point. Halving the lanes costs wall-clock and buys back the
+# diversity signal that makes the options genuinely different.
+[ "$LANES" -gt $(( (N + 1) / 2 )) ] && LANES=$(( (N + 1) / 2 ))
+[ "$LANES" -lt 1 ] && LANES=1
 mkdir -p "$LOG"
 
 command -v claude >/dev/null || { echo "burst: claude CLI not found"; exit 1; }
@@ -116,11 +122,19 @@ Constraints:
   done
 done
 
+# Release the worktrees BEFORE gating. `git worktree add -b` leaves each branch
+# checked out in its worktree, and git refuses to check out a branch that is
+# checked out elsewhere - so every gating checkout failed with 2>/dev/null
+# swallowing the error, and the burst reported zero survivors from four
+# perfectly good candidates.
+for BR in "${BUILT[@]}"; do git worktree remove --force ".burst/$BR" 2>/dev/null; done
+git worktree prune
+
 # Gate and capture sequentially in the main tree: ~5 of the ~50 minutes per
 # candidate, so there is nothing to win by parallelising them.
 for BR in "${BUILT[@]}"; do
   echo; echo "-- gating $BR --------------------------------------"
-  git checkout -q "$BR" 2>/dev/null || continue
+  git checkout -q "$BR" || { echo "   SKIPPED - cannot check out $BR"; continue; }
   if ! ./scripts/floors.sh > "$LOG/floors-${BR##*-}.txt" 2>&1; then
     echo "   DISCARDED - floors failed"
     grep -m3 -E 'x |FAIL --' "$LOG/floors-${BR##*-}.txt" | sed 's/^/     /'
@@ -130,7 +144,6 @@ for BR in "${BUILT[@]}"; do
   SURVIVORS+=("$BR")
   rm -rf "shots/$BR" && ./scripts/capture.sh "$BR" > /dev/null
 done
-for BR in "${BUILT[@]}"; do git worktree remove --force ".burst/$BR" 2>/dev/null; done
 
 git checkout -q "$START"
 
