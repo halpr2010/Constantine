@@ -950,6 +950,11 @@ D1–D5 and regresses on none. D6 is pass/fail, not comparative.
 
 ### 8a. Withdrawn requirements — do not queue these again
 
+- **Corner next-section preview** *(Claryo, paired with the scroll bar in §5)* —
+  WITHDRAWN by founder 09 Sep 2026: "do not promote the next-section preview we
+  will not be using this feature." A candidate was built and promoted; it is not
+  to be merged or rebuilt. The §5 sentence pairing it with the scroll progress
+  bar no longer applies.
 - **Card elevation / raise-on-hover** *(was Claryo Interactive, 10/10)* —
   WITHDRAWN by founder 09 Sep 2026: "scrap this idea and do not retry to
   complete a feature update for the hover cards they are no longer needed."
