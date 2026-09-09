@@ -1,7 +1,6 @@
 "use client";
 
 import GhostScene, { SceneVariant } from "@/components/GhostScene";
-import { GhostSprite } from "@/components/GhostFigure";
 import { useVertical } from "@/components/VerticalContext";
 
 /**
@@ -372,8 +371,6 @@ export default function OutputsSection() {
       data-register="canvas"
       className="border-t border-line-hairline px-6 py-24"
     >
-      {/* Three poses, serialised once for all three stages. */}
-      <GhostSprite />
       <div className="mx-auto max-w-6xl">
         <div className="text-xs font-medium tracking-wide text-fg-muted">Outputs</div>
         <h2 className="mt-4 text-3xl font-semibold leading-tight md:text-4xl">

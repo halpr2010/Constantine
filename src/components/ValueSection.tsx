@@ -1,5 +1,6 @@
 "use client";
 
+import FloorLedger from "@/components/FloorLedger";
 import Reveal from "@/components/Reveal";
 import SectionSeam from "@/components/SectionSeam";
 import { useVertical } from "@/components/VerticalContext";
@@ -66,20 +67,35 @@ export default function ValueSection() {
     >
       <SectionSeam from="technical" to="canvas" />
       <div className="relative mx-auto max-w-6xl">
-        {/* Mirrors ProblemSection's "The problem" eyebrow. The spec's eyebrow
-            text was identical to the museum heading, which rendered the same
-            line twice. */}
-        <Reveal
-          grammar="ink"
-          className="w-fit text-xs font-semibold uppercase tracking-wider text-fg-muted"
-        >
-          The value
-        </Reveal>
-        <Reveal grammar="focus" lag={0.06} className="mt-4">
-          <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
-            {copy.heading}
-          </h2>
-        </Reveal>
+        {/* The answer to #problem, drawn on the same object. The ledger there
+            has one track carrying data and four empty rails; here it is the
+            identical day with every rail written on and each zone's peak
+            marked. The heading and the closing line share the row with it so
+            the four cards below still land inside 1440x900. */}
+        <div className="grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-14">
+          <div>
+            {/* Mirrors ProblemSection's "The problem" eyebrow. The spec's
+                eyebrow text was identical to the museum heading, which
+                rendered the same line twice. */}
+            <Reveal
+              grammar="ink"
+              className="w-fit text-xs font-semibold uppercase tracking-wider text-fg-muted"
+            >
+              The value
+            </Reveal>
+            <Reveal grammar="focus" lag={0.06} className="mt-4">
+              <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
+                {copy.heading}
+              </h2>
+            </Reveal>
+            <Reveal grammar="ghost" lag={0.2} className="mt-4 max-w-2xl">
+              <p className="text-fg-secondary">{copy.closer}</p>
+            </Reveal>
+          </div>
+          <Reveal grammar="settle" lag={0.1}>
+            <FloorLedger mode="measured" />
+          </Reveal>
+        </div>
         {/* Four answers on one baseline have no natural stagger, so the lag
             supplies one: the row wipes left to right, which reads as results
             landing rather than as four blocks appearing together. */}
@@ -96,9 +112,6 @@ export default function ValueSection() {
             </Reveal>
           ))}
         </div>
-        <Reveal grammar="ghost" lag={0.2} className="mt-8 max-w-2xl">
-          <p className="text-fg-secondary">{copy.closer}</p>
-        </Reveal>
       </div>
     </section>
   );

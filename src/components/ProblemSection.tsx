@@ -1,5 +1,6 @@
 "use client";
 
+import FloorLedger from "@/components/FloorLedger";
 import Reveal from "@/components/Reveal";
 import SectionSeam from "@/components/SectionSeam";
 import { useVertical } from "@/components/VerticalContext";
@@ -50,26 +51,42 @@ export default function ProblemSection() {
             {copy.heading}
           </h2>
         </Reveal>
-        <Reveal grammar="ghost" lag={0.18} className="mt-4 max-w-2xl">
-          <p className="text-fg-secondary">{copy.lede}</p>
-        </Reveal>
-        <ul className="mt-8 space-y-3">
-          {copy.points.map((point, i) => (
-            <li key={point}>
-              <Reveal
-                grammar="ghost"
-                lag={0.14 * i}
-                className="flex items-start gap-3 text-sm text-fg-muted-list"
-              >
-                <span
-                  aria-hidden
-                  className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-marker-weak"
-                />
-                {point}
-              </Reveal>
-            </li>
-          ))}
-        </ul>
+        {/* The claim gets a picture of itself. FloorLedger in `blind` mode is
+            the day this section is describing: the door track carries data and
+            every zone track is an empty rail. #value shows the identical
+            geometry filled in, so the two sections are one argument seen twice
+            rather than two illustrations.
+
+            The lede sits INSIDE the column so the ledger starts level with it.
+            Hung below a full-width lede it left the whole top right of the
+            section empty and read as an afterthought pinned to the corner. */}
+        <div className="mt-8 grid gap-8 md:grid-cols-2 md:gap-12">
+          <div>
+            <Reveal grammar="ghost" lag={0.18} className="max-w-2xl">
+              <p className="text-fg-secondary">{copy.lede}</p>
+            </Reveal>
+            <ul className="mt-8 space-y-3">
+              {copy.points.map((point, i) => (
+                <li key={point}>
+                  <Reveal
+                    grammar="ghost"
+                    lag={0.14 * i}
+                    className="flex items-start gap-3 text-sm text-fg-muted-list"
+                  >
+                    <span
+                      aria-hidden
+                      className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-marker-weak"
+                    />
+                    {point}
+                  </Reveal>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <Reveal grammar="settle" lag={0.1} className="md:self-center">
+            <FloorLedger mode="blind" />
+          </Reveal>
+        </div>
       </div>
     </section>
   );
