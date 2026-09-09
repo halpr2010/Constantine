@@ -148,7 +148,33 @@ only `[UNBUILT]` and `[PARTIAL]` items. `[SLOT-BUILT — awaiting media]`
   says so on its own panel; ranked works are numbered rather than named. The
   "Outputs capture" media slot below is still `[UNBUILT]` — the section ships
   with drawn figures instead of a pending player.
-- **"Your Stack" integrations** *(Pocket hub-and-spoke)* — `[UNBUILT]`.
+- **"Your Stack" integrations** *(Pocket hub-and-spoke)* — `[BUILT]` 08 Sep
+  2026. `src/components/StackSection.tsx`, at `#stack` between `#privacy` and
+  `#use`. Reference: `design-refs/strips/Pocket_Product.png`, which is a VIDEO
+  and where the three things a still reading misses all live: the connectors
+  are curves, they carry a travelling dash train, and the dashes run the way
+  the data does. Four capability cards around the product object, one ingest
+  (cameras and video) and three exports (warehouse, dashboards, alerts), each
+  naming the real systems it connects to.
+  DECISIONS, for the next candidate. The section takes the TECHNICAL register:
+  §5 reserves it for architecture diagrams, and it also lands the reference's
+  white ground in all four palettes at once, which a canvas-register build
+  could only manage in light-canvas. The object at the centre nests
+  `data-register="product"` inside it, because that register is where the
+  product appears, and that is what gives the diagram a dark centre of gravity
+  on a light field. It carries no seam: `#privacy` above already declares
+  technical, so nothing changes across that boundary.
+  `--conduit` is a new working token (per theme AND per register) rather than a
+  use of `--chart-2`: `--chart-2` is the palette's blue but is ★ on-stage-only,
+  and these lines are drawn off the stage, so the demotion rule would have
+  required a per-theme value regardless.
+  HONESTY, per §9 and the founder's standing instruction: naming a system you
+  can connect to is a capability claim and is allowed, implying a relationship
+  is not. The framing is "works with your existing stack", every card states
+  the direction of the connection, and a footnote on the page says that none of
+  the companies named partners with, certifies or endorses Constantine. The
+  marks are drawn monochrome, which is both the §9 answer to a partner wall and
+  the only option CLAUDE.md's colour rule leaves.
 - **Edge unit spec** *(Pocket annotated-callout treatment)* — `[UNBUILT]`.
 - **Edge pipeline trust architecture** — `[UNBUILT]`.
 - **Revenue generation** — commercial logic, not a price list —

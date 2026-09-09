@@ -22,6 +22,9 @@ const VIEWS = [
   ["value", "#value"],
   ["privacy", "#privacy"],
   ["use", "#use"],
+  // §7 lists "integrations" among the six views the critic scores. It was
+  // missing here because the section did not exist when the list was written.
+  ["stack", "#stack"],
   ["outputs", "#outputs"],
   ["faq", "#faq"],
 ];
