@@ -250,16 +250,46 @@ the loop does not rebuild them, and so their §5 conflicts are visible.
   How it works. `src/components/ProblemSection.tsx`.
   §5 CONFLICT: both headings use the banned "X. Not Y." construction, and
   the eyebrow is ALL-CAPS, which §5 rejects.
+  VISUAL ADDED 09 Sep 2026: `FloorLedger` in `blind` mode, beside the lede and
+  the three points. See the Value entry below — it is one object, not two.
 - **Value section (`#value`)** — `[BUILT]`. Eyebrow, heading, four outcome
   cards and a closing line; switches per vertical. Overlaps the Revenue
   generation item above. `src/components/ValueSection.tsx`.
   §5 CONFLICT: three cards use "X, not Y"; eyebrow is ALL-CAPS.
+  VISUAL ADDED 09 Sep 2026: `src/components/FloorLedger.tsx`, ONE object shared
+  with `#problem` and shown in two states. A day in the venue, one track per
+  zone: at `#problem` only the door track carries data and the four zone tracks
+  are empty rails marked `unrecorded`; at `#value` the identical geometry is
+  written on end to end with each zone's peak hour marked. The two sections are
+  the same sentence read forwards and backwards, so they get the same
+  instrument rather than two unrelated illustrations, and a reader meets the
+  blanks filled in. Deliberately NOT the `#venue` plan: the plan answers
+  "where", and what `#problem` is missing is "when, and for how long". Both
+  panels are nested product-register stages inside their canvas-register
+  sections, and both carry an Illustrative chip (§4d rule 2).
 - **How it works (`#how`)** — `[BUILT]`. Four steps per vertical; the
   subject of P4. `src/components/HowItWorks.tsx`.
 - **Museum use cases (`#use`)** — `[BUILT]`. Three cards.
   `src/components/UseCases.tsx`.
+  VISUAL ADDED 09 Sep 2026: `src/components/UseCaseGlyph.tsx`. §5's standard
+  card is "eyebrow → title → copy → clean product visual" and these three
+  stopped after the copy, which is why the block was the flattest thing on the
+  page. Each card now ends in the reading its use case produces. THREE KINDS,
+  NOT SIX DRAWINGS: both verticals ask the same three shapes of question
+  (`ranked`, `delta`, `anomaly`), so the switcher changes the values and the
+  caption rather than the artwork. The glyphs are pushed to the bottom of the
+  card with `mt-auto`, because three cards with different amounts of copy
+  otherwise leave the row of readings stepped.
 - **Privacy (`#privacy`)** — `[BUILT]`. Subject of P5.
-  `src/components/PrivacySection.tsx`.
+  `src/components/PrivacySection.tsx`, with the figures in
+  `src/components/PrivacyStage.tsx`.
+  VISUAL ADDED 09 Sep 2026, and it is the section's argument rather than
+  decoration. See the §5 "People are never identifiable" entry for the
+  mechanism. The section is now two columns at lg — claim column beside the
+  panel, the two Q&As as Pocket promise cards below — which is also what keeps
+  heading, claims, panel and both answers inside 1440×900. §3 P5 is untouched:
+  the three guarantees and both Q&As are all still present, and the panel
+  states them a fourth time in a picture.
 - **Pilot form (`#pilot`)** — `[BUILT]`. Subject of P6.
   `src/components/PilotForm.tsx`.
 - **Brand assets** — `[BUILT]`. Share image and tab icon.
@@ -432,6 +462,42 @@ dome and not a plateau) and clipping BOTH lighting passes to the height field.
 The word "silhouette" is retired from this entry because it is what produced
 the pictogram.
 
+EXTENDED 09 Sep 2026 to `#privacy`, where the figures make the argument rather
+than illustrate it. `src/components/PrivacyStage.tsx`. Founder ask: give the
+privacy section people whose faces never resolve, and let them SHOW the
+no-tracking claim instead of the prose asserting it.
+
+THE MECHANISM, stated so it is not re-derived. The frame is cut by a VERTICAL
+BOUNDARY, the edge device. Left of it is the room, and it is the only place a
+body exists; right of it is the record, and it holds a floor position, a
+facing, a dwell and nothing else. The bodies do not stop at the line by being
+cropped: the figure mask carries a gradient that EATS them over the last 70
+units before it, so "the video is destroyed as it is processed" is drawn rather
+than stated and you can see where it stops. Each figure's data is bound AT THE
+FEET, and that is a content decision — what survives the device is a position
+and an orientation, so the track id, the facing arrow and the leader all attach
+to the floor mark. Binding a pose skeleton to the body would have drawn a claim
+the product does not make. The leader crosses the boundary and terminates in a
+handle on the far side, because the position DOES get through and it is all
+that does.
+
+Read off `design-refs/strips/Playvision_People_Movement.png` rather than off
+prose about it, the 10/10 reference binds data to a body three ways: hairline
+geometry drawn onto the figure, small mono readouts floating beside it on
+leaders, and a dark stats card headed by an anonymous player number. All three
+are reused; only the payload differs, because ours has to be an argument about
+what is NOT held, so the card ends in `identity none`, `face signature not
+computed`, `raw video destroyed at source`.
+
+At 390 the record card DOCKS BELOW the room instead of floating over it. At
+46% of a 342px panel every column truncated to an ellipsis and the payload of
+the whole panel was three rows of "zon…". The right of the boundary being empty
+on a phone is not a loss; it is the point.
+
+Two rules this does not bend: nothing is ever added inside the head outline,
+and the panel is a nested product-register stage, so the instrument scale is
+on-stage white and the figures read identically in all four palettes.
+
 **Motion carries information** *(Claryo)*. AMENDED 08 Sep 2026 — founder
 verdict: "the website feels too segmented rather than flowing as it should".
 
@@ -466,6 +532,16 @@ ANTI-REFERENCE (`Slingshot_Scroll.png`, 2/10): sections merging with no clear
 boundary; stretches that are nothing but a quote or a block of prose; no
 interactive features below the hero; a closing CTA so low-contrast it blends
 into the background. Do not reproduce any of these.
+
+CLEARED 09 Sep 2026, second clause. `tests/reveal.spec.ts` fails any section
+over 300 characters with nothing to look at, and four were failing: `#problem`
+(434), `#value` (565), `#privacy` (811) and `#use` (322). All four now carry a
+visual and the floor is green, so it hardens from a ratchet into an absolute
+gate: any new copy-heavy section must ship with its picture. One rule was used
+for all four rather than four bespoke treatments — every visual is a NESTED
+PRODUCT-REGISTER STAGE inside its section, which is how the Outputs beats and
+the HowItWorks demo walls already work, so the instrument scale is on-stage
+white and one build renders in all four palettes.
 
 User-triggered motion (the hover demos) is still the star and still gets the
 budget. All scroll motion freezes under prefers-reduced-motion, with every

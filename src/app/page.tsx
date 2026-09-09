@@ -14,6 +14,7 @@ import PilotForm from "@/components/PilotForm";
 import ScrollProgress from "@/components/ScrollProgress";
 import ScrollStage from "@/components/ScrollStage";
 import Reveal from "@/components/Reveal";
+import { GhostSprite } from "@/components/GhostFigure";
 import { VerticalProvider } from "@/components/VerticalContext";
 import Image from "next/image";
 
@@ -22,6 +23,12 @@ export default function Home() {
     // `relative` is load-bearing: the vertical switcher is positioned against
     // main while the entry question stands, so it scrolls with the entry view.
     <main className="relative min-h-screen bg-surface-page text-fg-primary">
+      {/* The three ghost poses, serialised ONCE for the whole document. It
+          lives here rather than inside Outputs because #privacy now uses the
+          same figures and sits above it: a <use> whose referenced <defs> comes
+          later in the document is resolved on the wrong side of first paint,
+          and duplicating the sprite would duplicate its element ids. */}
+      <GhostSprite />
       {/* The entry selector and every section that swaps copy read one shared
           vertical from this provider. Only those pieces are client components;
           this page stays server-rendered. */}
