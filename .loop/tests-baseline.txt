@@ -1,2 +1,1 @@
 gimmicks.spec.ts › §5 design floors (v2 constitution) › reduced motion: page is static and complete
-reveal.spec.ts › no section is a bare wall of prose
