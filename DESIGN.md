@@ -289,7 +289,13 @@ the loop does not rebuild them, and so their §5 conflicts are visible.
   tap DOES start the demos on touch, because the walls listen for
   `pointerover` as well as `pointermove` and a tap fires it. That is
   incidental rather than designed, and there is no explicit touch affordance.
-  There is NO `prefers-reduced-motion` handling anywhere in the codebase.
+  CORRECTED AGAIN 09 Sep 2026: `prefers-reduced-motion` is now handled
+  everywhere that moves — the scroll grammar, the entry drift, the seams, the
+  ambient field, the venue run, and, as of this cycle, the two demo walls and
+  the bench wireframe. Measured with `scripts/rm-audit.mjs`: at both widths and
+  on both verticals the page runs ZERO requestAnimationFrame callbacks while
+  idle and every viewport frame is byte-identical 600ms later. The remaining
+  gap in this entry is the touch affordance, not the preference.
 - **Viewport-fit discipline.** CORRECTED 07 Sep 2026: the rule is adopted.
   `#faq` carries `data-testid="viewport-section"` and both floors are green.
   Every other section is still untagged, and `#how` in particular (3113px at
@@ -302,13 +308,17 @@ are hollow and would let a regression through:
 
 - **touch / tap** — GENUINE pass. Tapping fires `pointerover`, the walls act
   on it, and the timer runs. Keep.
-- **reduced motion** — HOLLOW. It asserts
+- **reduced motion** — WAS HOLLOW, CLOSED 09 Sep 2026. It asserted
   `document.getAnimations()` has nothing running, but that API only sees Web
   Animations and CSS animations/transitions. Every demo here is
   requestAnimationFrame driving a canvas, which it cannot observe, so the
-  test passes whether or not the site honours the preference — and it does
-  not. Rewrite to assert the demos actually freeze under
-  `prefers-reduced-motion`.
+  test passed whether or not the site honoured the preference — and it did
+  not. It now samples the demo canvas twice 500ms apart with no interaction,
+  photographs the whole viewport twice at the atmosphere block (which is what
+  covers the ambient field and the venue wireframe, neither of which is inside
+  a card), and is paired with a second test asserting that hover STILL drives
+  the timers under the preference — because the cheapest way to pass a
+  stillness check is to stop the demos, which §3 forbids.
 - **viewport-fit (mobile)** — HOLLOW. It loops over zero tagged sections and
   passes trivially. The desktop variant asserts `n > 0` first and correctly
   fails. Add the same guard to the mobile test.
@@ -638,6 +648,35 @@ reduced-motion test by killing the demos, breaching §3 P1/P2:
 - User-initiated response MAY still animate. Hover or tap driving the
   attention/utilisation timers is interaction feedback, not ambient motion.
   Disabling it to pass the test is a §3 failure, not a fix.
+
+CLOSED 09 Sep 2026, and the principle that resolved it is worth keeping:
+UNDER THE PREFERENCE, THE DEMO'S CLOCK BECOMES THE VISITOR'S CLOCK. The walls
+were the last thing moving on an untouched page, and not because anything was
+visibly animating — engagement was zero, the painting was at rest, the numbers
+read 0.0. What moved was the ten-second window under the trace, which advances
+its time axis every frame whether or not anybody is there. Both walls now start
+their loop on a pointer and PARK the moment engagement is back at rest
+(`src/lib/motion.ts`, `MonaLisaWall.tsx`, `EquipmentWall.tsx`), so hover still
+drives attention, utilisation and workout time exactly as before, and an
+untouched page runs no frame callbacks at all.
+
+Three things a later candidate should not have to re-derive:
+
+1. A LOOP THAT PARKS NEEDS A REST FRAME. §5 asks for static AND complete, and a
+   canvas that simply stops is blank on first load. The resting chart is the
+   full window flat at zero — which is exactly what the live trace decays to,
+   so it is the honest reading rather than a decoration.
+2. A CANVAS DRAWN ONCE STILL HAS TO RE-THEME. Four palettes are live and the
+   harness flips `data-theme` AFTER mount, so code that redrew every frame
+   picked that up by accident. Anything that draws once must subscribe to
+   resize and to that attribute (`onRedraw`), or its variant screenshot lies.
+   The Insight sparklines were repainting an unchanging chart sixty times a
+   second purely to get this for free; they now draw once and subscribe.
+3. A CYCLE IS AMBIENT EVEN WHEN ITS AMPLITUDE IS ZERO. The bench rep repeats on
+   its own clock and only looks still when idle because the swing is multiplied
+   by utilisation. Under the preference the cycle is dropped and the bar's
+   POSITION carries the metric instead: racked when unused, lifted clear of the
+   hooks at full utilisation. Same information, no loop.
 
 **Copy register** (founder-rejected the essay/manifesto register — copy
 must not read like AI writing). Target: plain, concrete, benefit-led

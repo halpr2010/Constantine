@@ -109,4 +109,37 @@ unilaterally.
 | 20260908-200412-1 | cand-20260908-200412-1 | pass | cand | cand | tie | cand | cand | promote | Make the dashes actually travel, and prove it. shots/candidate/motion/flow.png resolves to only two distinct images across six 250ms samples, differing by 29 pixels confined to the top-left connector — about 1px of travel over 1.25s, roughly an order of magnitude short of the 1.05s dash period the capture comment assumes. Two candidate causes, and the next cycle should separate them: (a) the animation genuinely advances that slowly, in which case set the dash period so one dash crosses a whole connector in ~1.5s and widen the gap so an individual dash is trackable frame to frame; (b) Playwright's element-level stack.screenshot() is stalling the compositor, in which case re-shoot flow.png as full-page page.screenshot() calls with the scroll position held and crop afterwards. Target to assert: adjacent 250ms frames should differ by at least ~8px of dash displacement on every connector, not one. While there, give the 390 layout something better than 20px connector stubs — either route the spokes around the 2x2 grid so a dash has somewhere to travel, or drop to a single vertical spine with the four cards hanging off it. |
 | 20260908-200412-2 | cand-20260908-200412-2 | pass | cand | cand | cand | cand | cand | promote | Build the ambient field, and fix the strip that is meant to prove it in the same commit. motion/drift.png is six frames over six seconds of the ENTRY screen — pure flat black with 'Are you a…' and two pills, byte-identical between best and candidate — so the one capture the rubric points at for self-motion samples the single screen that is black by design and can never show a bloom. Change scripts/motion-strip.mjs to select a vertical first and capture drift on the post-selection hero (product/atmosphere register), then build the field there per Claryo_Ambiance_and_Scroll_Functionality_3.png: large soft purple blooms on pure black, drifting on their own clock with no cursor input, and no edge anywhere in frame where the field starts or stops. Size the blooms so consecutive drift frames differ visibly to the eye, not just to a pixel diff — the last two attempts were rejected as invisible, and with the strip pointed at the entry screen a third would have been unfalsifiable. |
 | 20260908-213012-1 | cand-20260908-213012-1 | FAIL | – | – | – | – | – | discarded | floors: FAIL — build broken |
+### Cycle 20260909-142443 — the reduced-motion floor, closed
+
+The last standing red from the opening backlog. What was moving on an untouched
+page was not anything that looked animated: engagement was zero, the paintings
+were at rest, the numbers read 0.0. It was the TIME AXIS under the demo charts.
+Both walls draw a rolling ten-second window, and the window advances every frame
+whether or not anybody is there, so no two frames of an idle page were ever the
+same. Two smaller ones sat behind it: the Insight sparklines repainted an
+unchanging chart sixty times a second (their only reason to, it turned out, was
+that redrawing every frame is how they picked up a runtime theme flip), and the
+bench rep cycles on its own clock and only looks still when idle because the
+swing is multiplied by utilisation.
+
+Fixed by making the demo's clock the visitor's clock rather than by disabling
+anything: under the preference each wall starts its loop on a pointer and parks
+when engagement is back at rest, drawing its resting trace (the window flat at
+zero, which is what the live trace decays to) so the card is static AND
+complete. Hover still drives attention, utilisation and workout time, and there
+is now a floor asserting exactly that, because the cheapest way to pass a
+stillness check is to stop the demos and that is a §3 P1/P2 failure.
+
+Measured with the new `scripts/rm-audit.mjs`, which walks the whole document
+rather than one canvas: at 1440 and 390, on both verticals, every viewport frame
+is byte-identical 600ms later and the page runs ZERO rAF callbacks while idle.
+The ambient field and the venue wireframe were already honouring the preference
+and are now covered by the floor as well as by the audit.
+
+Note for whoever writes the next audit: do NOT use element screenshots for
+this. Playwright scrolls an element into view before shooting it, which moves
+the page between the two samples and reports every scroll-positioned drawing as
+moving — the first version of this audit accused the ambient field and both
+Insight cards on that basis alone.
+
 | 20260909-134701-1 | cand-20260909-134701-1 | pass | cand | cand | tie | tie | cand | promote | Close the standing red: tests/reveal.spec.ts fails any <section> over 300 characters with no img/svg/canvas/video/figure/table/[data-visual] child, and PRIVACY is the loudest — museums-privacy-1440 and -390 show ~811 characters of prose under three guarantee pills with nothing to look at in all four palettes, which is the Slingshot 2/10 defect verbatim. Build the founder's ask there: anonymised GhostFigures reusing the volumetric idiom already in Outputs (Playvision_People_Movement.png is the 10/10), faces never resolving, with the no-tracking claim SHOWN — e.g. the figures carrying only zone/dwell numbers that detach and aggregate as they cross, so what leaves the frame is visibly a count and not a person — sized to compose within one viewport so the viewport-fit floor does not go red in exchange. Then walk the other over-300-char section the same test names and give it its own visual rather than a second copy of the figures. |
