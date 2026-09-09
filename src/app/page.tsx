@@ -37,7 +37,13 @@ export default function Home() {
             provider so it re-scans when the switcher rebuilds the page. */}
         <ScrollStage />
 
-        {/* Header */}
+        {/* Header. NO bottom border: it held the root ground after selection, so
+            over a section of opposite polarity it painted a solid band with a
+            razor edge — luminance stepping 53 -> 114 -> 255 across 3px, and
+            inverted in light-canvas. §5 requires ground changes with no visible
+            dividing line, and a permanent rule across the page is the most
+            visible one there is. ScrollProgress's filled portion is the only
+            rule at the header's foot now. */}
         {/* `data-entry-chrome` hands the header to the entry view's register
             while the question stands, so it disappears into the light ground
             instead of laying a dark bar across it (globals.css, entry block).
@@ -45,7 +51,7 @@ export default function Home() {
             does not show: nav, the pilot CTA, and the two dock slots. */}
         <header
           data-entry-chrome=""
-          className="pointer-events-none fixed left-0 right-0 top-0 z-50 border-b border-line-hairline bg-surface-page/80 backdrop-blur-xl"
+          className="pointer-events-none fixed left-0 right-0 top-0 z-50 bg-surface-page/80 backdrop-blur-xl"
         >
           <div className="pointer-events-auto mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
             <a href="/" className="flex items-center gap-2">

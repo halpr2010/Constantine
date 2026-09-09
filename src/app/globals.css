@@ -562,6 +562,12 @@ html[data-entry="entering"] [data-entry-chrome] {
 :root {
   /* A · dark — canvas, product and technical */
   --c-surf: #050505; --c-card: color-mix(in oklab, var(--color-zinc-900) 40%, transparent);
+  /* Action colours per register. A CTA must read against the ground it
+     actually sits on, not the theme's root ground: in light-canvas the
+     hero button measured 1.0:1 because --action-* was never remapped. */
+  --c-action: #ffffff; --c-action-hover: var(--color-zinc-200); --c-action-fg: #000000;
+  --p-action: #f4f4f7; --p-action-hover: #d9d9e2; --p-action-fg: #0a0a0d;
+  --t-action: #0a0a0b; --t-action-hover: var(--color-zinc-800); --t-action-fg: #ffffff;
   --c-line: color-mix(in oklab, var(--color-zinc-800) 50%, transparent);
   --c-edge: var(--color-zinc-800);
   --c-fg: var(--color-zinc-50); --c-fg2: var(--color-zinc-400);
@@ -592,6 +598,12 @@ html[data-entry="entering"] [data-entry-chrome] {
   --c-pos: var(--color-emerald-700); --c-neg: var(--color-red-700); --p-pos: var(--color-emerald-400); --p-neg: var(--color-red-400);
   --t-pos: var(--color-emerald-700); --t-neg: var(--color-red-700);
   --c-surf: #ffffff; --c-card: color-mix(in oklab, var(--color-zinc-100) 70%, transparent);
+  /* Action colours per register. A CTA must read against the ground it
+     actually sits on, not the theme's root ground: in light-canvas the
+     hero button measured 1.0:1 because --action-* was never remapped. */
+  --c-action: #0a0a0b; --c-action-hover: var(--color-zinc-800); --c-action-fg: #ffffff;
+  --p-action: #f6f3ff; --p-action-hover: #ded8f2; --p-action-fg: #0c0912;
+  --t-action: #0a0a0b; --t-action-hover: var(--color-zinc-800); --t-action-fg: #ffffff;
   --c-line: color-mix(in oklab, var(--color-zinc-300) 70%, transparent); --c-edge: var(--color-zinc-200);
   --c-fg: #0a0a0b; --c-fg2: var(--color-zinc-700); --c-fg3: var(--color-zinc-500);
   --p-surf: #0c0912; --p-card: color-mix(in oklab, #3a2f5c 34%, transparent);
@@ -608,6 +620,12 @@ html[data-entry="entering"] [data-entry-chrome] {
   --c-pos: var(--color-emerald-400); --c-neg: var(--color-red-400); --p-pos: var(--color-emerald-300); --p-neg: var(--color-red-300);
   --t-pos: var(--color-emerald-700); --t-neg: var(--color-red-700);
   --c-surf: #08060d; --c-card: color-mix(in oklab, #241c3a 34%, transparent);
+  /* Action colours per register. A CTA must read against the ground it
+     actually sits on, not the theme's root ground: in light-canvas the
+     hero button measured 1.0:1 because --action-* was never remapped. */
+  --c-action: #ffffff; --c-action-hover: #ded8f2; --c-action-fg: #0a0713;
+  --p-action: #f6f3ff; --p-action-hover: #ded8f2; --p-action-fg: #0a0713;
+  --t-action: #0a0713; --t-action-hover: #241c3a; --t-action-fg: #ffffff;
   --c-line: color-mix(in oklab, #6f5fa6 22%, transparent); --c-edge: color-mix(in oklab, #6f5fa6 34%, transparent);
   --c-fg: #f4f2fb; --c-fg2: #b9b3cc; --c-fg3: #8b849f;
   --p-surf: #0f0a1d; --p-card: color-mix(in oklab, #4a3a7a 32%, transparent);
@@ -621,6 +639,12 @@ html[data-entry="entering"] [data-entry-chrome] {
   --c-pos: #4ade80; --c-neg: #fb7185; --p-pos: #86efac; --p-neg: #fda4af;
   --t-pos: var(--color-emerald-700); --t-neg: var(--color-red-700);
   --c-surf: #04070a; --c-card: color-mix(in oklab, #123047 26%, transparent);
+  /* Action colours per register. A CTA must read against the ground it
+     actually sits on, not the theme's root ground: in light-canvas the
+     hero button measured 1.0:1 because --action-* was never remapped. */
+  --c-action: #7fd3ff; --c-action-hover: #a9e2ff; --c-action-fg: #03151f;
+  --p-action: #7fd3ff; --p-action-hover: #a9e2ff; --p-action-fg: #03151f;
+  --t-action: #03151f; --t-action-hover: #123047; --t-action-fg: #7fd3ff;
   --c-line: color-mix(in oklab, #4d90b8 20%, transparent); --c-edge: color-mix(in oklab, #4d90b8 32%, transparent);
   --c-fg: #eaf6ff; --c-fg2: #a8c2d4; --c-fg3: #7794a8;
   --p-surf: #061019; --p-card: color-mix(in oklab, #17475f 34%, transparent);
@@ -900,6 +924,8 @@ html[data-entry="entering"] [data-entry-chrome] {
 
 [data-register="canvas"] {
   --surface-page: var(--c-surf); --surface-card: var(--c-card);
+  --action-bg: var(--c-action); --action-bg-hover: var(--c-action-hover);
+  --action-fg: var(--c-action-fg);
   --surface-control: var(--c-card);
   --border-hairline: var(--c-line); --border-card: var(--c-edge);
   --text-primary: var(--c-fg); --text-secondary: var(--c-fg2);
@@ -915,6 +941,8 @@ html[data-entry="entering"] [data-entry-chrome] {
 }
 [data-register="product"] {
   --surface-page: var(--p-surf); --surface-card: var(--p-card);
+  --action-bg: var(--p-action); --action-bg-hover: var(--p-action-hover);
+  --action-fg: var(--p-action-fg);
   --surface-control: var(--p-card);
   --border-hairline: var(--p-line); --border-card: var(--p-edge);
   --text-primary: var(--p-fg); --text-secondary: var(--p-fg2);
@@ -939,6 +967,8 @@ html[data-entry="entering"] [data-entry-chrome] {
 html[data-entry="asking"] [data-entry-chrome],
 html[data-entry="entering"] [data-entry-chrome] {
   --surface-page: var(--t-surf); --surface-card: var(--t-card);
+  --action-bg: var(--t-action); --action-bg-hover: var(--t-action-hover);
+  --action-fg: var(--t-action-fg);
   --surface-control: var(--t-card);
   --border-hairline: var(--t-line); --border-card: var(--t-edge);
   --text-primary: var(--t-fg); --text-secondary: var(--t-fg2);

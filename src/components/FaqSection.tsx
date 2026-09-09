@@ -206,7 +206,7 @@ export default function FaqSection() {
       data-testid="viewport-section"
       // The header is fixed and ~88px tall; without scroll-mt an anchor jump
       // to #faq lands the eyebrow and heading underneath it.
-      className="scroll-mt-24 border-t border-line-hairline px-6 py-12 md:py-16"
+      className="scroll-mt-24 px-6 py-12 md:py-16"
     >
       <div className="mx-auto max-w-6xl">
         <div className="text-sm font-medium text-fg-muted">Common questions</div>

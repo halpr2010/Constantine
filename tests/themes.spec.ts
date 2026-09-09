@@ -191,6 +191,63 @@ for (const theme of THEMES) {
         .toBe(seen.length);
     });
 
+    test("every button and CTA has a visible shape, not just a legible label", async ({ page }) => {
+      // The floor gap that let an invisible CTA ship. This spec checked TEXT
+      // contrast, and the hero button's white label passed easily — while the
+      // button's own fill measured 1.0:1 against the ground behind it in
+      // light-canvas, because --action-* was never in the register remap set.
+      // The label read; the button was not there. A control has to have a
+      // visible edge, so its FILL is measured against what it sits on.
+      const bad = await page.evaluate(() => {
+        const cv = document.createElement("canvas");
+        cv.width = cv.height = 1;
+        const cx = cv.getContext("2d", { willReadFrequently: true })!;
+        cx.globalCompositeOperation = "copy";
+        const px = (v: string) => {
+          cx.fillStyle = "#000"; cx.fillStyle = v; cx.fillRect(0, 0, 1, 1);
+          const d = cx.getImageData(0, 0, 1, 1).data;
+          return [d[0], d[1], d[2], d[3] / 255];
+        };
+        const over = (f: number[], b: number[]) =>
+          [0, 1, 2].map((i) => f[i] * f[3] + b[i] * (1 - f[3])).concat(1);
+        const ground = (el: Element | null) => {
+          const st: number[][] = [];
+          for (let n = el; n; n = n.parentElement) {
+            const c = px(getComputedStyle(n).backgroundColor);
+            if (c[3] > 0) st.push(c);
+          }
+          let base = [255, 255, 255, 1];
+          for (const l of st.reverse()) base = over(l, base);
+          return base;
+        };
+        const lum = ([r, g, b]: number[]) => {
+          const f = (c: number) => { const s = c / 255; return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4); };
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+        };
+        const out: string[] = [];
+        for (const el of Array.from(document.querySelectorAll("a[href='#pilot'],button[type='submit'],[data-cta]"))) {
+          const cs = getComputedStyle(el);
+          const r = el.getBoundingClientRect();
+          if (r.width < 8 || r.height < 8 || cs.visibility === "hidden") continue;
+          const fill = px(cs.backgroundColor);
+          const hasBorder = parseFloat(cs.borderTopWidth) > 0 && px(cs.borderTopColor)[3] > 0;
+          // Only judge things that CLAIM a shape. An unfilled, unbordered
+          // anchor is an inline text link — "Ask it in the pilot request" is
+          // one — and its legibility is the text floor's job, not this one.
+          // Measuring it here reports 1.0:1 for every text link on the page.
+          if (fill[3] === 0) continue;
+          const behind = ground(el.parentElement);
+          const c = over(fill, behind);
+          const [hi, lo] = [lum(c), lum(behind)].sort((a, b) => b - a);
+          const ratio = (hi + 0.05) / (lo + 0.05);
+          if (ratio < 3 && !hasBorder)
+            out.push(`${(el.textContent ?? "").trim().slice(0, 30)} — ${ratio.toFixed(2)}:1`);
+        }
+        return out;
+      });
+      expect(bad, "control has no visible shape against its ground").toEqual([]);
+    });
+
     test("canvas bridge resolves — demos can draw", async ({ page }) => {
       // palette.ts reads tokens off the root at draw time. If a theme leaves any
       // chart token empty the demos draw with "" and vanish.

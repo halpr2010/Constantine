@@ -265,7 +265,7 @@ function BriefFragment({ c }: { c: Content["action"] }) {
           </li>
         ))}
       </ol>
-      <div className="mt-4 flex items-center justify-between border-t border-line-hairline pt-3">
+      <div className="mt-4 flex items-center justify-between pt-3">
         <span className="text-[10px] text-instrument-fg">Send to</span>
         <span className="font-mono text-[10px] text-instrument-fg-strong">
           {c.exports}
