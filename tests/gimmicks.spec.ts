@@ -195,11 +195,64 @@ test.describe("§5 design floors (v2 constitution)", () => {
       await hashOf(),
       "idle canvas animation must freeze under prefers-reduced-motion"
     ).toBe(first);
+    // One canvas in one card is a narrow window on a page that also carries an
+    // ambient field, a venue wireframe and a looping clip. Photograph the whole
+    // viewport twice instead, at the block where the atmosphere lives, touching
+    // nothing in between: anything on screen that is still running its own
+    // clock shows up as a changed frame.
+    // Element screenshots are deliberately not used for this — Playwright
+    // scrolls an element into view first, which moves the page between the two
+    // samples and reports every scroll-positioned drawing as moving.
+    await page.evaluate(() => {
+      document.querySelector("#venue")?.scrollIntoView();
+    });
+    await page.waitForTimeout(800);
+    const frame = async () =>
+      createHash("sha256").update(await page.screenshot()).digest("hex");
+    const before = await frame();
+    await page.waitForTimeout(500);
+    expect(
+      await frame(),
+      "the ambient field and the venue wireframe must be still under prefers-reduced-motion"
+    ).toBe(before);
     // Scrollytelling degrades: key content reachable by plain scroll
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     for (const t of [/Integrate/i, /no facial recognition/i]) {
       expect(await page.getByText(t).count()).toBeGreaterThan(0);
     }
+    await ctx.close();
+  });
+
+  test("reduced motion: the demos still answer the pointer", async ({ browser }) => {
+    // The other half of the §5 SCOPE rule, and the reason the test above cannot
+    // stand alone: the cheapest way to pass a stillness check is to stop the
+    // demos, which is a §3 P1/P2 failure rather than a fix. Ambient motion
+    // freezes; user-initiated response does not.
+    const ctx = await browser.newContext({ reducedMotion: "reduce" });
+    const page = await ctx.newPage();
+    await page.goto(BASE, { waitUntil: "networkidle" });
+
+    const card = page.getByTestId("exhibit-card").first();
+    expect(await attentionValue(card)).toBe(0); // idle: nothing accruing
+    await card.hover();
+    await page.waitForTimeout(1500);
+    expect(
+      await attentionValue(card),
+      "hover must still drive the attention timer under prefers-reduced-motion"
+    ).toBeGreaterThan(0.5);
+    const pct = parseFloat(
+      (await card.getByTestId("engagement-value").innerText()).replace(/[^\d.]/g, "")
+    );
+    expect(pct).toBeGreaterThan(0);
+
+    await page.getByTestId("hero-tab-gyms").click();
+    const gymCard = page.getByTestId("exhibit-card").first();
+    await gymCard.hover();
+    await page.waitForTimeout(1500);
+    expect(
+      await attentionValue(gymCard),
+      "tap/hover must still drive workout time under prefers-reduced-motion"
+    ).toBeGreaterThan(0.5);
     await ctx.close();
   });
 
