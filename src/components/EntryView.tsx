@@ -1,5 +1,6 @@
 "use client";
 
+import { useLayoutEffect, useRef } from "react";
 import { useVertical } from "@/components/VerticalContext";
 
 /**
@@ -26,14 +27,49 @@ import { useVertical } from "@/components/VerticalContext";
  *
  * Nothing here gates anything. The hero and every section below it are in the
  * document one scroll away, and a deep link or a crawler skips this view
- * entirely (VerticalContext).
+ * entirely (VerticalContext). That is also why this block stays IN FLOW while
+ * the question stands rather than being a fixed overlay: an unanswered visitor
+ * can scroll straight past it, and tests/reveal.spec.ts walks the whole page
+ * without ever answering.
  */
 export default function EntryView() {
   const { answered, leaving } = useVertical();
-  if (answered) return null;
+  const ref = useRef<HTMLDivElement>(null);
+
+  /**
+   * The 100vh block leaves the FLOW on the click, and leaves the SCREEN a
+   * second later. Those used to be the same event, which is what made holding
+   * the question expensive: the unmount removes a viewport of document from
+   * above the hero, and landing that shift inside the 1500ms hover window of
+   * `P2 — equipment hover drives the timer` is what discarded candidate
+   * 20260908-173122-1 (DESIGN.md §4).
+   *
+   * Taking the block out of flow at the instant of the click moves the shift to
+   * a moment when nothing is being pointed at yet, and the view is re-anchored
+   * to the pixel it already occupies so nothing appears to move. The hero then
+   * sits at document top for the whole drift, fully laid out, behind an opaque
+   * ground — and revealing it is a matter of lifting that ground.
+   */
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el || !leaving) return;
+    // Measured while the element is still in flow: no rule below changes its
+    // position, so this runs before the browser has painted the new state.
+    const { top } = el.getBoundingClientRect();
+    el.style.position = "fixed";
+    el.style.top = `${top}px`;
+    el.style.left = "0";
+    el.style.right = "0";
+    // The hero is live underneath from here on. Nothing in this view is
+    // clickable, so it must not stand between the visitor and the demos.
+    el.style.pointerEvents = "none";
+  }, [leaving]);
+
+  if (answered && !leaving) return null;
 
   return (
     <div
+      ref={ref}
       data-testid="vertical-selector"
       data-entry-view=""
       data-register="technical"
@@ -43,7 +79,11 @@ export default function EntryView() {
       {/* Measured off the reference still: the question is ~64px on a 1410px
           viewport, roughly a third larger than the 48px it was set at here,
           and that weight is most of what made ours read as a caption over a
-          control rather than as the screen's one question. */}
+          control rather than as the screen's one question.
+
+          It does not leave with the click. Reference frame 3 has it standing,
+          greyed, while the tab is still travelling; the grey is applied in the
+          entry block of globals.css off this element's data-state. */}
       <p
         id="entry-question"
         className="entry-question text-balance text-5xl font-semibold tracking-tight text-fg-primary md:text-6xl"

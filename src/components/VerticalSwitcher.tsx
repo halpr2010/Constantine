@@ -15,10 +15,16 @@ const CHOICES: [Vertical, string][] = [
 /**
  * How much smaller the track gets once it has drifted into the header. Frame 4
  * of design-refs/strips/Clary_Selector.png shows the docked tab at roughly
- * two-thirds the entry size; 0.8 is as far as ours can shrink before
- * "Museums & Galleries" stops being comfortably readable at 390w.
+ * two-thirds the entry size, and the reference shrinks it hard: ~98px on the
+ * entry screen against ~54px docked.
+ *
+ * It is per-width because only the desktop step grew on 09 Sep. The header row
+ * is 88px (a 56px wordmark plus its padding), so a 95px entry track has to land
+ * near 0.68 to sit inside it with air; 0.8 would leave 6px. Below 768 the entry
+ * track is still 81px and 0.8 is as far as it can shrink before
+ * "Museums & Galleries" stops being comfortably readable.
  */
-const DOCK_SCALE = 0.8;
+const dockScale = () => (window.innerWidth >= 768 ? 0.68 : 0.8);
 /**
  * The drift is one move on two clocks. Vertical is front-loaded and horizontal
  * is back-loaded, so the track rises to the header band first and only then
@@ -50,33 +56,39 @@ function activeSlot(): HTMLElement | null {
  * black and white, and a second saturated accent would have to clear AA against
  * four different grounds while still reading as the same brand. A shape does
  * not, and it says something the colour could not — each marker is the thing
- * Constantine measures in that space. Museums get a hung frame; gyms get a
- * loaded bar. Both are one silhouette at 16px, so they separate at a glance
- * before the label is read.
+ * Constantine measures in that space.
+ *
+ * REWORKED 09 Sep 2026. The first pass drew two hairline glyphs, and hairlines
+ * of the same weight in the same box carry the same visual mass: at 17px the
+ * two choices still read as a pair of small dark ticks and the difference only
+ * arrived once the label had been read, which is the note being answered. The
+ * founder's word is TILE, and the reference mark is a solid swatch, so these are
+ * solid now — and the differentiator is the tile's own OUTLINE, which is legible
+ * before any interior detail resolves: museums get a PORTRAIT tile (a hung
+ * frame), gyms a LANDSCAPE one (a loaded bar).
+ *
+ * Each is a single evenodd path so the interior is a true hole rather than a
+ * second fill. The mark sits on the raised pill when its choice is lit and on
+ * the track when it is not, and those are two different grounds; a knockout
+ * painted in either colour would be wrong on the other.
  */
 function VerticalMark({ id }: { id: Vertical }) {
   return (
     <svg className="vsel-mark" viewBox="0 0 18 18" aria-hidden focusable="false">
       {id === "museums" ? (
-        <>
-          <rect
-            x="2.6"
-            y="2.2"
-            width="12.8"
-            height="13.6"
-            rx="1.4"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          />
-          <path d="M5.1 12.6 L8 8.4 L10.1 10.9 L11.9 8.9 L13.1 12.6 Z" fill="currentColor" />
-        </>
+        // A hung frame, 11 x 14, with the picture knocked out of it.
+        <path
+          fillRule="evenodd"
+          fill="currentColor"
+          d="M3.5 2 H14.5 V16 H3.5 Z M5.4 12.9 L8.2 8.3 L10.2 10.9 L11.6 9.1 L13 12.9 Z"
+        />
       ) : (
-        <>
-          <rect x="5.3" y="7.9" width="7.4" height="2.2" fill="currentColor" />
-          <rect x="2.2" y="5" width="3" height="8" rx="1" fill="currentColor" />
-          <rect x="12.8" y="5" width="3" height="8" rx="1" fill="currentColor" />
-        </>
+        // A loaded bar, 15 x 10, with the bar and its two plates knocked out.
+        <path
+          fillRule="evenodd"
+          fill="currentColor"
+          d="M1.5 4 H16.5 V14 H1.5 Z M5.1 8.4 H12.9 V9.6 H5.1 Z M3.1 6.5 H4.5 V11.5 H3.1 Z M13.5 6.5 H14.9 V11.5 H13.5 Z"
+        />
       )}
     </svg>
   );
@@ -162,14 +174,15 @@ export default function VerticalSwitcher() {
     if (!el || !lf) return;
     const w = el.offsetWidth;
     const h = el.offsetHeight;
+    const scale = dockScale();
     // Reserve the landing space first: the header lays out around the tab, and
     // the slot's rect is only meaningful once it has the docked size.
     const slot = activeSlot();
-    let x = Math.max(12, window.innerWidth - w * DOCK_SCALE - 24);
+    let x = Math.max(12, window.innerWidth - w * scale - 24);
     let y = 14;
     if (slot) {
-      slot.style.width = `${Math.round(w * DOCK_SCALE)}px`;
-      slot.style.height = `${Math.round(h * DOCK_SCALE)}px`;
+      slot.style.width = `${Math.round(w * scale)}px`;
+      slot.style.height = `${Math.round(h * scale)}px`;
       const r = slot.getBoundingClientRect();
       if (r.width > 0) {
         x = r.left;
@@ -183,7 +196,7 @@ export default function VerticalSwitcher() {
     lf.style.transition = animate
       ? `transform ${ENTRY_DRIFT_MS}ms ${DRIFT_Y}`
       : "none";
-    lf.style.transform = `translate3d(0, ${y}px, 0) scale(${DOCK_SCALE})`;
+    lf.style.transform = `translate3d(0, ${y}px, 0) scale(${scale})`;
   }, []);
 
   // Measuring the DOM and storing the result is the one thing an effect is

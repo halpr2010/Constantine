@@ -44,9 +44,11 @@ export default function HeroSection() {
   return (
     <section
       data-register="product"
-      // The view that fades in when the entry question is answered (§4). The
-      // section's own ground fades with it, so the page crosses from the
-      // entry ground to the product ground with no visible edge.
+      // The view the entry question resolves into (§4). It no longer runs a
+      // fade of its own: the entry ground is lifted off a hero that has been
+      // sitting here, fully rendered, since the click, so the ground going IS
+      // this view arriving. The attribute stays because the crossing seam below
+      // is sized off it.
       data-entry-target=""
       className="relative flex min-h-screen w-full flex-col justify-center overflow-x-clip"
       // A wall's card is wider than its column by design (up to ~140px each
@@ -54,13 +56,15 @@ export default function HeroSection() {
       // before the switcher existed, without leaving a horizontal scrollbar.
       style={{ overflowClipMargin: "150px" }}
     >
-      {/* Only while the gate is up. The entry view now paints the technical
+      {/* Only while the gate is up. The entry view paints the technical
           register's light ground (§4), so a visitor who scrolls past the
           question instead of answering it would otherwise meet exactly the hard
           register edge §5 forbids. Once the question is answered the entry view
-          is gone and the hero is the first thing in the document — a seam there
-          would wash the top of the hero with a ground that is no longer above
-          it, so it is not rendered. */}
+          is out of flow and the hero is the first thing in the document — a seam
+          there would wash the top of the hero with a ground that is no longer
+          above it, so it is not rendered. `answered` flips as the tab lands, at
+          which point the entry ground is still fully opaque overhead, so this
+          unmounts unseen rather than popping mid-drift. */}
       {!answered && <SectionSeam from="technical" to="product" />}
 
       {/* pt clears the header. Below lg the docked vertical track gets its own
