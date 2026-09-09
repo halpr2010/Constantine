@@ -39,7 +39,15 @@ type Geometry = {
   walls: string[];
   /** Small rectangles: hanging walls in a gallery, equipment bays in a gym. */
   bays: [number, number, number, number][];
-  zones: { x: number; y: number; t: string }[];
+  /** A zone is an AREA; `ex` names one specific thing measured inside it.
+      Constantine reports per-zone engagement AND per-work / per-machine
+      attention, so the plan shows both levels rather than a bare zone id. */
+  /** A zone is an AREA; `ex` names one specific thing measured inside it, and
+      `exx`/`exy` place that name BESIDE the bay it refers to rather than under
+      the room name — otherwise it reads as a subtitle to the zone instead of a
+      label on the work. Constantine reports engagement per zone AND attention
+      per work or machine, so the plan has to show both, in the right places. */
+  zones: { x: number; y: number; t: string; ex: string; exx: number; exy: number }[];
   cameras: Cone[];
   /** The path a visitor takes through the zones. */
   flow: string;
@@ -75,11 +83,14 @@ const MUSEUM: Geometry = {
     [352, 386, 9, 88],
     [470, 470, 112, 9],
   ],
+    // Named, not numbered. "Z1..Z4" told a visitor nothing; §5 assigns an
+    // engagement zone per artwork, so the plan reads as a gallery Constantine
+    // has actually surveyed.
   zones: [
-    { x: 252, y: 262, t: "Z1" },
-    { x: 618, y: 168, t: "Z2" },
-    { x: 196, y: 468, t: "Z3" },
-    { x: 552, y: 400, t: "Z4" },
+      { x: 252, y: 262, t: "Renaissance Room", ex: "Mona Lisa", exx: 196, exy: 124 },
+      { x: 618, y: 168, t: "Impressionists", ex: "Water Lilies", exx: 636, exy: 248 },
+      { x: 196, y: 468, t: "Dutch Masters", ex: "Girl with a Pearl Earring", exx: 364, exy: 378 },
+      { x: 552, y: 400, t: "Modern Wing", ex: "No. 61 (Rust and Blue)", exx: 596, exy: 476 },
   ],
   cameras: [
     { x: 132, y: 100, a: 48 },
@@ -129,10 +140,10 @@ const GYM: Geometry = {
     [500, 452, 60, 30],
   ],
   zones: [
-    { x: 200, y: 276, t: "Z1" },
-    { x: 654, y: 268, t: "Z2" },
-    { x: 196, y: 436, t: "Z3" },
-    { x: 618, y: 452, t: "Z4" },
+      { x: 200, y: 276, t: "Cardio", ex: "Treadmill 04", exx: 332, exy: 146 },
+      { x: 654, y: 268, t: "Studio", ex: "Rower 02", exx: 596, exy: 170 },
+      { x: 196, y: 436, t: "Free Weights", ex: "Bench press", exx: 332, exy: 388 },
+      { x: 618, y: 452, t: "Strength", ex: "Cable stack", exx: 492, exy: 500 },
   ],
   cameras: [
     { x: 122, y: 108, a: 46 },
@@ -235,16 +246,27 @@ export default function VenuePlan({
         </g>
         <g fill="var(--instrument-fg-weak)" stroke="none">
           {g.zones.map((z, i) => (
-            <text
-              key={z.t}
-              x={z.x}
-              y={z.y}
-              fontSize={17}
-              letterSpacing={1.5}
-              opacity={ease(Math.max(0, p1 * 2 - 0.9 - i * 0.06))}
-            >
-              {z.t}
-            </text>
+            <g key={z.t} opacity={ease(Math.max(0, p1 * 2 - 0.9 - i * 0.06))}>
+              <text x={z.x} y={z.y} fontSize={17} letterSpacing={1.5}>
+                {z.t}
+              </text>
+                {/* The exemplar is placed BESIDE THE BAY it names, not under
+                    the room name — stacked, it read as a subtitle to the zone
+                    rather than a label on the work. A hairline leader ties it
+                    back to its zone so the pairing stays legible. */}
+                <line
+                  x1={z.x + 4}
+                  y1={z.y + 6}
+                  x2={z.exx - 4}
+                  y2={z.exy - 4}
+                  stroke="var(--instrument-fg-weak)"
+                  strokeWidth={0.5}
+                  opacity={0.26}
+                />
+                <text x={z.exx} y={z.exy} fontSize={11} letterSpacing={0.4} opacity={0.55}>
+                {z.ex}
+              </text>
+            </g>
           ))}
         </g>
 

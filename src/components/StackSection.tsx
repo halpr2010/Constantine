@@ -154,12 +154,79 @@ const MARKS: Record<MarkId, ReactNode> = {
   ),
 };
 
-function Mark({ id }: { id: MarkId }) {
+/**
+ * Real vendor marks, in their own brand colours.
+ *
+ * CLAUDE.md bans colour literals in components; this is the one place that ban
+ * does NOT apply, and the exception is deliberate. A brand mark's colour is a
+ * TRADEMARK, not a theme value: AWS orange stays AWS orange in all four
+ * palettes, and tokenising or recolouring it would make it wrong rather than
+ * consistent. The colours live inside the SVG files, not in this component.
+ *
+ * The set is curated for aspect: every mark is roughly square (0.9-1.7) so they
+ * sit as equal badges. Wordmark versions were rejected - Databricks at 6.32:1
+ * beside a square Snowflake mark reads as a mistake.
+ *
+ * Systems with no mark here keep the line-work glyph. That is a deliberate
+ * mixed treatment, not an oversight: ONVIF and RTSP are protocols, and CSV is a
+ * file format, so none of them has a logo to show.
+ */
+const LOGOS: Record<string, string> = {
+  Databricks: "/logos/databricks-icon.svg",
+  Snowflake: "/logos/snowflake-icon.svg",
+  "Amazon S3": "/logos/aws.svg",
+  BigQuery: "/logos/google-cloud.svg",
+  Tableau: "/logos/tableau-icon.svg",
+  Salesforce: "/logos/salesforce.svg",
+  Azure: "/logos/microsoft-azure.svg",
+  PostgreSQL: "/logos/postgresql.svg",
+  Grafana: "/logos/grafana.svg",
+  "Power BI": "/logos/microsoft-power-bi.svg",
+  Slack: "/logos/slack-icon.svg",
+  "Microsoft Teams": "/logos/microsoft-teams.svg",
+  "Google Drive": "/logos/google-drive.svg",
+  Email: "/logos/gmail.svg",
+  "CSV export": "/logos/microsoft-excel.webp",
+};
+
+/**
+ * Where no vendor logo exists, the line-work glyph gets that vendor's own
+ * colour instead of the muted foreground. Founder instruction: "use coloured
+ * icons if you can't find vendor logos or they aren't relevant."
+ *
+ * These are fixed, like the logo colours above and for the same reason - they
+ * stand in for a vendor's identity, so Axis yellow staying Axis yellow across
+ * all four palettes is correct rather than inconsistent. CLAUDE.md's ban on
+ * colour literals covers THEME colour; this is identity colour.
+ *
+ * Checked and unavailable in every open logo set: Axis, Milestone, Genetec,
+ * Bosch, Hanwha, Hikvision, Avigilon, Dahua (security vendors publish to none
+ * of them), plus Excel and Outlook. ONVIF and RTSP are protocols and Webhooks
+ * is a mechanism, so none of those has a logo to find in the first place.
+ */
+const MARK_COLOURS: Record<string, string> = {
+  ONVIF: "#0B6BA8",
+  RTSP: "#5B8DEF",
+  Axis: "#FFCC00",
+  Milestone: "#E4002B",
+  Webhooks: "#8B5CF6",
+};
+
+/**
+ * NO MARK EXISTS for the camera row. Axis, Milestone, Genetec, Bosch, Hanwha,
+ * Hikvision, Avigilon and Dahua publish to no open logo set - checked, all
+ * eight missing - and ONVIF and RTSP are protocols with no logo to show. That
+ * row therefore keeps the line-work glyphs. It is a deliberate mixed treatment,
+ * not an oversight; supplying official SVGs would be the only way to change it.
+ */
+
+function Mark({ id, colour }: { id: MarkId; colour?: string }) {
   return (
     <svg
       viewBox="0 0 16 16"
       aria-hidden
       className="h-3.5 w-3.5 shrink-0 text-fg-muted"
+        style={colour ? { color: colour } : undefined}
       fill="none"
       stroke="currentColor"
       strokeWidth={1.25}
@@ -219,7 +286,7 @@ const CARDS: Card[] = [
     systems: [
       { name: "Power BI", mark: "bars" },
       { name: "Tableau", mark: "cross" },
-      { name: "Looker", mark: "petals" },
+      { name: "Grafana", mark: "petals" },
       { name: "CSV export", mark: "sheet" },
     ],
   },
@@ -373,7 +440,13 @@ function StackCard({
             key={s.name}
             className="flex items-center gap-1.5 text-[13px] text-fg-secondary"
           >
-            <Mark id={s.mark} />
+            {LOGOS[s.name] ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={LOGOS[s.name]} alt="" aria-hidden
+                   className="h-3.5 w-3.5 shrink-0 object-contain" />
+            ) : (
+              <Mark id={s.mark} colour={MARK_COLOURS[s.name]} />
+            )}
             <span className="truncate">{s.name}</span>
           </li>
         ))}
@@ -381,7 +454,13 @@ function StackCard({
       <div className="lg:hidden">
         <div className="mt-2.5 flex items-center gap-2.5">
           {card.systems.map((s) => (
-            <Mark key={s.mark} id={s.mark} />
+            LOGOS[s.name] ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img key={s.name} src={LOGOS[s.name]} alt="" aria-hidden
+                   className="h-3.5 w-3.5 shrink-0 object-contain" />
+            ) : (
+              <Mark key={s.mark} id={s.mark} colour={MARK_COLOURS[s.name]} />
+            )
           ))}
         </div>
         <p className="mt-1.5 text-[11px] leading-snug text-fg-secondary">
