@@ -50,18 +50,20 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* §4: a returning visitor is not re-gated, and a deep link never
-            lands behind an unanswered question. Both have to be settled
-            BEFORE first paint or the entry view flashes up and jumps away,
-            and localStorage does not exist on the server — so this runs ahead
-            of the markup and VerticalContext reconciles React with it a frame
-            later. Silent on failure: a blocked origin just gets asked again. */}
+        {/* The entry question is asked on EVERY load (founder decision, 09 Sep
+            2026), so there is no stored choice to honour here any more — only a
+            deep link may skip the gate, because a link to #privacy or a crawler
+            must never land behind an unanswered question (§4). This still has
+            to be settled BEFORE first paint, or the entry view flashes up and
+            jumps away. Any value written by an earlier build is cleared, so a
+            visitor who chose before this change is not kept out of the gate for
+            good. Silent on failure: a blocked origin just gets asked. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{var d=document.documentElement,v=localStorage.getItem('constantine:vertical');" +
-              "if(v==='museums'||v==='gyms'){d.setAttribute('data-vertical',v);d.setAttribute('data-entry','answered');}" +
-              "else if(location.hash){d.setAttribute('data-entry','answered');}" +
+              "try{var d=document.documentElement;" +
+              "try{localStorage.removeItem('constantine:vertical');}catch(e){}" +
+              "if(location.hash){d.setAttribute('data-entry','answered');}" +
               "else{d.setAttribute('data-entry','asking');}}catch(e){}",
           }}
         />

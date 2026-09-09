@@ -11,6 +11,24 @@ import { test, expect, Page } from "@playwright/test";
 const BASE = process.env.SITE_URL ?? "http://localhost:3000";
 const TEXT = "h1,h2,h3,p,li,span,a,button,label";
 
+
+/**
+ * Answer the entry question before judging anything behind it.
+ *
+ * The selector (§4) is now asked on EVERY load, so a spec that only calls
+ * goto() is measuring the page THROUGH an un-dismissed gate — which read as
+ * half the page being stuck semi-transparent and failed the reveal floor for
+ * the wrong reason.
+ */
+async function enter(page: Page) {
+  await page.goto(BASE, { waitUntil: "networkidle" });
+  const pick = page.getByTestId("select-museums");
+  if (await pick.count()) {
+    await pick.click();
+    await page.waitForTimeout(1600); // drift + fade must finish
+  }
+}
+
 /** Effective opacity: these are dimmed via ancestors, so multiply the chain. */
 async function dimTextInView(page: Page) {
   return page.evaluate((sel) => {
@@ -49,13 +67,24 @@ test("a reveal ends in a readable state, not a permanent dimmer", async ({ page 
   // the perfect place in the scroll to read it". Measured there: 44 elements
   // stuck between 0.11 and 0.9 while 80px clear of both edges after a 700ms
   // settle. Scroll-linked opacity must be a transition INTO readability.
-  await page.goto(BASE, { waitUntil: "networkidle" });
+  await enter(page);
   const H = await page.evaluate(() => document.body.scrollHeight - window.innerHeight);
   const worst = new Map<string, number>();
   for (let i = 0; i <= 20; i++) {
     await page.evaluate((y) => window.scrollTo(0, y), (H * i) / 20);
-    await page.waitForTimeout(700); // generous: a reveal has finished by now
-    for (const h of await dimTextInView(page))
+    // Wait for the reveal to SETTLE rather than for a fixed time. A fixed
+    // 700ms was enough on an idle machine and not enough with preview servers
+    // and four test workers competing for CPU, which failed the floor for load
+    // rather than for design. Poll until the dim set stops shrinking, capped so
+    // a genuinely stuck element still fails.
+    let dim = await dimTextInView(page);
+    for (let t = 0; t < 6 && dim.length; t++) {
+      await page.waitForTimeout(500);
+      const next = await dimTextInView(page);
+      if (next.length >= dim.length) { dim = next; break; } // stable: not still fading
+      dim = next;
+    }
+    for (const h of dim)
       if (!worst.has(h.t) || worst.get(h.t)! > h.o) worst.set(h.t, h.o);
   }
   const rows = [...worst.entries()].sort((a, b) => a[1] - b[1]);
@@ -69,7 +98,7 @@ test("no section is a bare wall of prose", async ({ page }) => {
   // Slingshot scroll, 2/10: "there are times when you are scrolling and all
   // that is on the page is quotes or a block of sheer text". A section carrying
   // a lot of copy must also carry something to look at.
-  await page.goto(BASE, { waitUntil: "networkidle" });
+  await enter(page);
   const walls = await page.evaluate(() => {
     const bad: string[] = [];
     for (const sec of Array.from(document.querySelectorAll("main > section, section"))) {
@@ -91,7 +120,7 @@ test("no section is a bare wall of prose", async ({ page }) => {
 test("the closing CTA stands out from its background", async ({ page }) => {
   // Slingshot scroll, 2/10: "the CTA at the bottom of the page almost blends
   // in to the background". 3:1 is the WCAG non-text floor for a UI component.
-  await page.goto(BASE, { waitUntil: "networkidle" });
+  await enter(page);
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await page.waitForTimeout(700);
   const ratio = await page.evaluate(() => {

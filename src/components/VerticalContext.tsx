@@ -11,7 +11,13 @@ import React, {
 
 export type Vertical = "museums" | "gyms";
 
-/** Where the answer is remembered, so a returning visitor is not re-gated (§4). */
+/**
+ * FOUNDER DECISION, 09 Sep 2026: the entry question is asked on EVERY load.
+ * The choice used to be remembered, which was my call and not a brief - §4's
+ * "remember the choice locally so returning visitors are not re-gated" was a
+ * line I wrote myself. Founder verdict: "the selector should be mandatory every
+ * time". Nothing is persisted; the key survives only to clear stale values.
+ */
 export const VERTICAL_KEY = "constantine:vertical";
 
 /**
@@ -57,16 +63,14 @@ export function VerticalProvider({ children }: { children: React.ReactNode }) {
   const [leaving, setLeaving] = useState(false);
 
   useEffect(() => {
-    let stored: string | null = null;
+    // Clear anything an earlier build stored, so a visitor who already chose is
+    // not silently kept out of the gate forever.
     try {
-      stored = window.localStorage.getItem(VERTICAL_KEY);
+      window.localStorage.removeItem(VERTICAL_KEY);
     } catch {
-      // Private mode or a blocked origin: the gate simply asks again.
+      // Private mode or a blocked origin: nothing to clear.
     }
-    if (isVertical(stored)) {
-      setVertical(stored);
-      setAnswered(true);
-    } else if (window.location.hash) {
+    if (window.location.hash) {
       // A deep link must never land behind an unanswered question (§4). The
       // default vertical stands and nothing is written to storage, so the
       // question is still waiting on a later visit to the bare URL.
@@ -74,18 +78,15 @@ export function VerticalProvider({ children }: { children: React.ReactNode }) {
     }
     document.documentElement.setAttribute(
       "data-entry",
-      isVertical(stored) || window.location.hash ? "answered" : "asking"
+      window.location.hash ? "answered" : "asking"
     );
   }, []);
 
   const choose = useCallback(
     (v: Vertical) => {
       setVertical(v);
-      try {
-        window.localStorage.setItem(VERTICAL_KEY, v);
-      } catch {
-        // Remembering is a courtesy; failing to remember is not an error.
-      }
+      // Deliberately NOT persisted: founder decision 09 Sep 2026 - the entry
+      // question is asked on every visit.
       if (answered) return; // an ordinary switch, no entry choreography
 
       const root = document.documentElement;
