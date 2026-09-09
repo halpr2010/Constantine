@@ -24,7 +24,7 @@ How to use it:
 | **10** | Claryo Scroll | `Claryo_Scroll_Functionality.png` | Scroll behaviour | Every scroll either changes the ground (purple/steel ↔ black-and-white technical) or fades in new content. Each scroll surfaces something. | — |
 | **10** | Claryo Scroll 2 | `Claryo_Scroll_Functionality_2.png` | Stepped sections | Plan → Monitor → Orchestrate: previous step fades out, next fades in with its own imagery. Ground changes black↔white **without a visible dividing line** — scroll far enough and the page has simply become white, or black. | — |
 | **10** | Claryo Ambience + Scroll 3 | `Claryo_Ambiance_and_Scroll_Functionality_3.png` | **Ambience** + stepped diagram | THE ambience target: bright purple blooms on **pure black**, continuously moving, obvious. A white technical wireframe sits on top and augments per step while the step text accumulates. | — |
-| **10** | Claryo Interactive | `Claryo_Interactive_functionality.png` | Card hover | Hovering a card raises it and reveals its detail. | — |
+| ~~10~~ **DROPPED** | ~~Claryo Interactive~~ | `Claryo_Interactive_functionality.png` | ~~Card hover~~ | **WITHDRAWN by founder, 09 Sep 2026: "scrap this idea and do not retry". Three working options were built and all three declined. Not to be queued again.** | — |
 | **10** | PlayVision People | `Playvision_People_Movement.png` | Figures + scroll data | Animated figures, bodies annotated, insights surfacing on scroll; the data bound to each figure changes as you scroll. The deck framing around it is NOT wanted. | — |
 | **10** | PlayVision Hero Stat | `Playvision_Video_and_Hero_Stat.png` | Hero layout | Product-demo video + hero stat layout. Build the layout now; the video slot stays a placeholder until real footage exists (§4d). | — |
 | **8** | Slingshot Ambience | `Slingshot_Ambience.png` | Ambience mechanism | Grainy, swirling, many brand-consistent colours, reacting to the cursor. | **Bounded.** Visible edges where the field starts and stops. Ours must be unbounded. |
@@ -58,7 +58,7 @@ Status, 08 Sep 2026:
 | Claryo Scroll | partially — cross-fade behaviour queued |
 | Claryo Scroll 2 | partially — same |
 | Claryo Ambience + custom objects | BUILT — field + augmenting venue plan at `#venue` |
-| Claryo Interactive (card raise on hover) | NOT BUILT — queued |
+| Claryo Interactive (card raise on hover) | **DROPPED — founder withdrew the requirement** |
 | PlayVision People | on `best` (Outputs figures) |
 | PlayVision Hero Stat | NOT BUILT |
 | Slingshot Ambience (8/10, unbounded correction) | folded into the ambience task |

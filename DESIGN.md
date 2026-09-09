@@ -909,6 +909,15 @@ D1–D5 and regresses on none. D6 is pass/fail, not comparative.
   repo drift otherwise, and the loop wastes candidates rebuilding what
   already exists.
 
+### 8a. Withdrawn requirements — do not queue these again
+
+- **Card elevation / raise-on-hover** *(was Claryo Interactive, 10/10)* —
+  WITHDRAWN by founder 09 Sep 2026: "scrap this idea and do not retry to
+  complete a feature update for the hover cards they are no longer needed."
+  Three working candidates were built and ranked 8/7/7; all three were
+  declined. The reference row survives in REFERENCES.md marked DROPPED so that
+  the work-plan rule does not resurrect it as an unbuilt 10/10.
+
 ## 9. Hard prohibitions
 
 - No fabricated client names, testimonials, results, or implied
