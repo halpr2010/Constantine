@@ -2,6 +2,7 @@
 
 import PaintingWall from "@/components/MonaLisaWall";
 import EquipmentWall from "@/components/EquipmentWall";
+import SectionSeam from "@/components/SectionSeam";
 import { useVertical, type Vertical } from "@/components/VerticalContext";
 
 // Cross-fade through black: the outgoing set fades out, the hero holds black
@@ -12,7 +13,7 @@ const BLACK_HOLD_MS = 140;
 export default function HeroSection() {
   // One source of truth, shared with every section below the hero. The hero
   // now only reads it; the entry view's track is what writes it (§4).
-  const { vertical } = useVertical();
+  const { vertical, answered } = useVertical();
 
   // Title, subtitle and chips are deliberately identical on both tabs: the hero
   // states what Constantine does for any physical space, and the demo below it
@@ -45,7 +46,7 @@ export default function HeroSection() {
       data-register="product"
       // The view that fades in when the entry question is answered (§4). The
       // section's own ground fades with it, so the page crosses from the
-      // canvas ground to the product ground with no visible edge.
+      // entry ground to the product ground with no visible edge.
       data-entry-target=""
       className="relative flex min-h-screen w-full flex-col justify-center overflow-x-clip"
       // A wall's card is wider than its column by design (up to ~140px each
@@ -53,6 +54,15 @@ export default function HeroSection() {
       // before the switcher existed, without leaving a horizontal scrollbar.
       style={{ overflowClipMargin: "150px" }}
     >
+      {/* Only while the gate is up. The entry view now paints the technical
+          register's light ground (§4), so a visitor who scrolls past the
+          question instead of answering it would otherwise meet exactly the hard
+          register edge §5 forbids. Once the question is answered the entry view
+          is gone and the hero is the first thing in the document — a seam there
+          would wash the top of the hero with a ground that is no longer above
+          it, so it is not rendered. */}
+      {!answered && <SectionSeam from="technical" to="product" />}
+
       {/* pt clears the header. Below lg the docked vertical track gets its own
           header row (page.tsx), which takes the fixed header to 138px at 390w
           and would otherwise bury the eyebrow and the top of the H1. */}

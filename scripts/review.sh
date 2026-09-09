@@ -17,7 +17,7 @@ for B in "$@"; do
       await p.goto("http://localhost:3000", { waitUntil: "networkidle" });
       await p.waitForTimeout(600);
       await p.screenshot({ path: `shots/review/${process.env.B}.png`, fullPage: true,
-        mask: [p.locator("canvas"), p.locator("video")], maskColor: "#1b1b1f", animations: "disabled" });
+        mask: [p.locator("canvas:not([data-ambient-canvas])"), p.locator("video")], maskColor: "#1b1b1f", animations: "disabled" });
       await b.close();
     })();
   ' && echo "  captured $B"

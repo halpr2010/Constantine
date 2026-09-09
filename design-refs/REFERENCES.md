@@ -57,7 +57,7 @@ Status, 08 Sep 2026:
 | Claryo Hero (purple/steel ↔ technical) | NOT BUILT — queued |
 | Claryo Scroll | partially — cross-fade behaviour queued |
 | Claryo Scroll 2 | partially — same |
-| Claryo Ambience + custom objects | NOT BUILT — queued, highest priority |
+| Claryo Ambience + custom objects | BUILT — field + augmenting venue plan at `#venue` |
 | Claryo Interactive (card raise on hover) | NOT BUILT — queued |
 | PlayVision People | on `best` (Outputs figures) |
 | PlayVision Hero Stat | NOT BUILT |
