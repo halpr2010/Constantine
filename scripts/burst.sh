@@ -24,6 +24,11 @@ N="${1:?usage: burst.sh <N> <task>}"
 TASK="${2:?usage: burst.sh <N> <task>}"
 CYCLE="$(date +%Y%m%d-%H%M%S)"
 LOG=".loop/burst-$CYCLE"
+ROOT="$(pwd)"
+# Builders run concurrently. They spend nearly all their time waiting on the
+# model rather than on CPU, so the limit is memory and the odd overlapping
+# `next build`, not cores.
+LANES="${BURST_LANES:-4}"
 mkdir -p "$LOG"
 
 command -v claude >/dev/null || { echo "burst: claude CLI not found"; exit 1; }
@@ -47,61 +52,85 @@ npm run build > /dev/null 2>&1
 serve . 3000 || { echo "burst: best would not serve"; exit 1; }
 ./scripts/capture.sh best
 
-APPROACHES=""      # accumulates one line per built candidate
+# Build every candidate CONCURRENTLY, each in its own git worktree on its own
+# port. Sequential building is what turned an 8-candidate burst into a
+# 6.75-hour night: ~50 minutes each, almost all of it idle.
+#
+# The cost is the diversity signal — a candidate can only be told about
+# approaches that finished before it started. So lanes go in WAVES of $LANES,
+# and each wave learns what every earlier wave did. Within a wave candidates are
+# blind to each other; the ranking critic rejects duplicates anyway.
+mkdir -p .burst
+APPROACHES=""
 SURVIVORS=()
+BUILT=()
 
-for i in $(seq 1 "$N"); do
-  BRANCH="cand-$CYCLE-$i"
-  echo
-  echo "── candidate $i/$N — $BRANCH ────────────────────────"
-  git checkout -q "$BEST" && git checkout -q -b "$BRANCH"
-
-  DIVERSITY=""
-  if [ -n "$APPROACHES" ]; then
-    DIVERSITY="
-APPROACHES ALREADY TAKEN IN THIS BURST — you must take a DIFFERENT one. Not a
+i=0
+while [ "$i" -lt "$N" ]; do
+  WAVE=()
+  for _ in $(seq 1 "$LANES"); do
+    [ "$i" -ge "$N" ] && break
+    i=$((i+1))
+    BRANCH="cand-$CYCLE-$i"; WT=".burst/$BRANCH"; PORT=$((3200 + i))
+    git worktree add -f -b "$BRANCH" "$WT" "$BEST" >/dev/null 2>&1 || { echo "  x $BRANCH worktree"; continue; }
+    ln -s "$ROOT/node_modules" "$WT/node_modules" 2>/dev/null
+    DIV=""
+    [ -n "$APPROACHES" ] && DIV="
+APPROACHES ALREADY TAKEN IN THIS BURST - you must take a DIFFERENT one. Not a
 variation in a value or a tuned parameter: a different mechanism, a different
-composition, a different read of the reference. A near-twin of any of these is
-rejected as a duplicate and occupies no slot, so it is wasted work:
+composition, a different read of the reference. A near-twin is rejected as a
+duplicate and occupies no slot, so it is wasted work:
 $APPROACHES"
-  fi
-
-  claude -p --permission-mode acceptEdits --model opus \
-    "You are candidate $i of $N in a VARIANT BURST on this repo. The founder
-will see every candidate that clears the bar, ranked — so your job is to be a
-genuinely distinct, fully-realised option, not a safe average of the others.
+    ( cd "$WT" && PORT="$PORT" SITE_URL="http://localhost:$PORT" \
+      claude -p --permission-mode acceptEdits --model opus \
+      "You are candidate $i of $N in a VARIANT BURST. The founder sees every
+candidate that clears the bar, ranked - so be a genuinely distinct, fully
+realised option, not a safe average of the others.
 
 Read CLAUDE.md, DESIGN.md, design-refs/REFERENCES.md and experiments.md first.
 
 Task: $TASK
-$DIVERSITY
+$DIV
 
 Constraints:
-- ./scripts/floors.sh must pass. Run it. If it fails, fix it. A broken
-  candidate is discarded before anyone looks at it.
-- Never edit anything in .loop/ — those are the gate's baselines.
-- Four palettes are live and none is pinned; your work must render correctly in
-  all four.
-- Commit on this branch. FIRST LINE of the commit message must be a one-line
-  statement of YOUR APPROACH, in the form 'Approach: <what makes this
-  different>'. That line is read back to later candidates and to the critic, so
-  make it specific about mechanism." \
-    > "$LOG/build-$i.log" 2>&1
+- You are in an isolated git worktree on branch $BRANCH. Other candidates build
+  at the same time in their own worktrees; ignore them.
+- Any server you start MUST use port $PORT, never 3000. Run the gate as
+  PORT=$PORT ./scripts/floors.sh and it must pass before you finish.
+- Never edit anything in .loop/ - those are the gate's baselines.
+- Four palettes are live and none is pinned; your work must render in all four.
+- Commit on this branch. FIRST LINE of the commit message must be
+  'Approach: <what makes this different>' - it is read back to later candidates
+  and to the ranking critic, so be specific about mechanism." ) \
+      > "$LOG/build-$i.log" 2>&1 &
+    WAVE+=("$i"); echo "   lane $i started (port $PORT)"
+  done
+  wait
+  for j in "${WAVE[@]}"; do
+    BR="cand-$CYCLE-$j"
+    A="$(git log --format=%s -1 "$BR" 2>/dev/null | sed 's/^Approach: //')"
+    echo "   cand $j: ${A:0:86}"
+    [ -n "$A" ] && APPROACHES="$APPROACHES
+- $BR: $A"
+    BUILT+=("$BR")
+  done
+done
 
-  APPROACH="$(git log --format=%s -1 2>/dev/null | sed 's/^Approach: //')"
-  echo "   approach: ${APPROACH:0:88}"
-
-  if ! ./scripts/floors.sh > "$LOG/floors-$i.txt" 2>&1; then
-    echo "   DISCARDED — floors failed"
-    grep -m3 -E '✗|FAIL —' "$LOG/floors-$i.txt" | sed 's/^/     /'
+# Gate and capture sequentially in the main tree: ~5 of the ~50 minutes per
+# candidate, so there is nothing to win by parallelising them.
+for BR in "${BUILT[@]}"; do
+  echo; echo "-- gating $BR --------------------------------------"
+  git checkout -q "$BR" 2>/dev/null || continue
+  if ! ./scripts/floors.sh > "$LOG/floors-${BR##*-}.txt" 2>&1; then
+    echo "   DISCARDED - floors failed"
+    grep -m3 -E 'x |FAIL --' "$LOG/floors-${BR##*-}.txt" | sed 's/^/     /'
     continue
   fi
   echo "   floors passed"
-  APPROACHES="$APPROACHES
-- $BRANCH: $APPROACH"
-  SURVIVORS+=("$BRANCH")
-  rm -rf "shots/$BRANCH" && ./scripts/capture.sh "$BRANCH" > /dev/null
+  SURVIVORS+=("$BR")
+  rm -rf "shots/$BR" && ./scripts/capture.sh "$BR" > /dev/null
 done
+for BR in "${BUILT[@]}"; do git worktree remove --force ".burst/$BR" 2>/dev/null; done
 
 git checkout -q "$START"
 

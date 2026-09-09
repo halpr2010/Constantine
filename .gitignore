@@ -68,3 +68,4 @@ design-refs/*.mp4
 design-refs/*.MOV
 design-refs/*.MP4
 .work/
+.burst/

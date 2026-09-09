@@ -16,8 +16,18 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
+# Port and results path are parameterised so several candidates can be gated
+# concurrently, each in its own worktree. SITE_URL is what the specs read.
+PORT="${PORT:-3000}"
+export PORT
+export SITE_URL="http://localhost:$PORT"
+# Port and results path are parameterised so several candidates can be gated
+# concurrently, each in its own worktree. SITE_URL is what the specs read.
+PORT="${PORT:-3000}"
+export PORT
+export SITE_URL="http://localhost:$PORT"
 BASELINE=".loop/tests-baseline.txt"
-RESULTS=".loop/last-run.json"
+RESULTS=".loop/last-run-$PORT.json"
 mkdir -p .loop
 
 echo "── build ─────────────────────────────────────────────"
@@ -34,18 +44,18 @@ echo "build ok"
 echo "── serve ─────────────────────────────────────────────"
 # Kill only what is on OUR port. A blanket pkill also takes down the
 # side-by-side preview servers on 3101+, which are someone's review session.
-PID=$(lsof -ti tcp:3000 2>/dev/null)
+PID=$(lsof -ti tcp:$PORT 2>/dev/null)
 [ -n "$PID" ] && kill $PID 2>/dev/null
-for i in $(seq 1 20); do lsof -ti tcp:3000 >/dev/null 2>&1 || break; sleep 1; done
-nohup npx next start -p 3000 > .loop/server.log 2>&1 &
+for i in $(seq 1 20); do lsof -ti tcp:$PORT >/dev/null 2>&1 || break; sleep 1; done
+nohup npx next start -p $PORT > .loop/server-$PORT.log 2>&1 &
 UP=0
 for i in $(seq 1 60); do
-  curl -sf -m 5 -o /dev/null http://localhost:3000/ && { UP=1; break; }
+  curl -sf -m 5 -o /dev/null http://localhost:$PORT/ && { UP=1; break; }
   sleep 1
 done
-[ "$UP" -eq 1 ] || { echo "floors: FAIL — server did not come up"; tail -5 .loop/server.log; exit 1; }
+[ "$UP" -eq 1 ] || { echo "floors: FAIL — server did not come up"; tail -5 .loop/server-$PORT.log; exit 1; }
 # Prove it is OUR build: a stale server 404s the fresh CSS chunk.
-CSS=$(curl -sS -m 10 http://localhost:3000/ | grep -oE '/_next/static/[^"]*\.css' | head -1)
+CSS=$(curl -sS -m 10 http://localhost:$PORT/ | grep -oE '/_next/static/[^"]*\.css' | head -1)
 DISK=$(find .next/static -name '*.css' -exec basename {} \; 2>/dev/null | head -1)
 case "$CSS" in
   *"$DISK") echo "serving this build ($DISK)" ;;
@@ -60,7 +70,7 @@ PLAYWRIGHT_JSON_OUTPUT_NAME="$RESULTS" \
 # Fully-qualified title, so two tests with the same name in different files
 # stay distinguishable.
 FAILED="$(node -e '
-const r = require("./.loop/last-run.json");
+const r = require("./.loop/last-run-"+process.env.PORT+".json");
 const out = [];
 const walk = (s, path) => {
   for (const su of s.suites ?? []) walk(su, [...path, su.title]);
@@ -71,7 +81,7 @@ for (const s of r.suites ?? []) walk(s, [s.title]);
 console.log([...new Set(out)].sort().join("\n"));
 ')"
 
-TOTAL=$(node -e 'const r=require("./.loop/last-run.json");console.log((r.stats?.expected??0)+(r.stats?.unexpected??0)+(r.stats?.flaky??0))')
+TOTAL=$(node -e 'const r=require("./.loop/last-run-"+process.env.PORT+".json");console.log((r.stats?.expected??0)+(r.stats?.unexpected??0)+(r.stats?.flaky??0))')
 NFAIL=$([ -z "$FAILED" ] && echo 0 || printf '%s\n' "$FAILED" | wc -l | tr -d ' ')
 echo "$TOTAL tests, $NFAIL failing"
 
