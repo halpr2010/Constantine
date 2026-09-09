@@ -1,4 +1,2 @@
-gimmicks.spec.ts › §5 design floors (v2 constitution) › ambient field is visible, not imperceptible
-gimmicks.spec.ts › §5 design floors (v2 constitution) › ambient field moves on its own, with no cursor input
 gimmicks.spec.ts › §5 design floors (v2 constitution) › reduced motion: page is static and complete
 reveal.spec.ts › no section is a bare wall of prose

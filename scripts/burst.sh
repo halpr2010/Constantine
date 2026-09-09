@@ -135,6 +135,16 @@ git worktree prune
 for BR in "${BUILT[@]}"; do
   echo; echo "-- gating $BR --------------------------------------"
   git checkout -q "$BR" || { echo "   SKIPPED - cannot check out $BR"; continue; }
+  # A builder that died - a network blip took out all four privacy candidates
+  # at once with ENOTFOUND - leaves its branch identical to best. floors.sh
+  # passes it happily, because breaking nothing IS passing, and an empty
+  # candidate would then reach the ranking critic as a real option. An
+  # unchanged branch is a failed build, not a passing one.
+  if [ -z "$(git log --format=%H "$BEST".."$BR" 2>/dev/null)" ]; then
+    echo "   DISCARDED - builder produced no commit (see $LOG/build-${BR##*-}.log)"
+    tail -1 "$LOG/build-${BR##*-}.log" 2>/dev/null | sed 's/^/     /'
+    continue
+  fi
   if ! ./scripts/floors.sh > "$LOG/floors-${BR##*-}.txt" 2>&1; then
     echo "   DISCARDED - floors failed"
     grep -m3 -E 'x |FAIL --' "$LOG/floors-${BR##*-}.txt" | sed 's/^/     /'
