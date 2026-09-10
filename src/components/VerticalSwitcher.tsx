@@ -26,15 +26,18 @@ const CHOICES: [Vertical, string][] = [
  */
 const dockScale = () => (window.innerWidth >= 768 ? 0.68 : 0.8);
 /**
- * The drift is one move on two clocks. Vertical is front-loaded and horizontal
- * is back-loaded, so the track rises to the header band first and only then
- * runs along it to the corner. A single easing on a single transform draws a
- * straight diagonal, which crosses the hero demo on the way — the founder note
- * is "the drift path to the top right", and a diagonal through the middle of
- * the page is not that path.
+ * The drift is a STRAIGHT DIAGONAL to the corner.
+ *
+ * It used to run on two clocks — vertical front-loaded, horizontal back-loaded —
+ * so the track rose to the header band first and only then ran along it. That
+ * was a judgement call made to keep the path off the hero demo, and the founder
+ * rejected it: "it has started to swing upwards and then to the top right after
+ * being selected. Can we change this to having the selector just move diagonally
+ * to the top right." One easing on both axes draws one line.
  */
-const DRIFT_Y = "cubic-bezier(0.2, 0.9, 0.25, 1)";
-const DRIFT_X = "cubic-bezier(0.75, 0.02, 0.3, 1)";
+const DRIFT_EASE = "cubic-bezier(0.32, 0.72, 0.24, 1)";
+const DRIFT_Y = DRIFT_EASE;
+const DRIFT_X = DRIFT_EASE;
 
 type Geom = Record<Vertical, { x: number; w: number }>;
 
@@ -58,29 +61,45 @@ function activeSlot(): HTMLElement | null {
  * not, and it says something the colour could not — each marker is the thing
  * Constantine measures in that space.
  *
- * REWORKED 09 Sep 2026. The first pass drew two hairline glyphs, and hairlines
- * of the same weight in the same box carry the same visual mass: at 17px the
- * two choices still read as a pair of small dark ticks and the difference only
- * arrived once the label had been read, which is the note being answered. The
- * founder's word is TILE, and the reference mark is a solid swatch, so these are
- * solid now — and the differentiator is the tile's own OUTLINE, which is legible
- * before any interior detail resolves: museums get a PORTRAIT tile (a hung
- * frame), gyms a LANDSCAPE one (a loaded bar).
+ * REWORKED AGAIN 10 Sep 2026, on two founder notes.
  *
- * Each is a single evenodd path so the interior is a true hole rather than a
- * second fill. The mark sits on the raised pill when its choice is lit and on
- * the track when it is not, and those are two different grounds; a knockout
- * painted in either colour would be wrong on the other.
+ * THE MUSEUM MARK WAS A BROKEN-IMAGE ICON. It drew a frame with a mountain
+ * knocked out of it - which is the universal "this picture failed to load"
+ * glyph, and the founder read it exactly that way: "it looks like a placeholder
+ * for an image that hasn't rendered." It is now a gallery facade: pediment,
+ * four columns, a step. Unmistakable at 17px and impossible to read as a
+ * failure state.
+ *
+ * THE MARKS ARE COLOURED, and fixed rather than tokenised. Founder: "the gym
+ * icon should be a pink colour and the museum/gallery should be a blue colour."
+ * These identify a VERTICAL the way a logo identifies a vendor, so blue stays
+ * blue in all four palettes - the same exception the vendor marks in
+ * StackSection take, for the same reason. Both clear 3:1 on every ground they
+ * sit on, light or dark.
+ *
+ * The gym mark keeps its evenodd knockout so the bar and plates are true holes:
+ * it sits on the raised pill when lit and on the track when not, and a knockout
+ * painted in either ground's colour would be wrong on the other.
  */
+const MARK_COLOUR: Record<Vertical, string> = {
+  museums: "#3B82F6",
+  gyms: "#EC4899",
+};
+
 function VerticalMark({ id }: { id: Vertical }) {
   return (
-    <svg className="vsel-mark" viewBox="0 0 18 18" aria-hidden focusable="false">
+    <svg
+      className="vsel-mark"
+      viewBox="0 0 18 18"
+      aria-hidden
+      focusable="false"
+      style={{ color: MARK_COLOUR[id] }}
+    >
       {id === "museums" ? (
-        // A hung frame, 11 x 14, with the picture knocked out of it.
+        // A gallery facade: pediment, four columns, a step.
         <path
-          fillRule="evenodd"
           fill="currentColor"
-          d="M3.5 2 H14.5 V16 H3.5 Z M5.4 12.9 L8.2 8.3 L10.2 10.9 L11.6 9.1 L13 12.9 Z"
+          d="M9 2.1 L16.5 7.1 H1.5 Z M2.7 8.4 H4.5 V13.7 H2.7 Z M6.3 8.4 H8.1 V13.7 H6.3 Z M9.9 8.4 H11.7 V13.7 H9.9 Z M13.5 8.4 H15.3 V13.7 H13.5 Z M1.5 14.7 H16.5 V16.1 H1.5 Z"
         />
       ) : (
         // A loaded bar, 15 x 10, with the bar and its two plates knocked out.
