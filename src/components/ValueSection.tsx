@@ -1,5 +1,7 @@
 "use client";
 
+import FloorLedger from "@/components/FloorLedger";
+import Reveal from "@/components/Reveal";
 import { useVertical } from "@/components/VerticalContext";
 
 type Card = { title: string; desc: string };
@@ -13,7 +15,7 @@ const MUSEUM = {
     },
     {
       title: "Is the new layout working?",
-      desc: "Measure a re-hang or exhibition change against a real before-and-after, not a hunch.",
+      desc: "Measure a re-hang or exhibition change against a real before-and-after, so you know whether it worked.",
     },
     {
       title: "Where do we lose people?",
@@ -33,7 +35,7 @@ const GYM = {
   cards: [
     {
       title: "Which equipment earns its floor space?",
-      desc: "See what members actually use, so refresh and buying decisions follow real demand, not guesswork.",
+      desc: "See what members actually use, so refresh and buying decisions follow real demand.",
     },
     {
       title: "Where does the floor create friction?",
@@ -41,7 +43,7 @@ const GYM = {
     },
     {
       title: "Is a machine down before members complain?",
-      desc: "Catch equipment whose usage drops out of pattern the same day, not a week later.",
+      desc: "Catch equipment whose usage drops out of pattern on the same day it happens.",
     },
     {
       title: "Did the refit actually work?",
@@ -57,29 +59,66 @@ export default function ValueSection() {
   const copy = vertical === "gyms" ? GYM : MUSEUM;
 
   return (
-    <section id="value" className="border-t border-line-hairline px-6 py-24">
-      <div className="mx-auto max-w-6xl">
-        {/* Mirrors ProblemSection's "The problem" eyebrow. The spec's eyebrow
-            text was identical to the museum heading, which rendered the same
-            line twice. */}
-        <div className="text-xs font-semibold uppercase tracking-wider text-fg-muted">
-          The value
+    <section
+      id="value"
+      // TECHNICAL, not canvas, and no seam. This section used to declare canvas
+      // between #how and #privacy, which both declare technical: the page went
+      // black, white, black across three consecutive sections, and the two
+      // crossings cost 403px of empty ramp in and 406px out for 489px of
+      // content. Claryo changes ground when the ARGUMENT changes — problem to
+      // solution, solution to applications — never for one beat inside a run.
+      // #how, #value, #privacy and #stack are one run: what the system does,
+      // what it answers, what it refuses to hold, where it plugs in. The page
+      // now crosses into that ground once, at #how, and out of it once, at #use.
+      data-ground="technical"
+      className="section-band relative px-6"
+    >
+      <div className="relative mx-auto max-w-6xl">
+        {/* The answer to #problem, drawn on the same object. The ledger there
+            has one track carrying data and four empty rails; here it is the
+            identical day with every rail written on and each zone's peak
+            marked. The heading and the closing line share the row with it so
+            the four cards below still land inside 1440x900. */}
+        <div className="grid gap-8 lg:grid-cols-2 lg:items-center lg:gap-14">
+          <div>
+            {/* Mirrors ProblemSection's "The problem" eyebrow. The spec's
+                eyebrow text was identical to the museum heading, which
+                rendered the same line twice. */}
+            <Reveal
+              grammar="ink"
+              className="w-fit text-xs font-semibold uppercase tracking-wider text-fg-muted"
+            >
+              The value
+            </Reveal>
+            <Reveal grammar="focus" lag={0.06} className="mt-4">
+              <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
+                {copy.heading}
+              </h2>
+            </Reveal>
+            <Reveal grammar="ghost" lag={0.2} className="mt-4 max-w-2xl">
+              <p className="text-fg-secondary">{copy.closer}</p>
+            </Reveal>
+          </div>
+          <Reveal grammar="settle" lag={0.1}>
+            <FloorLedger mode="measured" />
+          </Reveal>
         </div>
-        <h2 className="mt-4 text-3xl font-semibold leading-tight md:text-4xl">
-          {copy.heading}
-        </h2>
+        {/* Four answers on one baseline have no natural stagger, so the lag
+            supplies one: the row wipes left to right, which reads as results
+            landing rather than as four blocks appearing together. */}
         <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {copy.cards.map((item) => (
-            <div
+          {copy.cards.map((item, i) => (
+            <Reveal
               key={item.title}
+              grammar="settle"
+              lag={0.13 * i}
               className="rounded-xl border border-line-card bg-surface-card p-6"
             >
               <h3 className="text-lg font-semibold">{item.title}</h3>
               <p className="mt-2 text-sm text-fg-muted">{item.desc}</p>
-            </div>
+            </Reveal>
           ))}
         </div>
-        <p className="mt-8 max-w-2xl text-fg-secondary">{copy.closer}</p>
       </div>
     </section>
   );

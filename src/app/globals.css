@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* §5 ambient background: its per-register colour ramp and disclosure grammar.
+   One feature, one file — see the header of atmosphere.css. */
+@import "./atmosphere.css";
 
 /* ---------------------------------------------------------------------------
    Theme layer — variant zero (dark). Values reference Tailwind's own palette
@@ -22,7 +25,9 @@
   --text-primary: var(--color-zinc-50);
   --text-secondary: var(--color-zinc-400);
   --text-muted-list: var(--color-zinc-400);
-  --text-muted: var(--color-zinc-500);
+  /* Raised off zinc-500, which measures ~4.2:1 on this ground: still a
+     distinct step below body copy, but clear of the AA floor. */
+  --text-muted: color-mix(in oklab, var(--color-zinc-400) 80%, var(--color-zinc-500));
   --text-emphasis: var(--color-zinc-300);
   --text-emphasis-strong: var(--color-zinc-200);
   --text-subtle: var(--color-zinc-600);
@@ -30,8 +35,17 @@
 
   /* R2 · product / atmosphere — the stage the demos are rendered on.
      Independent of --surface-page by design: the walls keep their dark stage
-     even when the canvas register goes light. Equal here, hence variant zero. */
-  --stage-surface: var(--surface-page);
+     even when the canvas register goes light. Variant zero's stage is the same
+     colour its page happens to be, which is why this used to be written as
+     `var(--surface-page)`.
+     STATED AS A LITERAL, 10 Sep 2026. --surface-page is now the PAGE GROUND, a
+     registered token that changes as the reader scrolls, so the alias made the
+     demo stage follow the ground: on the gate's white technical ground the
+     walls went white and their instrument scale — white at 60% — measured
+     1.00:1 against it. The three other themes always stated their stage
+     outright; this one now does too, and the ★ demotion rule in TOKENS.md holds
+     again because the stage is theme-level in all four. */
+  --stage-surface: #050505;
   --wall-backdrop: var(--stage-surface); /* alias, never a copy */
 
   /* ★ on-stage-only (TOKENS.md demotion rule) */
@@ -39,7 +53,21 @@
   --instrument-fg-strong: color-mix(in oklab, var(--color-white) 80%, transparent);
   --instrument-fg-weak: color-mix(in oklab, var(--color-white) 70%, transparent);
   --instrument-fg-faint: color-mix(in oklab, var(--color-white) 50%, transparent);
-  --instrument-well: color-mix(in oklab, var(--color-zinc-950) 60%, transparent);
+  /* Aliased, never a copy: defined once as a fixed zinc-950 fill, this was
+     the last theme-specific token still painting inside components. It read
+     as a dark rectangle on every light ground and every light register.
+     --surface-inset-soft is remapped per theme and per register, so the
+     chart well now follows whatever it sits on.
+     RESTATED PER REGISTER, 10 Sep 2026, and it turns out this was never doing
+     what the paragraph above claims. A custom property's var() is substituted
+     where it is DECLARED, so an alias written once on :root resolved against
+     the root's --surface-inset-soft and not against the register the well was
+     standing in — invisible while the root ground was the theme's own dark
+     base, and immediately visible once --surface-page became the page ground:
+     on the gate's white technical ground the Outputs tiles took a white fill
+     and their green delta measured 1.52:1 on it. The declaration is repeated in
+     each register block below, so the substitution happens there. */
+  --instrument-well: var(--surface-inset-soft);
   --chart-label: rgba(255, 255, 255, 0.75);
   --chart-1: rgba(239, 68, 68, 0.8);
   --chart-2: rgba(59, 130, 246, 0.8);
@@ -100,6 +128,8 @@
   --color-tech-ink: var(--tech-ink);
   --color-tech-rule: var(--tech-rule);
 
+  --color-conduit: var(--conduit);
+
   --color-action: var(--action-bg);
   --color-action-hover: var(--action-bg-hover);
   --color-on-action: var(--action-fg);
@@ -118,10 +148,1044 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Smooth scrolling is animation the reader did not ask for: an anchor jump
+   under prefers-reduced-motion lands instantly, and the §5 rule reads the new
+   position in the same frame. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
+  /* Both read the WORKING tokens, which are now registered custom properties
+     carried on <html> and interpolated when the ground changes (see THE PAGE
+     GROUND below). Painting the page from --surface-page rather than from a
+     theme literal is what makes the whole document one ground. --foreground is
+     kept for Tailwind's --color-foreground mapping; the ink here has to be the
+     ground's own ink or the two would cross-fade out of step. */
   background: var(--surface-page);
-  color: var(--foreground);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+/* ---------------------------------------------------------------------------
+   Register themes (§5, UNDER EVALUATION). Each defines all three registers.
+   Applied via data-theme on <html>; absent = variant zero (dark).
+   The stage stays dark in every theme by design — that is what keeps the
+   instrument scale and chart pair ★ under the demotion rule.
+   --------------------------------------------------------------------------- */
+
+/* B · white canvas + silver/purple product + black technical (literal §5) */
+[data-theme="light-canvas"] {
+  --c-pos: var(--color-emerald-700); --c-neg: var(--color-red-700); --p-pos: var(--color-emerald-400); --p-neg: var(--color-red-400);
+  --t-pos: var(--color-emerald-700); --t-neg: var(--color-red-700);
+  --surface-page: #ffffff;
+  --surface-card: color-mix(in oklab, var(--color-zinc-100) 70%, transparent);
+  --surface-inset: var(--color-zinc-100);
+  --surface-inset-soft: color-mix(in oklab, var(--color-zinc-200) 40%, transparent);
+  --surface-control: color-mix(in oklab, var(--color-zinc-200) 70%, transparent);
+  --border-hairline: color-mix(in oklab, var(--color-zinc-300) 70%, transparent);
+  --border-card: var(--color-zinc-200);
+  --border-input: var(--color-zinc-300);
+  --border-input-focus: var(--color-zinc-400);
+  --text-primary: #0a0a0b;
+  --text-secondary: var(--color-zinc-700);
+  --text-muted-list: var(--color-zinc-600);
+  --text-muted: var(--color-zinc-500);
+  --text-emphasis: var(--color-zinc-800);
+  --text-emphasis-strong: var(--color-zinc-900);
+  --text-subtle: var(--color-zinc-400);
+  --marker-weak: var(--color-zinc-400);
+  --foreground: #0a0a0b;
+  /* product/atmosphere: a dark stage inset in a light room, silver/purple cast */
+  --stage-surface: #0c0912;
+  --card-shadow: rgba(24, 16, 48, 0.28);
+  --glass-sheen: color-mix(in oklab, #b9a8ff 14%, transparent);
+  /* technical: strict black on white */
+  --tech-surface: #ffffff;
+  --tech-ink: #000000;
+  --tech-rule: var(--color-zinc-300);
+  /* CTA inverts on a light ground */
+  --action-bg: #0a0a0b;
+  --action-bg-hover: var(--color-zinc-800);
+  --action-fg: #ffffff;
+  /* AA on white: emerald-500 is ~2.3:1, emerald-700 ~4.8:1 */
+  --accent-positive: var(--color-emerald-700);
+  --accent-positive-soft: var(--color-emerald-600);
+  --accent-negative: var(--color-red-700);
+  --accent-negative-soft: var(--color-red-600);
+}
+
+/* C · dark canvas + silver/purple product + black technical (Claryo-leaning) */
+[data-theme="dark-canvas"] {
+  --c-pos: var(--color-emerald-400); --c-neg: var(--color-red-400); --p-pos: var(--color-emerald-300); --p-neg: var(--color-red-300);
+  --t-pos: var(--color-emerald-700); --t-neg: var(--color-red-700);
+  --surface-page: #08060d;
+  --surface-card: color-mix(in oklab, #241c3a 34%, transparent);
+  --surface-inset: #0b0813;
+  --surface-inset-soft: color-mix(in oklab, #1a1430 30%, transparent);
+  --surface-control: color-mix(in oklab, #241c3a 55%, transparent);
+  --border-hairline: color-mix(in oklab, #6f5fa6 22%, transparent);
+  --border-card: color-mix(in oklab, #6f5fa6 34%, transparent);
+  --border-input: color-mix(in oklab, #6f5fa6 40%, transparent);
+  --border-input-focus: color-mix(in oklab, #b9a8ff 55%, transparent);
+  --text-primary: #f4f2fb;
+  --text-secondary: #b9b3cc;
+  --text-muted-list: #a49dba;
+  --text-muted: #8b849f;
+  --text-emphasis: #d8d3e6;
+  --text-emphasis-strong: #e8e5f2;
+  --text-subtle: #6d6782;
+  --marker-weak: #6d6782;
+  --foreground: #f4f2fb;
+  --stage-surface: #08060d;
+  --card-shadow: rgba(8, 4, 24, 0.7);
+  --glass-sheen: color-mix(in oklab, #b9a8ff 12%, transparent);
+  --tech-surface: #ffffff;
+  --tech-ink: #000000;
+  --tech-rule: var(--color-zinc-300);
+  --action-bg: #ffffff;
+  --action-bg-hover: #ded8f2;
+  --action-fg: #0a0713;
+  --accent-positive: var(--color-emerald-400);
+  --accent-positive-soft: var(--color-emerald-300);
+  --accent-negative: var(--color-red-400);
+  --accent-negative-soft: var(--color-red-300);
+}
+
+/* D · wildcard "instrument": the overlay idiom becomes the brand.
+   Cool steel rather than purple, and the technical register INVERTS to a
+   white surface, so the register interplay differs structurally from B and C
+   rather than being another tint. */
+[data-theme="instrument"] {
+  --c-pos: #4ade80; --c-neg: #fb7185; --p-pos: #86efac; --p-neg: #fda4af;
+  --t-pos: var(--color-emerald-700); --t-neg: var(--color-red-700);
+  --surface-page: #04070a;
+  --surface-card: color-mix(in oklab, #123047 26%, transparent);
+  --surface-inset: #061019;
+  --surface-inset-soft: color-mix(in oklab, #0d2233 30%, transparent);
+  --surface-control: color-mix(in oklab, #123047 50%, transparent);
+  --border-hairline: color-mix(in oklab, #4d90b8 20%, transparent);
+  --border-card: color-mix(in oklab, #4d90b8 32%, transparent);
+  --border-input: color-mix(in oklab, #4d90b8 38%, transparent);
+  --border-input-focus: color-mix(in oklab, #7fd3ff 55%, transparent);
+  --text-primary: #eaf6ff;
+  --text-secondary: #a8c2d4;
+  --text-muted-list: #93b0c4;
+  --text-muted: #7794a8;
+  --text-emphasis: #cfe4f2;
+  --text-emphasis-strong: #e2f1fb;
+  --text-subtle: #5d788a;
+  --marker-weak: #5d788a;
+  --foreground: #eaf6ff;
+  --stage-surface: #04070a;
+  --card-shadow: rgba(0, 12, 20, 0.72);
+  --glass-sheen: color-mix(in oklab, #7fd3ff 12%, transparent);
+  --tech-surface: #f4f7f9;
+  --tech-ink: #04070a;
+  --tech-rule: #9fb4c2;
+  --action-bg: #7fd3ff;
+  --action-bg-hover: #a9e2ff;
+  --action-fg: #03151f;
+  --accent-positive: #4ade80;
+  --accent-positive-soft: #86efac;
+  --accent-negative: #fb7185;
+  --accent-negative-soft: #fda4af;
+}
+
+
+/* ---------------------------------------------------------------------------
+   ENTRY VIEW (§4 "Vertical selector — the site's entry view", Claryo 10/10).
+   Reference: design-refs/strips/Clary_Selector.png. Frames 1-2 are a clean
+   ground with the question high on the screen and the track just below it;
+   frame 3 is the track drifting to the top right while the ground empties;
+   frame 4 is the chosen view with the track parked in the header.
+
+   Structure is here rather than in the components because two elements have to
+   agree on one line: the question at 34vh and the track at 51vh. Both numbers
+   are measured off design-refs/Claryo-Tab-Selector.png, which is the same
+   screen as strip frames 1-2 at full resolution — question centre at 34% of
+   the viewport, track centre at 51.5%. The track is a sibling of the entry
+   view, not a child, so that it survives the view being unmounted.
+
+   THE GROUND IS THE TECHNICAL REGISTER, revised 08 Sep 2026 on founder note:
+   "the reference uses a WHITE ground for the entry screen and ours is black".
+   It used to claim `canvas`, which is the register §5 describes as light — but
+   canvas is only light in one of the four live palettes, so three quarters of
+   the site opened on black. Technical is the register that is defined light in
+   ALL FOUR (#ffffff / #eceff3 / #ffffff / #f4f7f9 with black ink), and §5's
+   description of it — strict black and white, austerity as the credibility
+   signal — is a literal description of the reference frame. Answering the
+   question then crosses from the site's lightest ground to the product
+   register's darkest, which is the stronger transition the note asks for; the
+   hero renders a seam for that crossing while the gate is up.
+   --------------------------------------------------------------------------- */
+
+/* The choreography, mirrored from VerticalContext (ENTRY_DRIFT_MS /
+   ENTRY_FADE_MS). Three files have to agree on these two numbers. */
+:root {
+  --entry-drift: 1000ms;
+  --entry-out: 420ms;
+}
+
+/* The inline boot script in layout.tsx stamps this before first paint for a
+   visitor whose answer is remembered, so the gate never flashes. React unmounts
+   the view a frame later; this rule covers the frame in between. It is scoped
+   OFF the leaving state, because `answered` now flips while the entry ground is
+   still standing and holding the question — see below. */
+html[data-entry="answered"] [data-entry-view]:not([data-state="leaving"]) {
+  display: none;
+}
+
+.entry-view {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.entry-view > * {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding-inline: 1.5rem;
+  text-align: center;
+}
+
+/* THE GROUND IS WHAT LEAVES, and only once the tab has landed. Reference frame
+   3 (design-refs/strips/Clary_Selector.png) has the greyed question standing as
+   the tab reaches the corner; the old order faded it at 280ms against a 1000ms
+   drift, which spent two thirds of the travel over an empty screen.
+   EntryView takes this block out of flow on the click, so by now the hero is
+   laid out at document top directly underneath an opaque ground. Lifting the
+   ground IS the chosen view's fade-in: one crossing rather than two fades
+   arranged to look like one. */
+.entry-view[data-state="leaving"] {
+  opacity: 0;
+  /* Front-loaded, so the half-opacity beat where the ground reads as a scrim
+     over the hero passes quickly and the crossing still lands as the clean cut
+     the reference makes between frames 3 and 4. */
+  transition: opacity var(--entry-out) cubic-bezier(0.25, 0.6, 0.35, 1)
+    var(--entry-drift);
+  /* Load-bearing. While the question stands this block sits ABOVE the hero in
+     flow and never overlaps it; once it is taken out of flow the two occupy the
+     same pixels, both positioned with z-index auto, and the later one in the
+     document wins. Without this the ground is still fully opaque and simply
+     painted underneath the hero, which looks exactly like the fade running
+     instantly. Under the header (50) and under the drifting track (60). */
+  z-index: 40;
+}
+
+/* The question greys the moment the answer lands, and holds. Derived from the
+   register's own ink over its own ground rather than taken from a token, so it
+   is the same ghost grey against all four entry grounds. */
+.entry-view[data-state="leaving"] .entry-question {
+  color: color-mix(in oklab, var(--text-primary) 26%, var(--surface-page));
+  transition: color 320ms ease;
+}
+
+.entry-question {
+  top: 34vh;
+  transform: translateY(-50%);
+}
+
+/* While the question stands the header is the reference's bare corner: the
+   wordmark alone, on the entry's own ground. Nav and the pilot CTA arrive with
+   the chosen view. The dock slots are inside this too — they are sized at the
+   moment of selection, by which point `data-entry` has already flipped to
+   "entering" and they are laid out again. */
+html[data-entry="asking"] [data-entry-aside] {
+  display: none;
+}
+
+/* THE CORNER IS EMPTY WHEN THE TAB ARRIVES. Through the drift the nav and the
+   pilot CTA are laid out — the dock slot's landing rect is measured against
+   them and would move if they appeared afterwards — but not yet painted, so the
+   tab travels across a bare band into a bare corner as it does in reference
+   frame 3, and the chrome arrives with the chosen view. */
+html[data-entry="entering"] [data-entry-aside] {
+  opacity: 0;
+}
+
+[data-entry-aside] {
+  transition: opacity 400ms ease;
+}
+
+/* The header used to be handed the ENTRY's register while the question stood,
+   so it disappeared into the light screen instead of laying a dark bar across
+   it, and it crossed back to the page's register on this 400ms transition as
+   the tab landed. Both halves are gone, 10 Sep 2026, because the page ground
+   makes them redundant and then wrong: while the gate owns the middle of the
+   screen the PAGE is technical, so a header reading `bg-surface-page/80` is
+   already the entry's own ground; and pinning it to technical until `data-entry`
+   flipped left a light band standing over the hero for anyone who scrolled past
+   the question without answering it, which is the band this whole rewrite
+   exists to remove. The header now has no ground of its own in any state — it
+   is 80% of whatever the page is, in every frame of every crossing.
+   Only the border stays on a transition of its own: it is switched by the rule
+   below rather than by a token, so it has nothing to interpolate with. */
+[data-entry-chrome] {
+  transition: border-color 400ms ease;
+}
+
+/* THE HEADER NEEDS NO OBSERVER ANY MORE. HeaderRegister.tsx existed because
+   each section owned its own ground: the header held the ROOT ground for the
+   whole page and therefore painted a band of the opposite polarity across the
+   top of every frame over a section that disagreed with it, so it had to watch
+   what was under its own foot and re-ink. With one page-level ground there is
+   nothing to disagree with — the header's `bg-surface-page/80` reads the same
+   registered token as the page it floats over, so it cross-fades in the same
+   frames, by construction rather than by observation. The component is gone. */
+
+/* No rule across the entry screen. The reference's entry frame carries the
+   wordmark and nothing else, and §5's first scroll requirement is that grounds
+   never meet along a visible line. The hairline was drawn at 8% of the entry's
+   own ink, which on a white screen is a grey line straight across it. Once the
+   visitor is past the gate the border returns and the header separates from the
+   dark hero the way it does everywhere else on the page. */
+html[data-entry="asking"] [data-entry-chrome],
+html[data-entry="entering"] [data-entry-chrome] {
+  border-bottom-color: transparent;
+}
+
+/* No crossing is rendered between the gate and the hero any more. The gate
+   declares data-ground="technical" and the hero declares data-ground="product",
+   so an unanswered visitor who scrolls past the question crosses the same way
+   every other boundary on the page crosses: the whole ground fades under them.
+   The seam this replaced was the entry's own special case of the mechanism that
+   is now site-wide. */
+
+/* The one vertical control. Absolutely positioned in the document while the
+   question stands, so it scrolls with the entry view; VerticalSwitcher
+   re-anchors it to the viewport on selection and drives the drift from there.
+   Two nested transforms, not one: the tab carries X and the lift carries Y, so
+   the drift can run them on DIFFERENT easings and the path to the corner bends
+   instead of cutting a straight diagonal across the hero (§4). */
+.vsel-tab {
+  position: absolute;
+  top: 51vh;
+  left: 50%;
+  z-index: 60;
+  transform: translate3d(-50%, 0, 0);
+}
+
+.vsel-lift {
+  transform: translate3d(0, -50%, 0);
+}
+
+/* The capsule, and the reason the control carries `data-register="technical"`
+   wherever it goes: in the reference it is the same light track on the white
+   entry screen and docked over the black hero. Declaring the register on the
+   track itself is what makes that true in all four palettes without the
+   component naming a colour.
+   The fill is a step of the register's OWN ink over its OWN ground, derived
+   rather than picked, so the track is a shade of its surroundings in every
+   theme and the raised pill below can simply be the ground again. */
+.vsel-track[data-register] {
+  --vsel-pad: 0.5rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: var(--vsel-pad);
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--text-primary) 6%, var(--surface-page));
+}
+
+/* Inset to the track's own padding, so the raised pill reads as a label
+   lifting out of the track rather than as a second capsule on top of it. */
+.vsel-pill {
+  position: absolute;
+  top: var(--vsel-pad);
+  bottom: var(--vsel-pad);
+  left: 0;
+  border-radius: 9999px;
+  background: var(--surface-page);
+  /* The reference's pill is raised by shadow alone — no border, no fill
+     colour. --card-shadow is themed, so the lift reads on every ground. */
+  box-shadow:
+    0 1px 2px color-mix(in oklab, var(--card-shadow) 45%, transparent),
+    0 6px 16px color-mix(in oklab, var(--card-shadow) 30%, transparent);
+  transition:
+    transform 320ms cubic-bezier(0.3, 0, 0.2, 1),
+    width 320ms cubic-bezier(0.3, 0, 0.2, 1),
+    opacity 180ms ease;
+}
+
+/* Padding re-measured off design-refs/Claryo-Tab-Selector.png, 09 Sep 2026.
+   Against that still at its true 1410px viewport width the track is ~98px tall
+   around a ~70px pill, and the labels are ~21px. Ours were 81 / 65 / 17, which
+   is a control the size of a form widget where the reference has the only
+   object on the screen. The desktop step now runs 95 / 68 / 19.
+   Symmetric flanks: the old asymmetric pl-9/pr-7 existed only to clear an
+   absolutely positioned dot, and the marker has been inline since 08 Sep. */
+.vsel-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  border-radius: 9999px;
+  padding: 0.7rem 1.05rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: color 200ms ease;
+}
+
+.vsel-mark {
+  width: 1.0625rem;
+  height: 1.0625rem;
+  flex: none;
+}
+
+@media (min-width: 768px) {
+  .vsel-track[data-register] {
+    --vsel-pad: 0.85rem;
+  }
+  .vsel-choice {
+    gap: 0.7rem;
+    padding: 1.3rem 1.9rem;
+    font-size: 1.1875rem;
+  }
+  .vsel-mark {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+/* The chosen view no longer runs a fade of its own. It used to: the hero was
+   held at zero and brought up on its own clock while the entry view faded on
+   another, two fades arranged to look like one crossing. Now the entry ground
+   is lifted off a hero that has been sitting at document top, fully rendered,
+   since the click — the ground going is the view arriving, and there is exactly
+   one thing to time. A permanent dimmer is what tests/reveal.spec.ts exists to
+   catch, and the safest number of scroll-independent opacity rules on the hero
+   is none.
+   `data-entry-target` stays on the hero: the crossing seam is sized off it. */
+
+/* §5: the whole entry freezes. The choice still lands, it just lands at once.
+   !important because VerticalSwitcher writes the drift transition inline. */
+@media (prefers-reduced-motion: reduce) {
+  .entry-view,
+  .entry-view > *,
+  .entry-view .entry-question,
+  [data-entry-aside],
+  [data-entry-chrome],
+  .vsel-pill,
+  .vsel-lift,
+  .vsel-tab {
+    transition: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   REGISTER SCOPING. §5's three registers vary by SECTION, not by site — that
+   is where Claryo's white -> purple -> steel rhythm comes from. Each theme
+   below declares three register palettes; a section picks one with
+   data-register, and the working tokens are remapped for its subtree.
+   Palette and register assignment stay independent: a feature built against
+   the working tokens renders correctly in every theme and every register.
+   --------------------------------------------------------------------------- */
+:root {
+  /* A · dark — canvas, product and technical */
+  --c-surf: #050505; --c-card: color-mix(in oklab, var(--color-zinc-900) 40%, transparent);
+  /* Action colours per register. A CTA must read against the ground it
+     actually sits on, not the theme's root ground: in light-canvas the
+     hero button measured 1.0:1 because --action-* was never remapped. */
+  --c-action: #ffffff; --c-action-hover: var(--color-zinc-200); --c-action-fg: #000000;
+  --p-action: #f4f4f7; --p-action-hover: #d9d9e2; --p-action-fg: #0a0a0d;
+  --t-action: #0a0a0b; --t-action-hover: var(--color-zinc-800); --t-action-fg: #ffffff;
+  --c-line: color-mix(in oklab, var(--color-zinc-800) 50%, transparent);
+  --c-edge: var(--color-zinc-800);
+  --c-fg: var(--color-zinc-50); --c-fg2: var(--color-zinc-400);
+  --c-fg3: color-mix(in oklab, var(--color-zinc-400) 80%, var(--color-zinc-500)); /* zinc-500 measured 4.02:1 on the canvas card */
+  --p-surf: #0a0a0d; --p-card: color-mix(in oklab, #2a2a35 30%, transparent);
+  --p-line: color-mix(in oklab, #8a8aa0 18%, transparent); --p-edge: color-mix(in oklab, #8a8aa0 28%, transparent);
+  --p-fg: #f4f4f7; --p-fg2: #b6b6c4; --p-fg3: #8c8c9c;
+  --t-surf: #ffffff; --t-card: #f4f4f5; --t-line: var(--color-zinc-300);
+  --t-edge: var(--color-zinc-400); --t-fg: #000000; --t-fg2: var(--color-zinc-700);
+  --t-fg3: var(--color-zinc-600); /* on a light ground the muted step darkens */
+  /* accents per register: AA against that register's own ground */
+  --c-pos: var(--color-emerald-500); --c-neg: var(--color-red-500);
+  --p-pos: var(--color-emerald-400); --p-neg: var(--color-red-400);
+  --t-pos: var(--color-emerald-700); --t-neg: var(--color-red-700);
+  /* --conduit — the colour a connection is drawn in (#stack's flowing dashes,
+     and its direction chips). It is the palette's blue, per founder
+     instruction, but it cannot BE --chart-2: that token is ★ on-stage-only and
+     these lines are drawn off the stage, so TOKENS.md's demotion rule requires
+     a value per theme AND per register anyway. Declaring it outright leaves
+     --chart-2's ★ intact and lets the hue answer the ground it lands on — the
+     blue that reads on #050505 is invisible on the technical register's white,
+     which is the register the diagram actually sits in. */
+  --c-conduit: #60a5fa; --p-conduit: #60a5fa; --t-conduit: #1d4ed8;
+  /* Fallback for anything drawn outside a declared register. */
+  --conduit: var(--c-conduit);
+}
+[data-theme="light-canvas"] {
+  --c-pos: var(--color-emerald-700); --c-neg: var(--color-red-700); --p-pos: var(--color-emerald-400); --p-neg: var(--color-red-400);
+  --t-pos: var(--color-emerald-700); --t-neg: var(--color-red-700);
+  --c-surf: #ffffff; --c-card: color-mix(in oklab, var(--color-zinc-100) 70%, transparent);
+  /* Action colours per register. A CTA must read against the ground it
+     actually sits on, not the theme's root ground: in light-canvas the
+     hero button measured 1.0:1 because --action-* was never remapped. */
+  --c-action: #0a0a0b; --c-action-hover: var(--color-zinc-800); --c-action-fg: #ffffff;
+  --p-action: #f6f3ff; --p-action-hover: #ded8f2; --p-action-fg: #0c0912;
+  --t-action: #0a0a0b; --t-action-hover: var(--color-zinc-800); --t-action-fg: #ffffff;
+  --c-line: color-mix(in oklab, var(--color-zinc-300) 70%, transparent); --c-edge: var(--color-zinc-200);
+  --c-fg: #0a0a0b; --c-fg2: var(--color-zinc-700); --c-fg3: var(--color-zinc-500);
+  --p-surf: #0c0912; --p-card: color-mix(in oklab, #3a2f5c 34%, transparent);
+  --p-line: color-mix(in oklab, #b9a8ff 22%, transparent); --p-edge: color-mix(in oklab, #b9a8ff 34%, transparent);
+  --p-fg: #f6f3ff; --p-fg2: #c3badd; --p-fg3: #9a90b8;
+  /* Technical inverts canvas: a pale steel band with white cards lifting off
+     it, so the two light registers read as different ground rather than the
+     same white twice. */
+  --t-surf: #eceff3; --t-card: #ffffff; --t-line: #000000; --t-edge: #000000;
+  --t-fg: #000000; --t-fg2: #1c1c1c; --t-fg3: #3f3f3f;
+  --c-conduit: #1d4ed8; --p-conduit: #7fb3ff; --t-conduit: #1d4ed8;
+}
+[data-theme="dark-canvas"] {
+  --c-pos: var(--color-emerald-400); --c-neg: var(--color-red-400); --p-pos: var(--color-emerald-300); --p-neg: var(--color-red-300);
+  --t-pos: var(--color-emerald-700); --t-neg: var(--color-red-700);
+  --c-surf: #08060d; --c-card: color-mix(in oklab, #241c3a 34%, transparent);
+  /* Action colours per register. A CTA must read against the ground it
+     actually sits on, not the theme's root ground: in light-canvas the
+     hero button measured 1.0:1 because --action-* was never remapped. */
+  --c-action: #ffffff; --c-action-hover: #ded8f2; --c-action-fg: #0a0713;
+  --p-action: #f6f3ff; --p-action-hover: #ded8f2; --p-action-fg: #0a0713;
+  --t-action: #0a0713; --t-action-hover: #241c3a; --t-action-fg: #ffffff;
+  --c-line: color-mix(in oklab, #6f5fa6 22%, transparent); --c-edge: color-mix(in oklab, #6f5fa6 34%, transparent);
+  --c-fg: #f4f2fb; --c-fg2: #b9b3cc; --c-fg3: #8b849f;
+  --p-surf: #0f0a1d; --p-card: color-mix(in oklab, #4a3a7a 32%, transparent);
+  --p-line: color-mix(in oklab, #b9a8ff 26%, transparent); --p-edge: color-mix(in oklab, #b9a8ff 38%, transparent);
+  --p-fg: #f8f5ff; --p-fg2: #cabfe6; --p-fg3: #9c92bd;
+  --t-surf: #ffffff; --t-card: #ffffff; --t-line: #000000; --t-edge: #000000;
+  --t-fg: #000000; --t-fg2: #1c1c1c; --t-fg3: #3f3f3f;
+  --c-conduit: #7aa7ff; --p-conduit: #8ab4ff; --t-conduit: #1d4ed8;
+}
+[data-theme="instrument"] {
+  --c-pos: #4ade80; --c-neg: #fb7185; --p-pos: #86efac; --p-neg: #fda4af;
+  --t-pos: var(--color-emerald-700); --t-neg: var(--color-red-700);
+  --c-surf: #04070a; --c-card: color-mix(in oklab, #123047 26%, transparent);
+  /* Action colours per register. A CTA must read against the ground it
+     actually sits on, not the theme's root ground: in light-canvas the
+     hero button measured 1.0:1 because --action-* was never remapped. */
+  --c-action: #7fd3ff; --c-action-hover: #a9e2ff; --c-action-fg: #03151f;
+  --p-action: #7fd3ff; --p-action-hover: #a9e2ff; --p-action-fg: #03151f;
+  --t-action: #03151f; --t-action-hover: #123047; --t-action-fg: #7fd3ff;
+  --c-line: color-mix(in oklab, #4d90b8 20%, transparent); --c-edge: color-mix(in oklab, #4d90b8 32%, transparent);
+  --c-fg: #eaf6ff; --c-fg2: #a8c2d4; --c-fg3: #7794a8;
+  --p-surf: #061019; --p-card: color-mix(in oklab, #17475f 34%, transparent);
+  --p-line: color-mix(in oklab, #7fd3ff 24%, transparent); --p-edge: color-mix(in oklab, #7fd3ff 36%, transparent);
+  --p-fg: #f2fbff; --p-fg2: #b9d8e8; --p-fg3: #86a6b8;
+  --t-surf: #f4f7f9; --t-card: #ffffff; --t-line: #04070a; --t-edge: #04070a;
+  --t-fg: #04070a; --t-fg2: #23343d; --t-fg3: #4d626e;
+  /* This theme's blue is its own cool steel rather than the indigo the other
+     three carry; --conduit follows the palette it is standing in. */
+  --c-conduit: #7fd3ff; --p-conduit: #7fd3ff; --t-conduit: #0a6d9e;
+}
+
+/* ---------------------------------------------------------------------------
+   SCROLL-DRIVEN DISCLOSURE (§5 "Motion carries information", amended 08 Sep
+   2026 — the entrance-animation ban was lifted and replaced by a quality bar).
+   Progress arrives from src/components/ScrollStage.tsx as --r, one number per
+   element. Scroll position decides WHEN a reveal starts; the transition below
+   decides how it runs, and it always runs all the way to 1.
+
+   REVISED 08 Sep 2026. --r used to be written continuously from the element's
+   position in the viewport, which made every grammar here a scroll-linked
+   dimmer: the page read correctly at one exact offset and was grey either side
+   of it. §5 now states that a reveal is a transition INTO a readable state, and
+   tests/reveal.spec.ts measures it.
+   --------------------------------------------------------------------------- */
+
+/* Registering the property is what lets --r be interpolated inside calc(),
+   multiplied by a length, and — the part this rewrite depends on —
+   TRANSITIONED, so one declaration animates the opacity, blur, travel and clip
+   of every grammar together. The initial value is 1, so the page is FAIL-OPEN:
+   with no JS, before hydration, and under reduced motion everything is already
+   in its final revealed state. */
+@property --r {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+/* Mirrors DUR in src/components/ScrollStage.tsx, which schedules the latch
+   from the same number. The reveal floor settles for 700ms after a scroll
+   lands, so duration plus the longest authored lag has to clear that. */
+:root {
+  --reveal-dur: 420ms;
+}
+
+/* ---------------------------------------------------------------------------
+   #scale — the PlayVision hero-stat block (HeroStat.tsx).
+
+   In Playvision_Video_and_Hero_Stat.png the clip runs off the right edge of
+   the screen; it has no outer edge, which is what stops the block reading as
+   two cards parked beside each other. Reproducing that means the row cannot
+   live inside a centred max-width container, so the alignment is done with
+   padding instead: the left pad lands the copy column exactly where every
+   other section's `mx-auto max-w-6xl px-6` content starts (half the leftover
+   width, plus the same 1.5rem gutter), and the right pad is zero so the last
+   grid column reaches the viewport. Below lg the frame stops bleeding and the
+   rule is a plain gutter on both sides.
+   --------------------------------------------------------------------------- */
+.statbleed {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+@media (min-width: 1024px) {
+  .statbleed {
+    padding-left: max(1.5rem, calc((100vw - 72rem) / 2 + 1.5rem));
+    padding-right: 0;
+  }
+}
+
+/* §4d rule 1: the slot's box is declared once and does not move when a clip
+   lands in it. Both ratios come from the component as custom properties so the
+   pending state and a future <video> are laid out by the same rule. */
+.media-slot {
+  aspect-ratio: var(--slot-aspect-sm, var(--slot-aspect, 16 / 9));
+}
+@media (min-width: 768px) {
+  .media-slot {
+    aspect-ratio: var(--slot-aspect, 16 / 9);
+  }
+}
+
+/* The unexposed frame has to read as a lit rectangle standing in the section's
+   ground, the way the reference's clip does. --surface-inset is the register's
+   card fill and it is TRANSLUCENT, so one pass of it over the product ground is
+   barely a step; two stacked passes is a visible frame and is still nothing but
+   the register's own token, so it re-themes with everything else. A hardcoded
+   grey here would be the exact defect CLAUDE.md's colour rule exists to stop. */
+.capture-frame {
+  background-color: var(--surface-inset);
+  background-image: linear-gradient(var(--surface-inset), var(--surface-inset));
+}
+
+/* The transition is attached only once the driver has armed an element, one
+   frame after it writes --r: 0. Arming and dimming in the same style recalc
+   would leave the transition nothing to run from and the element would snap.
+   --reveal-delay carries Reveal's authored `lag`, which is what turns a row of
+   cards sharing one top edge into a wipe across the row. */
+[data-reveal][data-reveal-armed] {
+  transition: --r var(--reveal-dur) cubic-bezier(0.22, 0.61, 0.36, 1)
+    var(--reveal-delay, 0ms);
+}
+
+/* No grammar below ever reaches opacity 0. An un-revealed element is dim, not
+   absent — that is what Claryo actually does (design-refs/Claryo-scroll-2.png,
+   where "Orchestrate" is legible as shape before it resolves), it keeps the
+   page from reading as empty mid-scroll, and it keeps content inside
+   tests/copy.spec.ts's visible-text walk, which drops anything at opacity 0
+   and would otherwise report the privacy claims as missing from the page. */
+
+/* focus — the claim resolving out of a defocused frame. Headings only. */
+[data-reveal="focus"] {
+  opacity: calc(0.22 + 0.78 * var(--r));
+  filter: blur(calc((1 - var(--r)) * 9px));
+}
+
+/* ghost — dim to full, in place. Body copy and list items never travel: text
+   that slides is the generic tell the old ban existed to keep out. */
+[data-reveal="ghost"] {
+  opacity: calc(0.16 + 0.84 * var(--r));
+}
+
+/* ink — drawn left to right. Rules and eyebrows. */
+[data-reveal="ink"] {
+  opacity: calc(0.12 + 0.88 * var(--r));
+  clip-path: inset(0 calc((1 - var(--r)) * 100%) 0 0);
+}
+
+/* settle — arrive and come to rest. Cards and panels only. */
+[data-reveal="settle"] {
+  opacity: calc(0.14 + 0.86 * var(--r));
+  transform: translate3d(0, calc((1 - var(--r)) * 26px), 0)
+             scale(calc(0.978 + 0.022 * var(--r)));
+}
+
+/* advance — step forward off the spine. The #how sequence only. */
+[data-reveal="advance"] {
+  opacity: calc(0.14 + 0.86 * var(--r));
+  transform: translate3d(calc((1 - var(--r)) * -30px), 0, 0);
+}
+
+/* spine — the rule that threads the #how sequence, inked top-down as the block
+   passes through the viewport (data-reveal-mode="span"), so it advances in step
+   with the steps it connects rather than finishing while the first one is still
+   arriving.
+   The fill is a gradient on the rule itself rather than a child element: --r
+   does not inherit, and the driver measures the element it writes to — a child
+   whose own height IS the progress would feed its measurement back into itself
+   and latch on the first frame. */
+[data-reveal="spine"] {
+  opacity: 1;
+  background-color: var(--border-hairline);
+  background-image: linear-gradient(
+    to bottom,
+    var(--text-primary) 0%,
+    var(--text-primary) calc(var(--r) * 100%),
+    transparent calc(var(--r) * 100%),
+    transparent 100%
+  );
+}
+
+/* Resolved. The driver drops its inline --r once an element latches, and this
+   clears the composited layers with it rather than leaving a blur(0px) filter
+   and an identity transform on forty elements for the rest of the session. */
+[data-reveal][data-revealed] {
+  opacity: 1;
+  filter: none;
+  clip-path: none;
+  transform: none;
+}
+
+/* §5: "All scroll motion freezes under prefers-reduced-motion, with every
+   element in its final revealed state." ScrollStage never starts, so --r stays
+   at its initial 1; this pins the outcome even if an inline value survives a
+   preference change mid-session. */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    filter: none !important;
+    clip-path: none !important;
+    transform: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   THE BOUNDARY BUDGET — §5, "every scroll should surface something".
+
+   Measured with `node scripts/coverage.mjs` on the promoted build: coverage
+   across the nine scroll frames read 85 / 70 / 35 / 86 / 36 / 77 / 28 / 83 / 56
+   percent, with single unbroken empty bands of 444px, 329px and 301px. Every
+   one of those bands is a section boundary, and every boundary was built the
+   same way — a closing `pb-40 md:pb-52` meeting an opening `pt-40 md:pt-48`,
+   about 400px of ground with nothing standing on it. The seam then spends its
+   whole ~350px travel inside that gap, so the ground change gets a frame to
+   itself.
+
+   That is the one thing neither Claryo scroll reference ever does. In
+   Claryo_Scroll_Functionality.png frames 4→5 the dark ground climbs while the
+   white section's headline and body are still on screen; in _2.png frames 4→5
+   the outgoing pain-point row is still leaving the top edge as the next heading
+   arrives at the bottom. Consecutive frames always overlap in content, and the
+   crossing happens BEHIND live copy.
+
+   So the closing and opening space is one governed number rather than a
+   Tailwind pair chosen per section. At 2 x --band the widest boundary gap is
+   224px against a 760px frame, which puts the outgoing section's last block and
+   the incoming section's heading both inside the seam's travel — the seam
+   dissolves behind them instead of in front of nothing. It is a token and not
+   nine class lists so that the budget is auditable: one grep says what every
+   boundary costs, and coverage.mjs says whether that is still enough.
+   --------------------------------------------------------------------------- */
+:root {
+  --band: 6rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --band: 7rem;
+  }
+}
+
+.section-band {
+  padding-block: var(--band);
+  /* The closing space used to double as anchor clearance. At 224px it no
+     longer can, so the clearance is stated: the fixed header is ~88px at md+
+     and ~138px at 390, where the docked vertical track takes its own row. */
+  scroll-margin-top: 9.5rem;
+}
+
+@media (min-width: 768px) {
+  .section-band {
+    scroll-margin-top: 6rem;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   THE PAGE GROUND (§5 requirement 1, rewritten 10 Sep 2026).
+
+   WHAT WAS HERE BEFORE, and why it is gone. `.section-seam` was a gradient
+   sheet sitting in the closing space of each section, dissolving the incoming
+   register's ground over the outgoing one. It was measured, tuned twice, and
+   got the worst row-to-row luminance step on the page down to 3/255. The
+   founder rejected it twice anyway, and the second verdict says exactly why:
+   "we still see a straight (now faded) but clear line where the black and white
+   pages start." A dissolve between two grounds still has two grounds, so a
+   boundary is somewhere on screen in every frame of the crossing; softening it
+   changes what the line looks like, never whether there is one.
+
+   design-refs/Claryo-Ground-Black.png and -White.png are the same heading and
+   the same three cards, once white-on-black and once black-on-white, unmoved.
+   Nothing in that pair is a transition between two areas. The ground under the
+   ENTIRE page changed and the foreground inverted with it.
+
+   SO THE GROUND IS NOT A LAYER. It is the value of the working tokens, carried
+   on <html> and inherited by everything. Registering them below as <color>
+   custom properties is what makes them transitionable: flipping one attribute,
+   `data-ground` on the root, retargets all twenty-eight at once and the browser
+   interpolates ground and ink together on one clock. There is no element to
+   position, no geometry to get wrong, and no second ground in the document to
+   meet the first along an edge — a page-level property has no edges.
+
+   Three consequences worth stating so they are not re-derived:
+
+   1. THE FOREGROUND INVERTS BECAUSE IT IS THE SAME SWITCH. Ink, hairlines, card
+      fills, the CTA and the accents are in the transition list beside the
+      ground. A backdrop layer would have had to be paired with a separate
+      token swap for the text, and the two would drift; here they cannot.
+   2. NESTED REGISTERS ARE UNAFFECTED, and that is what keeps the founder's
+      approved work alive. `[data-register]` on a PANEL (PrivacyStage, the
+      FloorLedger, the Outputs stages, the #stack hub, the demo walls) still
+      remaps the tokens for its own subtree, statically. Those are bounded
+      objects standing on the ground, not the ground itself; a dark instrument
+      panel on a light page is §5's own composition rule. Only TOP-LEVEL
+      sections changed vocabulary — from `data-register`, which paints, to
+      `data-ground`, which declares and paints nothing.
+   3. THE FADE RUNS ON ITS OWN CLOCK, not on scroll offset. §5 requirement 2
+      exists because binding opacity continuously to scroll position makes a
+      dimmer that is only correct at one offset. Scroll decides WHEN the ground
+      changes; the transition then runs to completion and latches, exactly as
+      the reveal grammar does.
+
+   REDUCED MOTION. GroundDriver never sets `data-ground-fade` under the
+   preference and this block is switched off besides, so the ground resolves
+   instantly to whatever the scroll position implies. The page is always at one
+   settled ground, never mid-fade — which is the state the floor photographs.
+   --------------------------------------------------------------------------- */
+
+@property --surface-page { syntax: "<color>"; inherits: true; initial-value: #050505; }
+@property --surface-card { syntax: "<color>"; inherits: true; initial-value: rgba(24, 24, 27, 0.4); }
+@property --surface-control { syntax: "<color>"; inherits: true; initial-value: rgba(24, 24, 27, 0.6); }
+@property --surface-inset { syntax: "<color>"; inherits: true; initial-value: #09090b; }
+@property --surface-inset-soft { syntax: "<color>"; inherits: true; initial-value: rgba(9, 9, 11, 0.3); }
+@property --border-hairline { syntax: "<color>"; inherits: true; initial-value: rgba(39, 39, 42, 0.5); }
+@property --border-card { syntax: "<color>"; inherits: true; initial-value: #27272a; }
+@property --border-input { syntax: "<color>"; inherits: true; initial-value: #3f3f46; }
+@property --border-input-focus { syntax: "<color>"; inherits: true; initial-value: #52525b; }
+@property --text-primary { syntax: "<color>"; inherits: true; initial-value: #fafafa; }
+@property --text-secondary { syntax: "<color>"; inherits: true; initial-value: #a1a1aa; }
+@property --text-muted-list { syntax: "<color>"; inherits: true; initial-value: #a1a1aa; }
+@property --text-muted { syntax: "<color>"; inherits: true; initial-value: #9d9da7; }
+@property --text-emphasis { syntax: "<color>"; inherits: true; initial-value: #d4d4d8; }
+@property --text-emphasis-strong { syntax: "<color>"; inherits: true; initial-value: #e4e4e7; }
+@property --text-subtle { syntax: "<color>"; inherits: true; initial-value: #52525b; }
+@property --marker-weak { syntax: "<color>"; inherits: true; initial-value: #52525b; }
+@property --action-bg { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
+@property --action-bg-hover { syntax: "<color>"; inherits: true; initial-value: #e4e4e7; }
+@property --action-fg { syntax: "<color>"; inherits: true; initial-value: #000000; }
+@property --accent-positive { syntax: "<color>"; inherits: true; initial-value: #10b981; }
+@property --accent-positive-soft { syntax: "<color>"; inherits: true; initial-value: #34d399; }
+@property --accent-negative { syntax: "<color>"; inherits: true; initial-value: #ef4444; }
+@property --accent-negative-soft { syntax: "<color>"; inherits: true; initial-value: #f87171; }
+@property --conduit { syntax: "<color>"; inherits: true; initial-value: #60a5fa; }
+/* The ambient field's ramp is in the same list, so the atmosphere crosses with
+   the page instead of snapping one frame ahead of it. --atmos-base is defined
+   to equal the current ground (atmosphere.css); if it did not cross-fade in
+   step, the one boundary the field is built to have — none — would reappear as
+   a rectangle for the length of every crossing. */
+@property --atmos-base { syntax: "<color>"; inherits: true; initial-value: #0a0a0d; }
+@property --atmos-mid { syntax: "<color>"; inherits: true; initial-value: #4b2f8f; }
+@property --atmos-core { syntax: "<color>"; inherits: true; initial-value: #c3a6ff; }
+
+:root {
+  /* One number for the crossing, mirrored as GROUND_MS in GroundDriver.tsx,
+     which carries the measurement behind it. Long enough to read as the page
+     BECOMING the other colour rather than as a cut; short enough that the
+     per-frame restyle a page-level token change costs never takes frames the
+     §3 demos need. */
+  --ground-dur: 500ms;
+  /* Symmetric ease. A front-loaded curve would put the ambiguous middle — the
+     stretch where neither ink is fully resolved — early in the crossing and
+     hold it, which is the "fog bank" the seam was rejected for twice; the
+     ambiguity is unavoidable in a cross-fade, so it is spent as fast as the
+     ends allow and lingered on at neither. */
+  --ground-ease: cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+/* The transition is armed by GroundDriver for the duration of a crossing and
+   disarmed afterwards, rather than standing permanently on the root. That is
+   load-bearing for two things that are not the ground: the capture harness and
+   tests/themes.spec.ts flip `data-theme` AFTER mount, which changes every token
+   in this list — a standing transition would make the whole suite sample the
+   page mid-fade — and the first paint of a session must land on its ground
+   rather than crossing into it from the initial values above. */
+html[data-ground-fade] {
+  transition-property: --surface-page, --surface-card, --surface-control,
+    --surface-inset, --surface-inset-soft, --border-hairline, --border-card,
+    --border-input, --border-input-focus, --text-primary, --text-secondary,
+    --text-muted-list, --text-muted, --text-emphasis, --text-emphasis-strong,
+    --text-subtle, --marker-weak, --action-bg, --action-bg-hover, --action-fg,
+    --accent-positive, --accent-positive-soft, --accent-negative,
+    --accent-negative-soft, --conduit, --atmos-base, --atmos-mid, --atmos-core;
+  transition-duration: var(--ground-dur);
+  transition-timing-function: var(--ground-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-ground-fade] {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   #stack CONNECTORS (§4 "Your Stack" integrations, Pocket hub-and-spoke).
+   Reference: design-refs/strips/Pocket_Product.png, which is a VIDEO — the
+   dashes sit at a different point on each curve in every frame, so the
+   connector is a dash TRAIN travelling the path rather than a dotted line.
+
+   Direction is carried by the path itself: a path authored from the card to
+   the hub reads as an ingest, one authored from the hub to the card reads as
+   an export, and this one animation runs them both. That is why there is no
+   "reverse" variant here — encoding direction in the geometry rather than in a
+   modifier means the arrowhead, the chip and the motion can never disagree.
+
+   The keyframe travels TWO dash periods (2 x (5+11)) so the loop is seamless
+   at any path length. 1.4s over 32 user units is ~23 units/s, which is fast
+   enough to read as flow at a glance and slow enough that a 250ms motion-strip
+   sample lands the dashes somewhere new.
+   --------------------------------------------------------------------------- */
+@keyframes stack-flow {
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+
+.flow-path {
+  fill: none;
+  stroke: var(--conduit);
+  stroke-linecap: round;
+  stroke-dasharray: 5 11;
+  animation: stack-flow 1.4s linear infinite;
+  /* Hovering one card quietens the rest of the diagram. Interaction feedback,
+     so it is allowed to animate; the information is fully present without it. */
+  transition: opacity 220ms ease, stroke-width 220ms ease;
+}
+
+/* The still line the dashes travel along, so a connector is legible as a
+   connection before any dash reaches that part of the curve. */
+.flow-rail {
+  fill: none;
+  stroke: var(--conduit);
+  opacity: 0.28;
+  transition: opacity 220ms ease;
+}
+
+/* §5: ambient motion freezes, and the diagram rests as a static dashed path
+   rather than disappearing. */
+@media (prefers-reduced-motion: reduce) {
+  .flow-path {
+    animation: none;
+    transition: none;
+  }
+  .flow-rail {
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   ONE TABLE, TWO SCOPES.
+
+   Each block below is claimed by two selectors and the body is written once.
+
+   `html[data-ground="X"]` is THE PAGE GROUND. GroundDriver writes it from the
+   register declared by whichever section owns the middle of the viewport, and
+   the registered properties above interpolate the whole table when it changes.
+   Everything in the document that has not claimed a register of its own reads
+   these values, which is the entire mechanism: one ground, page-wide, always.
+
+   `[data-register="X"]` is a NESTED STAGE — a panel that stands on the ground
+   rather than being it. It sets the same table statically for its own subtree,
+   which is how a dark product-register instrument keeps reading correctly on a
+   white page and vice versa. Specificity keeps them from arguing: the root
+   selector is (0,1,1) so it beats the theme blocks for the working tokens, and
+   a nested block is a different element so it simply wins for its own subtree.
+
+   The last two declarations changed with this rewrite. They used to name the
+   register's source variable directly (`background: var(--c-surf)`), which is
+   correct for a static panel and WRONG for the root — a shorthand pointing at a
+   theme literal cannot interpolate, so the ground would have snapped while the
+   ink faded. Pointing both at the register's own working token instead means
+   the static case resolves to exactly what it did before, and the root case
+   paints whatever the transition currently holds.
+   --------------------------------------------------------------------------- */
+html[data-ground="canvas"],
+[data-register="canvas"] {
+  --surface-page: var(--c-surf); --surface-card: var(--c-card);
+  --action-bg: var(--c-action); --action-bg-hover: var(--c-action-hover);
+  --action-fg: var(--c-action-fg);
+  --surface-control: var(--c-card);
+  --border-hairline: var(--c-line); --border-card: var(--c-edge);
+  --text-primary: var(--c-fg); --text-secondary: var(--c-fg2);
+  --text-muted-list: var(--c-fg2); --text-muted: var(--c-fg3);
+  --text-emphasis: var(--c-fg2); --text-emphasis-strong: var(--c-fg);
+  --text-subtle: var(--c-fg3); --marker-weak: var(--c-fg3);
+  --surface-inset: var(--c-card); --surface-inset-soft: var(--c-card);
+  --instrument-well: var(--surface-inset-soft);
+  --border-input: var(--c-edge); --border-input-focus: var(--c-fg3);
+  --accent-positive: var(--c-pos); --accent-negative: var(--c-neg);
+  --accent-positive-soft: var(--c-pos); --accent-negative-soft: var(--c-neg);
+  --conduit: var(--c-conduit);
+}
+html[data-ground="product"],
+[data-register="product"] {
+  --surface-page: var(--p-surf); --surface-card: var(--p-card);
+  --action-bg: var(--p-action); --action-bg-hover: var(--p-action-hover);
+  --action-fg: var(--p-action-fg);
+  --surface-control: var(--p-card);
+  --border-hairline: var(--p-line); --border-card: var(--p-edge);
+  --text-primary: var(--p-fg); --text-secondary: var(--p-fg2);
+  --text-muted-list: var(--p-fg2); --text-muted: var(--p-fg3);
+  --text-emphasis: var(--p-fg2); --text-emphasis-strong: var(--p-fg);
+  --text-subtle: var(--p-fg3); --marker-weak: var(--p-fg3);
+  --surface-inset: var(--p-card); --surface-inset-soft: var(--p-card);
+  --instrument-well: var(--surface-inset-soft);
+  --border-input: var(--p-edge); --border-input-focus: var(--p-fg3);
+  --accent-positive: var(--p-pos); --accent-negative: var(--p-neg);
+  --accent-positive-soft: var(--p-pos); --accent-negative-soft: var(--p-neg);
+  --conduit: var(--p-conduit);
+}
+/* The header joins this list while the entry question stands, and stays in it
+   through the drift ("entering"), because the entry ground is still standing
+   underneath it until the tab lands: the gate paints the technical ground edge
+   to edge, and chrome sitting on it has to be inked for that ground rather than
+   for the page's. Sharing the selector rather than copying the block is what
+   keeps the remap FULL — a partial one leaves text at the parent theme's values
+   and washes the header out. */
+html[data-ground="technical"],
+[data-register="technical"] {
+  --surface-page: var(--t-surf); --surface-card: var(--t-card);
+  --action-bg: var(--t-action); --action-bg-hover: var(--t-action-hover);
+  --action-fg: var(--t-action-fg);
+  --surface-control: var(--t-card);
+  --border-hairline: var(--t-line); --border-card: var(--t-edge);
+  --text-primary: var(--t-fg); --text-secondary: var(--t-fg2);
+  --text-muted-list: var(--t-fg2); --text-muted: var(--t-fg3);
+  --text-emphasis: var(--t-fg2); --text-emphasis-strong: var(--t-fg);
+  --text-subtle: var(--t-fg3); --marker-weak: var(--t-fg3);
+  --surface-inset: var(--t-card); --surface-inset-soft: var(--t-card);
+  --instrument-well: var(--surface-inset-soft);
+  --border-input: var(--t-edge); --border-input-focus: var(--t-fg3);
+  --accent-positive: var(--t-pos); --accent-negative: var(--t-neg);
+  --accent-positive-soft: var(--t-pos); --accent-negative-soft: var(--t-neg);
+  --conduit: var(--t-conduit);
+}
+
+/* ONLY A NESTED STAGE PAINTS. The three blocks above are claimed by <html> as
+   well, and the page ground is painted once, by <body>. Three elements each
+   filling the viewport with the same animating colour is three full-page
+   repaints per frame of every crossing for one visible result; measured with a
+   rAF counter, a crossing costs zero frames either way, but the cheapest
+   version of a mechanism that touches every element on the page is the one
+   worth keeping. A panel that declares a register still fills its own box —
+   that is what makes it a stage rather than a hole. */
+[data-register] {
+  background-color: var(--surface-page);
+  color: var(--text-primary);
 }

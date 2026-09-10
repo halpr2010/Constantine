@@ -45,3 +45,27 @@ shots/
 verdict-*.json
 test-results/
 playwright-report/
+
+# Loop working state: captures are large and regenerated every cycle;
+# baselines are tracked, run artefacts are not.
+shots/best/
+shots/candidate/
+shots/compare/
+.loop/*
+!.loop/copy-baseline.txt
+!.loop/tests-baseline.txt
+test-results/
+
+# Live preview worktrees
+.preview/
+
+# Reference videos: source material, kept locally. Several exceed GitHub's
+# 100MB hard file limit (Claryo - Interactive functionality.mov is 114MB), so
+# committing them would break pushes outright. The extracted frame strips in
+# design-refs/strips/ are what the loop actually reads, and those ARE tracked.
+design-refs/*.mov
+design-refs/*.mp4
+design-refs/*.MOV
+design-refs/*.MP4
+.work/
+.burst/

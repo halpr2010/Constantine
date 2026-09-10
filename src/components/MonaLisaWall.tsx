@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { token } from "@/lib/palette";
+import { onRedraw, stillQuery } from "@/lib/motion";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 function clamp(v: number, a: number, b: number) {
@@ -51,7 +52,10 @@ export default function PaintingWall({
   const paintingRef = useRef<HTMLDivElement | null>(null);
   const imageRef = useRef<HTMLDivElement | null>(null);
 
-  const [reveal, setReveal] = useState(0);
+  // A static card is a leaderboard entry, not a demo: it is born at full
+  // intensity rather than lerping there, which is what lets its chart be drawn
+  // once instead of every frame.
+  const [reveal, setReveal] = useState(isStatic ? 1 : 0);
   const [attentionSeconds, setAttentionSeconds] = useState(0);
   const currentRevealRef = useRef(0);
   const targetRevealRef = useRef(0);
@@ -89,7 +93,61 @@ export default function PaintingWall({
     []
   );
 
+  // Static cards are the Insight leaderboard: one 12-point sparkline, drawn
+  // once. This used to be a branch inside the live rAF loop, so an unchanging
+  // chart was repainted sixty times a second for the life of the page. The only
+  // two things that can invalidate it are a resize and a runtime theme flip,
+  // which is exactly what onRedraw subscribes to.
   useEffect(() => {
+    if (!isStatic) return;
+
+    const draw = () => {
+      const canvas = chartRef.current;
+      const ctx = canvas?.getContext("2d");
+      if (!canvas || !ctx) return;
+      const cw = canvas.clientWidth || (size === "mini" ? 140 : 260);
+      const ch = canvas.clientHeight || 44;
+      if (canvas.width !== cw || canvas.height !== ch) {
+        canvas.width = cw;
+        canvas.height = ch;
+      }
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const labelH = 12;
+      const padding = { top: 8, right: 12, bottom: labelH, left: 12 };
+      const plotW = w - padding.left - padding.right;
+      const plotH = h - padding.top - padding.bottom;
+      const n = staticChartValues.length;
+
+      ctx.strokeStyle = token(chartToken);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let i = 0; i < n; i++) {
+        const x = padding.left + (i / (n - 1)) * plotW;
+        const y = padding.top + plotH - staticChartValues[i] * plotH;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      ctx.fillStyle = token("chart-label");
+      ctx.font = `400 11px ${getComputedStyle(document.body).fontFamily}`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "alphabetic";
+      for (const { month, index } of staticChartLabels) {
+        const x = padding.left + (index / (n - 1)) * plotW;
+        ctx.fillText(month, x, h - 3);
+      }
+    };
+
+    draw();
+    return onRedraw(draw);
+  }, [isStatic, size, chartToken, staticChartValues, staticChartLabels]);
+
+  useEffect(() => {
+    if (isStatic) return;
     // Parked: this wall belongs to the vertical that is not on screen. Reset it
     // so it starts cold when its tab comes back, rather than inheriting the
     // engagement the other vertical's wall built up under the same pointer.
@@ -108,25 +166,29 @@ export default function PaintingWall({
       });
       return () => cancelAnimationFrame(id);
     }
+    // §5 SCOPE, ambient vs interaction. Under prefers-reduced-motion this demo
+    // keeps its interaction — hover still drives attention and intensity, and
+    // §3 makes disabling that a failure rather than a fix — but it stops
+    // running a clock of its own. The rolling ten-second trace is the ambient
+    // half: with nobody near the painting it still advances its time axis every
+    // frame, so an untouched page is never twice the same. Under the preference
+    // the loop below starts on a pointer and parks the moment the wall is back
+    // at rest, which makes the demo's clock the visitor's clock.
+    const still = stillQuery();
     let raf: number | null = null;
+
+    /** Engaged, or at rest? Below REST there is no engagement now and none
+     *  incoming, so the only thing another frame would change is the time
+     *  axis under a flat line. */
+    const REST = 0.002;
 
     const compute = () => {
       const imageEl = imageRef.current;
-      if (!imageEl) return;
+      if (!imageEl) return false;
 
       const last = lastPointerRef.current;
 
-      if (isStatic) {
-        targetRevealRef.current = 1;
-        currentRevealRef.current = 1;
-        setReveal(1);
-        const now = performance.now() / 1000;
-        if (samplesRef.current.length === 0) {
-          for (let i = 0; i < 50; i++) {
-            samplesRef.current.push({ t: now - (50 - i) * 0.2, v: 1 });
-          }
-        }
-      } else if (!last.active) {
+      if (!last.active) {
         targetRevealRef.current = 0;
       } else {
         const r = imageEl.getBoundingClientRect();
@@ -181,106 +243,137 @@ export default function PaintingWall({
         samplesRef.current = samplesRef.current.filter((s) => s.t > cutoff);
       }
 
+      const ctx = fit();
       const canvas = chartRef.current;
-      if (canvas) {
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          // Match canvas resolution to display size to avoid stretched text
-          const cw = canvas.clientWidth || (isMini ? 140 : 260);
-          const ch = canvas.clientHeight || 44;
-          if (canvas.width !== cw || canvas.height !== ch) {
-            canvas.width = cw;
-            canvas.height = ch;
-          }
-          const w = canvas.width;
-          const h = canvas.height;
-          ctx.clearRect(0, 0, w, h);
+      if (ctx && canvas) {
+        const w = canvas.width;
+        const h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
 
-          if (isStatic) {
-            // Static monthly chart: 12 data points, 5 x-axis labels
-            const labelH = 12;
-            const padding = { top: 8, right: 12, bottom: labelH, left: 12 };
-            const plotW = w - padding.left - padding.right;
-            const plotH = h - padding.top - padding.bottom;
-            const n = staticChartValues.length;
-
+        if (samplesRef.current.length >= 2) {
+          const padding = 2;
+          const plotW = w - padding * 2;
+          const plotH = h - padding * 2;
+          const tMin = now - chartWindowSeconds;
+          const tMax = now;
+          const tRange = tMax - tMin;
+          if (tRange >= 0.01) {
             ctx.strokeStyle = token(chartToken);
             ctx.lineWidth = 1;
             ctx.beginPath();
-            for (let i = 0; i < n; i++) {
-              const x = padding.left + (i / (n - 1)) * plotW;
-              const y = padding.top + plotH - staticChartValues[i] * plotH;
+            for (let i = 0; i < samplesRef.current.length; i++) {
+              const s = samplesRef.current[i];
+              const x = padding + ((s.t - tMin) / tRange) * plotW;
+              const y = padding + plotH - (s.v * plotH);
               if (i === 0) ctx.moveTo(x, y);
               else ctx.lineTo(x, y);
             }
             ctx.stroke();
-
-            ctx.fillStyle = token("chart-label");
-            const fontFamily =
-              typeof document !== "undefined"
-                ? getComputedStyle(document.body).fontFamily
-                : "system-ui, sans-serif";
-            ctx.font = `400 11px ${fontFamily}`;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "alphabetic";
-            for (const { month, index } of staticChartLabels) {
-              const x = padding.left + (index / (n - 1)) * plotW;
-              ctx.fillText(month, x, h - 3);
-            }
-          } else if (samplesRef.current.length >= 2) {
-            const padding = 2;
-            const plotW = w - padding * 2;
-            const plotH = h - padding * 2;
-            const tMin = now - chartWindowSeconds;
-            const tMax = now;
-            const tRange = tMax - tMin;
-            if (tRange >= 0.01) {
-              ctx.strokeStyle = token(chartToken);
-              ctx.lineWidth = 1;
-              ctx.beginPath();
-              for (let i = 0; i < samplesRef.current.length; i++) {
-                const s = samplesRef.current[i];
-                const x = padding + ((s.t - tMin) / tRange) * plotW;
-                const y = padding + plotH - (s.v * plotH);
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-              }
-              ctx.stroke();
-            }
           }
         }
       }
+
+      return currentRevealRef.current > REST || targetRevealRef.current > REST;
+    };
+
+    /** Match the backing store to the box; hand back a context to draw in. */
+    const fit = () => {
+      const canvas = chartRef.current;
+      const ctx = canvas?.getContext("2d");
+      if (!canvas || !ctx) return null;
+      // Match canvas resolution to display size to avoid stretched text
+      const cw = canvas.clientWidth || (size === "mini" ? 140 : 260);
+      const ch = canvas.clientHeight || 44;
+      if (canvas.width !== cw || canvas.height !== ch) {
+        canvas.width = cw;
+        canvas.height = ch;
+      }
+      return ctx;
+    };
+
+    /** The instrument at rest: ten seconds of no engagement, which is exactly
+     *  what the live trace decays to. Drawn rather than left blank, because §5
+     *  asks for a page that is static AND complete — a demo card with an empty
+     *  well in it would be neither. */
+    const drawRest = () => {
+      const ctx = fit();
+      const canvas = chartRef.current;
+      if (!ctx || !canvas) return;
+      const padding = 2;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = token(chartToken);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padding, canvas.height - padding);
+      ctx.lineTo(canvas.width - padding, canvas.height - padding);
+      ctx.stroke();
+    };
+
+    /** Back to rest, and off the frame clock until a pointer arrives. Values
+     *  are snapped to zero rather than left at the epsilon, so the parked frame
+     *  is byte-identical every time it is reached. */
+    const park = () => {
+      if (raf != null) cancelAnimationFrame(raf);
+      raf = null;
+      currentRevealRef.current = 0;
+      targetRevealRef.current = 0;
+      attentionStartRef.current = null;
+      lastAttentionUpdateRef.current = 0;
+      samplesRef.current = [];
+      setReveal(0);
+      setAttentionSeconds(0);
+      drawRest();
+    };
+
+    const loop = () => {
+      const engaged = compute();
+      if (still?.matches && !engaged) {
+        park();
+        return;
+      }
+      raf = requestAnimationFrame(loop);
+    };
+
+    const start = () => {
+      if (raf == null) raf = requestAnimationFrame(loop);
     };
 
     const onPointer = (e: PointerEvent) => {
       lastPointerRef.current = { x: e.clientX, y: e.clientY, active: true };
-      if (raf == null) loop();
+      start();
     };
 
-    const loop = () => {
-      compute();
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
+    if (still?.matches) drawRest();
+    else start();
 
     const opts = { capture: true } as AddEventListenerOptions;
-    if (!isStatic) {
-      window.addEventListener("pointermove", onPointer, opts);
-      window.addEventListener("pointerover", onPointer, opts);
-      window.addEventListener("pointerenter", onPointer, opts);
-      // Don't use pointerleave - it can cause engagement to drop when mouse is stationary.
-      // We keep last position and only update on pointermove.
-    }
+    window.addEventListener("pointermove", onPointer, opts);
+    window.addEventListener("pointerover", onPointer, opts);
+    window.addEventListener("pointerenter", onPointer, opts);
+    // Don't use pointerleave - it can cause engagement to drop when mouse is stationary.
+    // We keep last position and only update on pointermove.
+
+    // The preference can change mid-session, and a parked wall is the one case
+    // that cannot recover on its own: nothing else would restart its loop.
+    const onPref = () => {
+      if (!still?.matches) start();
+    };
+    still?.addEventListener("change", onPref);
+    // A parked canvas is redrawn by nothing else, so it owns the resize and
+    // theme-flip path that the running loop gets for free.
+    const offRedraw = onRedraw(() => {
+      if (raf == null) drawRest();
+    });
 
     return () => {
-      if (!isStatic) {
-        window.removeEventListener("pointermove", onPointer, opts);
-        window.removeEventListener("pointerover", onPointer, opts);
-        window.removeEventListener("pointerenter", onPointer, opts);
-      }
+      window.removeEventListener("pointermove", onPointer, opts);
+      window.removeEventListener("pointerover", onPointer, opts);
+      window.removeEventListener("pointerenter", onPointer, opts);
+      still?.removeEventListener("change", onPref);
+      offRedraw();
       if (raf != null) cancelAnimationFrame(raf);
     };
-  }, [chartToken, isStatic, staticChartValues, staticChartLabels, active]);
+  }, [chartToken, isStatic, size, active]);
 
   // Compute filters from reveal so:
   // far: 5% color minimum (not fully white)
@@ -332,7 +425,13 @@ export default function PaintingWall({
               data-testid={
                 isStatic ? "insight-card" : active ? "exhibit-card" : undefined
               }
-              className={`relative flex flex-col items-center rounded-[20px] bg-surface-inset-soft shadow-[0_40px_90px_var(--card-shadow)] ${
+              // No panel tint or drop shadow, matching EquipmentWall. A painting
+              // covers its own card, so the tint only ever showed as a rim
+              // around the art — invisible against flat #050505, an obvious
+              // mismatched border once the ambience and registers changed what
+              // sits behind it. The two walls must agree: they are the same
+              // module showing different subjects.
+              className={`relative flex flex-col items-center rounded-[20px] ${
                 isMini ? "w-[260px] p-2 rounded-[12px] md:w-[280px]" : "p-5"
               }`}
             >

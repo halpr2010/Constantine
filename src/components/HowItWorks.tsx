@@ -3,6 +3,7 @@
 import Image from "next/image";
 import PaintingWall from "@/components/MonaLisaWall";
 import EquipmentWall from "@/components/EquipmentWall";
+import Reveal from "@/components/Reveal";
 import { useVertical } from "@/components/VerticalContext";
 
 type Step = {
@@ -173,37 +174,74 @@ export default function HowItWorks() {
   const steps = isGym ? GYM_STEPS : MUSEUM_STEPS;
 
   return (
-    <section id="how" className="border-t border-line-hairline px-6 pt-12 pb-24">
-      <div className="mx-auto max-w-6xl">
-        <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
-          How it Works…
-        </h2>
-        <p className="mt-4 max-w-2xl text-fg-secondary">
-          {isGym ? (
-            <>
-              From the CCTV you already own to equipment-level behavioural insight:
-              <br />
-              integrate, calibrate, and measure how members use the gym floor.
-            </>
-          ) : (
-            <>
-              From a camera coverage survey to artwork-level engagement insights:
-              <br />
-              Integrate, calibrate, measure, and understand visitor attention in
-              real-world space.
-            </>
-          )}
-        </p>
+    <section
+      id="how"
+      data-ground="technical"
+      className="section-band relative px-6"
+    >
+      <div className="relative mx-auto max-w-6xl">
+        <Reveal grammar="focus">
+          <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
+            How it Works…
+          </h2>
+        </Reveal>
+        <Reveal grammar="ghost" lag={0.16} className="mt-4 max-w-2xl">
+          <p className="text-fg-secondary">
+            {isGym ? (
+              <>
+                From the CCTV you already own to equipment-level behavioural insight:
+                <br />
+                integrate, calibrate, and measure how members use the gym floor.
+              </>
+            ) : (
+              <>
+                From a camera coverage survey to artwork-level engagement insights:
+                <br />
+                Integrate, calibrate, measure, and understand visitor attention in
+                real-world space.
+              </>
+            )}
+          </p>
+        </Reveal>
 
-        <div className="mt-12 space-y-16">
-          {steps.map((step) => (
-            <div
+        {/* The sequence is the one place on the page where the argument is
+            literally ordered, so it gets the one continuous element: a rule
+            threading all four steps that inks downward as the block passes
+            through the viewport, with each step arriving off it. This is the
+            "flowing rather than segmented" device — a reader sees how far
+            through Integrate → Calibrate → Measure → Insight they are without
+            being told. */}
+        <div className="relative mt-12">
+          {/* The rule rides the container's own left gutter rather than taking
+              a grid column: the Insight step's card rail already overflows a
+              390 viewport, and buying 26px of layout for the spine would push
+              that leak further. */}
+          <div
+            aria-hidden
+            data-reveal="spine"
+            data-reveal-mode="span"
+            className="pointer-events-none absolute -left-3 bottom-2 top-2 w-px md:-left-6"
+          />
+
+          <div className="space-y-16">
+          {steps.map((step, i) => (
+            <Reveal
               key={step.n + step.title}
-              className="flex flex-col gap-6 rounded-xl border border-line-card bg-surface-card p-6 md:flex-row md:items-center md:gap-8 md:p-8"
+              grammar="advance"
+              lag={0.06 * i}
             >
+            {/* The card is the sequence device and every step gets the same
+                one. The register used to sit HERE when a step carried a demo,
+                and only step 4 does, so three light bordered cards were
+                followed by a borderless black slab at the same radius: the
+                spine threaded three cards and a different component. The
+                register belongs to the demo INSIDE the card — a nested
+                product-register stage, the same rule PrivacyStage, FloorLedger
+                and the Outputs beats already follow. */}
+            <div className="flex flex-col gap-6 rounded-xl border border-line-card bg-surface-card p-6 md:flex-row md:items-center md:gap-8 md:p-8">
               <div className="flex-1">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-xl font-semibold text-instrument-fg">
+                  <span className="text-xl font-semibold text-fg-secondary">
                     {step.n}
                   </span>
                   <h3 className="text-xl font-semibold">{step.title}</h3>
@@ -218,14 +256,22 @@ export default function HowItWorks() {
                 {step.sub && (
                   <p className="mt-2 text-sm text-fg-muted">{step.sub}</p>
                 )}
+                {/* Nested, so a step is still resolving after its own heading
+                    has landed: the ticks arrive under a title that is already
+                    sharp, which is the beat the founder described as features
+                    "appearing in turn". --r does not inherit, so this reads its
+                    own position rather than the card's. */}
                 <ul className="mt-4 space-y-2">
-                  {step.items.map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-start gap-2 text-sm text-fg-muted-list"
-                    >
-                      <span className="mt-0.5 shrink-0 text-accent-positive">✓</span>
-                      {item}
+                  {step.items.map((item, j) => (
+                    <li key={item}>
+                      <Reveal
+                        grammar="ghost"
+                        lag={0.1 * j}
+                        className="flex items-start gap-2 text-sm text-fg-muted-list"
+                      >
+                        <span className="mt-0.5 shrink-0 text-accent-positive">✓</span>
+                        {item}
+                      </Reveal>
                     </li>
                   ))}
                 </ul>
@@ -235,7 +281,10 @@ export default function HowItWorks() {
               </div>
 
               {step.paintings ? (
-                <div className="flex shrink-0 flex-row flex-nowrap items-start gap-4 md:gap-6">
+                <div
+                  data-register="product"
+                  className="flex shrink-0 flex-row flex-nowrap items-start gap-4 overflow-hidden rounded-lg border border-line-card p-3 md:gap-6"
+                >
                   <div className="w-[280px] shrink-0 md:w-[300px]">
                     <div className="h-[440px] w-full">
                       <PaintingWall
@@ -277,7 +326,10 @@ export default function HowItWorks() {
                   </div>
                 </div>
               ) : step.equipment ? (
-                <div className="flex shrink-0 flex-row flex-nowrap items-start gap-4 md:gap-6">
+                <div
+                  data-register="product"
+                  className="flex shrink-0 flex-row flex-nowrap items-start gap-4 overflow-hidden rounded-lg border border-line-card p-3 md:gap-6"
+                >
                   <div className="w-[280px] shrink-0 md:w-[300px]">
                     <div className="h-[440px] w-full">
                       <EquipmentWall
@@ -331,7 +383,9 @@ export default function HowItWorks() {
                 )
               )}
             </div>
+            </Reveal>
           ))}
+          </div>
         </div>
       </div>
     </section>

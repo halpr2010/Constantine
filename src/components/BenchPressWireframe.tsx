@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { stillQuery } from "@/lib/motion";
 import { useEffect, useRef, useState } from "react";
 
 /**
@@ -56,7 +57,25 @@ export default function BenchPressWireframe({ util }: { util: number }) {
     utilRef.current = util;
   }, [util]);
 
+  // §5 SCOPE. The rep is a CYCLE — it repeats on its own clock whether or not
+  // anybody is there, and the only reason an idle bench looks still is that the
+  // whole swing is multiplied by utilisation. Under prefers-reduced-motion the
+  // cycle is dropped and the bar's POSITION carries the metric instead: racked
+  // when the machine is unused, lifting clear of the hooks as utilisation
+  // rises. The graphic still answers the pointer (§3 keeps that), it just
+  // stops running a loop to do it.
+  const [still, setStill] = useState(false);
   useEffect(() => {
+    const mq = stillQuery();
+    if (!mq) return;
+    const sync = () => setStill(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
+    if (still) return;
     let raf = 0;
     let last = performance.now();
 
@@ -107,7 +126,11 @@ export default function BenchPressWireframe({ util }: { util: number }) {
 
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [still]);
+
+  // Still: the bar is placed straight from utilisation, in render rather than
+  // through state, so there is no frame clock in this component at all.
+  const barDy = still ? -util * LIFT_UP_PCT : dy;
 
   return (
     <div
@@ -138,7 +161,7 @@ export default function BenchPressWireframe({ util }: { util: number }) {
           height: "auto",
           left: `${BARBELL_LEFT_PCT}%`,
           top: `${BARBELL_REST_TOP_PCT}%`,
-          transform: `translateY(${dy}%)`,
+          transform: `translateY(${barDy}%)`,
           pointerEvents: "none",
         }}
       />

@@ -195,12 +195,103 @@ test.describe("§5 design floors (v2 constitution)", () => {
       await hashOf(),
       "idle canvas animation must freeze under prefers-reduced-motion"
     ).toBe(first);
+    // One canvas in one card is a narrow window on a page that also carries an
+    // ambient field, a venue wireframe and a looping clip. Photograph the whole
+    // viewport twice instead, at the block where the atmosphere lives, touching
+    // nothing in between: anything on screen that is still running its own
+    // clock shows up as a changed frame.
+    // Element screenshots are deliberately not used for this — Playwright
+    // scrolls an element into view first, which moves the page between the two
+    // samples and reports every scroll-positioned drawing as moving.
+    await page.evaluate(() => {
+      document.querySelector("#venue")?.scrollIntoView();
+    });
+    await page.waitForTimeout(800);
+    const frame = async () =>
+      createHash("sha256").update(await page.screenshot()).digest("hex");
+    const before = await frame();
+    await page.waitForTimeout(500);
+    expect(
+      await frame(),
+      "the ambient field and the venue wireframe must be still under prefers-reduced-motion"
+    ).toBe(before);
     // Scrollytelling degrades: key content reachable by plain scroll
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     for (const t of [/Integrate/i, /no facial recognition/i]) {
       expect(await page.getByText(t).count()).toBeGreaterThan(0);
     }
     await ctx.close();
+  });
+
+  test("reduced motion: the demos still answer the pointer", async ({ browser }) => {
+    // The other half of the §5 SCOPE rule, and the reason the test above cannot
+    // stand alone: the cheapest way to pass a stillness check is to stop the
+    // demos, which is a §3 P1/P2 failure rather than a fix. Ambient motion
+    // freezes; user-initiated response does not.
+    const ctx = await browser.newContext({ reducedMotion: "reduce" });
+    const page = await ctx.newPage();
+    await page.goto(BASE, { waitUntil: "networkidle" });
+
+    const card = page.getByTestId("exhibit-card").first();
+    expect(await attentionValue(card)).toBe(0); // idle: nothing accruing
+    await card.hover();
+    await page.waitForTimeout(1500);
+    expect(
+      await attentionValue(card),
+      "hover must still drive the attention timer under prefers-reduced-motion"
+    ).toBeGreaterThan(0.5);
+    const pct = parseFloat(
+      (await card.getByTestId("engagement-value").innerText()).replace(/[^\d.]/g, "")
+    );
+    expect(pct).toBeGreaterThan(0);
+
+    await page.getByTestId("hero-tab-gyms").click();
+    const gymCard = page.getByTestId("exhibit-card").first();
+    await gymCard.hover();
+    await page.waitForTimeout(1500);
+    expect(
+      await attentionValue(gymCard),
+      "tap/hover must still drive workout time under prefers-reduced-motion"
+    ).toBeGreaterThan(0.5);
+    await ctx.close();
+  });
+
+  test("ambient field moves on its own, with no cursor input", async ({ page }) => {
+    // The floor that was missing. Two candidates satisfied every stated §5
+    // constraint and were rejected as "completely static": one had no
+    // autonomous animation at all, the other drifted too slowly to see. The
+    // gate could not tell either from a working field, so it passed both.
+    //
+    // Sample the field twice, 900ms apart, touching nothing. A field that is
+    // genuinely drifting changes; one that only answers the cursor does not.
+    await page.goto(BASE, { waitUntil: "networkidle" });
+    const field = page.getByTestId("ambient-field").first();
+    await expect(field).toBeAttached();
+    const hashOf = async () =>
+      createHash("sha256").update(await field.screenshot()).digest("hex");
+    const first = await hashOf();
+    await page.waitForTimeout(900);
+    expect(
+      await hashOf(),
+      "ambient field is static: §5 requires continuous autonomous drift, " +
+        "with cursor reactivity modulating it rather than replacing it"
+    ).not.toBe(first);
+  });
+
+  test("ambient field is visible, not imperceptible", async ({ page }) => {
+    // "Low intensity" produced two fields indistinguishable from each other
+    // and from no field at all. §5 now requires the field to be clearly
+    // present as atmosphere, so assert it actually paints a spread of tones
+    // rather than one flat ground colour.
+    await page.goto(BASE, { waitUntil: "networkidle" });
+    const field = page.getByTestId("ambient-field").first();
+    await expect(field).toBeAttached();
+    const spread = await field.screenshot().then((buf) => {
+      // Cheap proxy for "there is a gradient here": distinct byte values
+      // across the PNG. A flat fill compresses to very few.
+      return new Set(buf).size;
+    });
+    expect(spread, "ambient field renders as a flat fill").toBeGreaterThan(64);
   });
 
   test("touch: demos start via tap (hover is not the only path)", async ({ browser }) => {

@@ -1,0 +1,315 @@
+# Experiments ledger
+
+One row per candidate. `next_experiment` from each verdict seeds the next
+cycle — this file is the only channel by which the loop learns anything, so a
+rejected candidate with a sharp lesson is worth more than a vague promotion.
+
+Written by `scripts/loop.sh`. Add human verdicts by hand; mark them **(human)**.
+
+## Baseline — cycle 0
+
+Recorded at `best` = `d5fa7cb` + registers/palette-floor.
+
+| Measure | State |
+|---|---|
+| Playwright | 39 tests, 4 red (all §5 features not yet built) |
+| Copy violations | 9 (`X, not Y`), absolute ban, ratcheted |
+| Palettes live | 4 — dark, light-canvas, dark-canvas, instrument; none pinned |
+| Registers | canvas / product / technical, full-token remap, floor-tested |
+
+Known red, and deliberately so:
+
+- `scroll progress bar exists, starts empty, completes at page end`
+- `viewport-fit: tagged sections compose within one screen (desktop)`
+- `viewport-fit: tagged sections compose within one screen (mobile)`
+- `reduced motion: page is static and complete`
+
+## Cycles
+
+| # | Candidate | Floors | D1 | D2 | D3 | D4 | D5 | Verdict | Lesson |
+|---|---|---|---|---|---|---|---|---|---|
+| 20260907-184421-1 | cand-20260907-184421-1 | pass | tie | cand | cand | tie | cand | promote | The graduations hang downward out of the nav rail into the content beneath, and at 390w that lands them on top of type the sticky nav already clips: in museums-privacy-390 the ticks strike through the half-hidden 'Privacy by design' H2, and in gyms-use-390 they cross the 'behaviour into decisions inside a club, across' body line. Fix both halves in one change — give every anchored section a scroll-margin-top equal to the nav height so its heading clears the rail at 390, and draw the graduations upward into the rail's own band so the instrument never overlays content. |
+
+### Cycle 20260907-184421 — post-mortem (human verdict overrides critic)
+
+**(human)** REJECTED the graduated-rule scroll bar. Critic said promote on
+D2/D3/D5; founder rejected on sight. The critic was not wrong by its own
+lights — it was reasoning without the reference.
+
+Root cause, three layers, all upstream of the builder:
+
+1. `DESIGN.md` §5 described the Slingshot bar as "a measurement instrument in
+   the site's data-overlay idiom, not a generic loading strip". The reference
+   shows a plain hairline. The spec editorialised a reference into a brief.
+   (The gloss was itself an "X, not Y" construction, in the section that bans
+   them.)
+2. The cycle's task prompt repeated that gloss, hardening it.
+3. **Nothing in the harness ever opened `design-refs/`.** Neither `CLAUDE.md`
+   nor `scripts/critic.md` mentioned the directory, so the builder never saw
+   `Slingshot-Scroll-Bar-1.png` and the critic praised the result for exactly
+   the property that was wrong.
+
+Layer 3 is the real defect: it would have produced the same drift for Claryo,
+Pocket and Playvision. Fixed by adding a References section to both files,
+with the rule that where prose and image disagree, the image wins.
+
+Rebuilt as one hairline on the header's bottom edge. Floors still pass and the
+390w graduation overlap the critic found is gone with the graduations.
+
+**Lesson for later cycles:** a candidate can be faithful to the spec and still
+be wrong, when the spec paraphrases a picture. Reference entries describe the
+reference; interpretation belongs in the candidate.
+| 20260907-193223-1 | cand-20260907-193223-1 | pass | cand | cand | tie | tie | cand | promote | Give the field visible overlap structure in the two palettes where it currently reads as one flat radial vignette rather than crossing fields: in instrument and light-canvas the hero shows a single centre-weighted wash, while dark-canvas shows two distinguishable lobes and is much closer to Slingshot-CTA-Title-Page.png. Try three or four fields per palette with deliberately offset centres pushed toward the frame edges so at least two overlaps fall inside the 1440x900 hero band, and hold the per-field alpha where it is so the intensity ceiling does not move; judge success by whether the instrument hero shows a hue shift where two fields cross rather than a smooth falloff from one centre. |
+| 20260907-193223-2 | cand-20260907-193223-2 | pass | tie | cand | cand | tie | cand | promote | Close viewport-fit at 390 by rebuilding the hero demo pair as a single paged card. The hero section captures 390x1705 in BOTH best and candidate — 2.0x the 844px viewport — because the two full-size demo cards stack vertically below the copy block, which is exactly what the red mobile viewport-fit floor is measuring; the second card (Stairmaster / Water Lily Pond) sits entirely below the fold with roughly 250px of empty gap above it. Make the pair one card at <=430px tall with a swipe or dot pager between the two subjects, so heading, copy, CTA and one live demo compose within 844px. Keep both demos mounted and interactive so the timers still run on tap; hiding one to save height would breach P1/P2. |
+| 20260907-202212-1 | cand-20260907-202212-1 | pass | cand | best | tie | best | tie | reject | Keep the scroll-margin-top offset and the viewport-section tagging exactly as built — that part is right and is the whole D1 win — then redo the 390 fit without horizontal rails: make use-cases and value a 2-up compact grid (or 4 tighter full-width cards with the body copy cut to two lines) so every card stays on screen, restore the privacy chips to full-width rows, and give the privacy panel back enough bottom padding that 'because it does not exist.' is not sliced. Then extend data-testid="viewport-section" to the how-it-works section, which is 2856px at 390 and 1960px at 1440 and is the scroll-step section the rule was written for; splitting its four steps into a pinned one-step-at-a-time sequence is the real work the floor is asking for. |
+| 20260907-204637-1 | cand-20260907-204637-1 | pass | tie | tie | tie | tie | tie | reject | Fix the sticky-nav anchor collision, which is the one defect visible in these sheets and is worth a genuine D1+D2 win rather than another invisible one. At 390w in all four palettes and both verticals, jumping to an anchored section leaves its heading under the header: 'Privacy by design' is struck through by the nav bar in privacy-390 (gyms and museums), 'Fitness Space Use' plus its first copy line is struck through in gyms-use-390, and 'What you can now answer' is hidden entirely in museums-value-390 so the section opens on a bare 'THE VALUE' eyebrow. Give every anchored section a scroll-margin-top equal to the header height (measure it, do not guess — the nav is ~64px at 390w and the hairline sits on its bottom edge), tag those same sections data-testid="viewport-section", and trim the section's vertical rhythm until heading, copy and visual compose inside 390x844 and 1440x900. That closes both red viewport-fit floors and, unlike this candidate, the improvement will actually appear in the capture the critic scores. |
+| 20260907-210542-1 | cand-20260907-210542-1 | FAIL | – | – | – | – | – | discarded |     ✗ gimmicks.spec.ts › P1 — Museums hero demo › cards track independently |
+| 20260907-211305-1 | cand-20260907-211305-1 | pass | tie | cand | tie | cand | cand | promote | At 390w the sticky header bisects section headings when a section is scrolled to: in privacy-museums-390 "Privacy by design" is sliced through its x-height by the header in all four palettes, in both best and candidate, and value-390 puts the header block between the eyebrow and the first card. Give every anchored section a scroll-margin-top equal to the header height (plus a few px), and verify by capturing #privacy and #value at 390x844 in dark and light-canvas — the heading must clear the header entirely. Secondary, fold into the same candidate: the dark palette's product register has no surface separation from the page ground, so the new integrations panel loses its edge, its connector hairlines and its hub chip; raise the product-register surface token in dark so the panel reads as a distinct field the way it does in dark-canvas. |
+| 20260907-213539-1 | cand-20260907-213539-1 | pass | cand | cand | cand | cand | tie | promote | The Use Cases block is now the flattest thing on the page: at 1440w "Museum & Gallery Use Cases" is three text-only cards about 90px tall with no visual at all, sitting directly above an Outputs section that gives every beat a ghost-silhouette panel with a floating UI fragment. Rebuild it on the same module — keep the three category cards, but give the section one panel showing the fragment that category would actually produce (a floor plan with zone counts for Museums & Galleries, a run-of-show timeline for Temporary Exhibitions, an arrivals curve for Cultural Venues) — and reuse GhostScene rather than authoring new artwork, since it is static SVG and already reads correctly in all four palettes. |
+| 20260907-220250-1 | cand-20260907-220250-1 | pass | cand | cand | tie | tie | cand | promote | Close the two viewport-fit reds by tagging the right unit: museums-how at 390 is 3113px tall because all four numbered steps live in one section, so tagging the section can never fit 844px — tag each Integrate/Calibrate/Measure/Insight step as its own data-testid="viewport-section" so the unit that must compose is one step's heading + copy + visual, and cap each step's visual so the tallest (Insight, which carries two ranked cards side by side) still clears 844px at 390 and 900px at 1440. |
+| 20260907-224009-1 | cand-20260907-224009-1 | pass | cand | cand | tie | cand | cand | promote | Adopt viewport-fit on #how, which §4b names as the section the rule was written for: it is 3113px tall at 390 and it also leaks horizontally — the Insight step's `w-[280px] shrink-0` card rail places its second card at x=345..625, so document.scrollWidth is 625 against a 390 viewport and the whole page scrolls sideways. Rebuild step 4 as a single-card-per-screen rail clipped inside its own overflow-x container, then tag each of the four steps data-testid="viewport-section" so heading, copy and visual land together at both widths. |
+
+### Overnight 07 Sep 2026 — two harness defects, both found by disbelieving a result
+
+**False negative discarded good work.** Task 4 (copy backlog) was gated FAIL
+with nine phantom failures, including every protected demo test and console
+errors — from a commit that touched only copy strings. `loop.sh` leaves a
+server running after its capture step, and `playwright.config.ts` sets
+`reuseExistingServer: true`, so the next candidate's suite ran against the
+PREVIOUS candidate's build. `floors.sh` now kills any existing server, starts
+one on the build it just made, and refuses to run unless the served CSS chunk
+matches the chunk on disk. Re-gated: PASS, with all nine violations cleared.
+
+The same failure mode could as easily produce a false PASS, which no one would
+have investigated.
+
+**The critic cannot see behavioural work.** Task 3 closed the reduced-motion
+floor and was REJECTED — correctly under §7 as written. All 96 palette captures
+were byte-identical, so D1-D5 were five ties, and D6 is defined as pass/fail
+rather than comparative. A candidate whose entire value is invisible in a
+screenshot can therefore never win. That rules out accessibility, performance
+and behaviour — a large share of the remaining backlog. §7 needs a route for
+work that is correct and invisible; flagged for adjudication, not fixed
+unilaterally.
+| 20260908-075053-1 | cand-20260908-075053-1 | FAIL | – | – | – | – | – | discarded |     ✗ gimmicks.spec.ts › P1 — Museums hero demo › hover starts the attention timer |
+| 20260908-075053-2 | cand-20260908-075053-2 | pass | tie | tie | tie | tie | tie | reject | Make the ambient field reviewable before building more of it. scripts/screenshot.mjs, strip.mjs and review.sh all mask page.locator("canvas") to #1b1b1f, and AmbientField mounts a canvas at absolute inset-0 filling the hero, so the mask box covers the nav, headline, CTA, vertical switcher and both demos: all eight candidate hero captures are a flat rectangle and the critic has zero evidence about the site's most important asset. Narrow the mask to canvas:not([data-ambient-canvas]) (tagging AmbientField's canvas) and capture the hero with prefers-reduced-motion emulated, where DESIGN.md §4b says the field draws one composed pose and stops — that yields a stable byte-comparable frame showing the field and the demos together. Until that lands, every ambient-field candidate is unpromotable regardless of quality. Note also that Slingshot-CTA-Title-Page.png shows the field as a bounded band with the nav bar sitting above it in solid black and a hard edge at the section end, not running under the header as inset-0 implies. |
+| 20260908-105409-1 | cand-20260908-105409-1 | pass | cand | cand | tie | tie | cand | promote | Fix the dark-palette seam, which is the weakest execution of the thing just built: in strips/A-dark.png the four #050505-to-#ffffff joins ramp through neutral grey and read as fog banks, while the same seam in instrument and dark-canvas carries teal and purple and reads as a lit boundary. Give .section-seam a tinted midpoint in the dark theme — ramp --seam-a to --seam-b through the product register's own tint via color-mix rather than straight through neutral — and cut --seam-h at 390 (currently clamp(7rem,12vw,11rem), which spends ~200px before any content in problem-museums-390 and value-gyms-390) so mobile sections start sooner. |
+| 20260908-105409-2 | cand-20260908-105409-2 | pass | tie | cand | cand | tie | cand | promote | Make the RegisterSeam length and bloom a function of the luminance distance between the two registers it joins, not a fixed 112/176px. Compare candidate/strips/B-light-canvas.png against A-dark.png and D-instrument.png: where the two grounds are close in luminance the dissolve is invisible and excellent, but the four black-to-white seams in dark and instrument spend their middle in flat mid-grey and read as fog bands. Try halving the seam to ~88px desktop when the two grounds differ by more than roughly half the luminance range, and raising the product-register bloom carried across the middle so the crossover is tinted atmosphere rather than neutral grey — then re-shoot the strips and check the value-to-privacy and privacy-to-use seams in instrument specifically, which are the two worst. |
+| 20260908-120744-1 | cand-20260908-120744-1 | pass | cand | cand | cand | cand | cand | promote | At 390 the Outputs figures are effectively invisible: the near-opaque 'Live zone feed' / 'Attention this week' / 'Monday brief' card spans the full panel width and sits directly over the body, so only the crown of the head, a sliver of one forearm and the shins escape it — the entire payload of this change is lost at one of the two judged widths. At 390, inset the card to ~85% width, drop its opacity, and offset the figure so a whole body reads beside rather than behind it. Then give GhostFigure an action pose per row (reaching at a wall, crouching, walking through a doorway) with resolved hands and feet instead of the one frontal arms-at-sides mannequin repeated six times, which is the largest remaining distance to the PlayVision 10/10. |
+| 20260908-130504-1 | cand-20260908-130504-1 | pass | tie | best | tie | tie | tie | reject | Fix the capture harness before spending another candidate on this feature — it wrote 6 frames of 96, no compare sheets and no motion strip, so the loop just judged an animation feature entirely from stills and three of four live palettes were never rendered; verify `shots/candidate/motion/drift.png` and `scroll.png` exist and that all four palettes × both widths × both verticals are captured, and if the entry view is now a full-height section, confirm the capture's per-view scroll offsets were not shifted by it (that shift is the likely cause of the truncated run, and it also explains why the 'hero' view now frames the gate rather than the demos). Then, on the design: raise the entry view's label contrast to the working fg token so the two verticals read as the only actionable thing on the screen, move the question/track pair from the vertical centre to roughly the upper third as in `Clary_Selector.png` frames 1–2, and add the small saturated accent dot beside the hovered label — the lift plus dot is what makes the reference's track feel live, and the current track reads as disabled chrome without it. |
+| 20260908-130504-2 | cand-20260908-130504-2 | pass | tie | tie | best | cand | cand | reject | Keep the entry view exactly as structured — in-flow section above the hero, one pill shared with the header, choice remembered, nothing gated — but stop the first screen being empty of product: bind the pill hover to a live, muted preview of that vertical's demo on the ground behind the question (MonaLisaWall for Museums & Galleries, BenchPressWireframe for Gyms, at low opacity and without the metric readouts), so 'hover colourises the pill' and 'the demos are the protagonist' are satisfied by the same gesture and the drift then resolves into the demo already running rather than starting it cold. Ship it with a full capture — four palettes, 1440 and 390, and motion/drift.png + motion/scroll.png — because the drift to top right and the clean fade-in are the two assertions the Claryo row is scored on and this cycle produced no frame of either. |
+| 20260908-141016-1 | cand-20260908-141016-1 | pass | cand | cand | tie | tie | cand | promote | Move the ground change BEHIND content instead of into an empty band: keep the section's heading (and, in HowItWorks, the step imagery) on screen while the seam ramp runs under it, the way Claryo holds Plan/Monitor/Orchestrate through the black↔white swap. Target the two frames in shots/candidate/motion/scroll.png that are currently ~60% bare gradient (privacy and use-cases entries) and reclaim most of the 1153px the page grew — success is those frames carrying live content at every scroll position while the 1px-column edge count stays at zero. Second, smaller: light-canvas's technical ground is 239 against a 255 canvas, so nothing visibly changes there; give it a real ground per §5's black technical register so that palette gets the alternation the other three now have. |
+| 20260908-141016-2 | cand-20260908-141016-2 | pass | tie | cand | cand | tie | cand | promote | Give light-canvas a real second ground. Its register pair is currently 239 and 255, so the four seams that read as black->white in dark, dark-canvas and instrument are a 6% step there and the 32vh band is an empty gutter in the one palette that most needs it — probe the strip at the #value join (candidate/strips/B-light-canvas.png, y≈4800-5100) to confirm before and after. Retint light-canvas's alternate ground token to something at least 40 grey levels from its base (its own deep ink, not black) and re-run the same profile: the seam should stay monotonic with no row-to-row step above ~3, and every crossing should surface something in all four palettes rather than three. |
+| 20260908-152934-1 | cand-20260908-152934-1 | pass | cand | cand | cand | cand | cand | promote | Close the join between the question and the drift: keep 'Are you a...' on screen, faded to a dim value, for the whole duration of the tab's travel and fade it out only once the tab has landed in the header — Clary_Selector frame 3 shows the greyed question still standing as the tab reaches the corner, whereas candidate select.png frame 7 has heading and subline already gone before the tab has left centre, which inserts a blank beat and is the single largest remaining distance from the 10/10. While there, route the travel path clear of the hero demo (frame 8 flies the tab across the Mona Lisa card) and consider dropping the 'Choose one and every section below...' subline, since the reference's screen holds only the question and the pills. Separately, the 390 header dock needs its backdrop extended behind the second row so the pill stops overhanging the header's hairline onto the first card — worst in light-canvas, where the header/section boundary is nearly invisible. |
+| 20260908-152934-2 | cand-20260908-152934-2 | pass | cand | cand | cand | cand | cand | promote | Give the sticky header an opaque ground at 390. The header is transparent and floats over content in both best and candidate; best only got away with it because the tall wordmark block happened to cover what passed underneath. The candidate's shorter chip row does not, so landing on #value at 390 slices 'What you can now answer' horizontally through the word 'answer' in all four palettes (shots/candidate/light-canvas/museums-value-390.png is the clearest). Fix it with a token-driven header background plus scroll-margin-top on the section anchors equal to the header height, not by padding the sections — and while in there, raise the docked pill's contrast against its track in light-canvas, where white-on-white makes the selected vertical the hardest state to read on the site. |
+| 20260908-173122-1 | cand-20260908-173122-1 | FAIL | – | – | – | – | – | discarded |     ✗ gimmicks.spec.ts › P2 — Gyms hero demo › equipment hover drives the timer |
+| 20260908-173122-2 | cand-20260908-173122-2 | pass | tie | cand | cand | cand | cand | promote | Make the venue object the subject of its frame rather than a diagram inside it. At 1440 the wireframe is ~360x220px in a 3060px-tall section, against a reference polygon that fills ~70% of viewport height — scale it to roughly 60-70vh, centre it in the pinned view, and cut the section's pinned length so each augmentation step lands within one screen instead of scrolling through empty field between them. At 390 give it a portrait aspect and move the four step labels beside the drawing as they augment, so the mobile section stops resolving into a stacked text list. Second, smaller: the opaque full-width header lays a visible band across the field in light-canvas — try a translucent/backdrop-blurred header over the atmosphere block so the one remaining edge in an otherwise unbounded field disappears. |
+| 20260908-185019-1 | cand-20260908-185019-1 | pass | cand | tie | cand | cand | tie | promote | Take the step out of its card. In the how-it-works pinned frame, drop the bordered fixed-height container and compose each step directly on the technical ground the way Claryo_Scroll_Functionality_2.png frames 6-11 do: the step verb alone at display scale (same size as 'How it Works…', no '1.' numeral — the rail already carries position), three lines of prose and the check list beneath it in the left half, and the step's room diagram enlarged to fill the right half of the viewport. That removes the dead space on step 1 (each step then sizes itself), fixes the A·dark case where the card edge is nearly invisible, and closes the largest remaining distance to the 10/10. Do it at 1440w only and leave the 390w stack alone. |
+| 20260908-185019-2 | cand-20260908-185019-2 | pass | cand | cand | cand | tie | tie | promote | The pinned frame now exists and is the right vessel; fill it the way the reference does. In HoldStage, drop the card chrome from the held step and give each step the reference composition: the single word (Integrate / Calibrate / Measure / Insight) set in Inter Display at hero scale on the left with three lines of copy under it, the room visual at roughly half the viewport width on the right, and the tick list demoted or folded into the copy so the step fits one 1440x900 frame without a container. §5's single-word display-header rule already specifies this and the current '1. Integrate' heading inside a rounded card does not meet it. Then, and only then, put the ambience behind that same frame — Claryo_Ambiance_and_Scroll_Functionality_3.png is a picture of this exact sequence with purple blooms on pure black underneath and a white venue wireframe augmenting per step — because the pin is the one place on the site where a per-step augmenting object has somewhere to live. First fix the harness: scripts/settle.mjs must drive drift.png past the selector into the hero, or the two ambient floors can never be judged from the captures however good the field is. |
+| 20260908-200412-1 | cand-20260908-200412-1 | pass | cand | cand | tie | cand | cand | promote | Make the dashes actually travel, and prove it. shots/candidate/motion/flow.png resolves to only two distinct images across six 250ms samples, differing by 29 pixels confined to the top-left connector — about 1px of travel over 1.25s, roughly an order of magnitude short of the 1.05s dash period the capture comment assumes. Two candidate causes, and the next cycle should separate them: (a) the animation genuinely advances that slowly, in which case set the dash period so one dash crosses a whole connector in ~1.5s and widen the gap so an individual dash is trackable frame to frame; (b) Playwright's element-level stack.screenshot() is stalling the compositor, in which case re-shoot flow.png as full-page page.screenshot() calls with the scroll position held and crop afterwards. Target to assert: adjacent 250ms frames should differ by at least ~8px of dash displacement on every connector, not one. While there, give the 390 layout something better than 20px connector stubs — either route the spokes around the 2x2 grid so a dash has somewhere to travel, or drop to a single vertical spine with the four cards hanging off it. |
+| 20260908-200412-2 | cand-20260908-200412-2 | pass | cand | cand | cand | cand | cand | promote | Build the ambient field, and fix the strip that is meant to prove it in the same commit. motion/drift.png is six frames over six seconds of the ENTRY screen — pure flat black with 'Are you a…' and two pills, byte-identical between best and candidate — so the one capture the rubric points at for self-motion samples the single screen that is black by design and can never show a bloom. Change scripts/motion-strip.mjs to select a vertical first and capture drift on the post-selection hero (product/atmosphere register), then build the field there per Claryo_Ambiance_and_Scroll_Functionality_3.png: large soft purple blooms on pure black, drifting on their own clock with no cursor input, and no edge anywhere in frame where the field starts or stops. Size the blooms so consecutive drift frames differ visibly to the eye, not just to a pixel diff — the last two attempts were rejected as invisible, and with the strip pointed at the entry screen a third would have been unfalsifiable. |
+| 20260908-213012-1 | cand-20260908-213012-1 | FAIL | – | – | – | – | – | discarded | floors: FAIL — build broken |
+### Cycle 20260909-142443 — the reduced-motion floor, closed
+
+The last standing red from the opening backlog. What was moving on an untouched
+page was not anything that looked animated: engagement was zero, the paintings
+were at rest, the numbers read 0.0. It was the TIME AXIS under the demo charts.
+Both walls draw a rolling ten-second window, and the window advances every frame
+whether or not anybody is there, so no two frames of an idle page were ever the
+same. Two smaller ones sat behind it: the Insight sparklines repainted an
+unchanging chart sixty times a second (their only reason to, it turned out, was
+that redrawing every frame is how they picked up a runtime theme flip), and the
+bench rep cycles on its own clock and only looks still when idle because the
+swing is multiplied by utilisation.
+
+Fixed by making the demo's clock the visitor's clock rather than by disabling
+anything: under the preference each wall starts its loop on a pointer and parks
+when engagement is back at rest, drawing its resting trace (the window flat at
+zero, which is what the live trace decays to) so the card is static AND
+complete. Hover still drives attention, utilisation and workout time, and there
+is now a floor asserting exactly that, because the cheapest way to pass a
+stillness check is to stop the demos and that is a §3 P1/P2 failure.
+
+Measured with the new `scripts/rm-audit.mjs`, which walks the whole document
+rather than one canvas: at 1440 and 390, on both verticals, every viewport frame
+is byte-identical 600ms later and the page runs ZERO rAF callbacks while idle.
+The ambient field and the venue wireframe were already honouring the preference
+and are now covered by the floor as well as by the audit.
+
+Note for whoever writes the next audit: do NOT use element screenshots for
+this. Playwright scrolls an element into view before shooting it, which moves
+the page between the two samples and reports every scroll-positioned drawing as
+moving — the first version of this audit accused the ambient field and both
+Insight cards on that basis alone.
+
+| 20260909-134701-1 | cand-20260909-134701-1 | pass | cand | cand | tie | tie | cand | promote | Close the standing red: tests/reveal.spec.ts fails any <section> over 300 characters with no img/svg/canvas/video/figure/table/[data-visual] child, and PRIVACY is the loudest — museums-privacy-1440 and -390 show ~811 characters of prose under three guarantee pills with nothing to look at in all four palettes, which is the Slingshot 2/10 defect verbatim. Build the founder's ask there: anonymised GhostFigures reusing the volumetric idiom already in Outputs (Playvision_People_Movement.png is the 10/10), faces never resolving, with the no-tracking claim SHOWN — e.g. the figures carrying only zone/dwell numbers that detach and aggregate as they cross, so what leaves the frame is visibly a count and not a person — sized to compose within one viewport so the viewport-fit floor does not go red in exchange. Then walk the other over-300-char section the same test names and give it its own visual rather than a second copy of the figures. |
+| 20260909-142443-1 | cand-20260909-142443-1 | pass | tie | tie | tie | tie | tie | promote | Add a reduced-motion capture pass to the harness so this class of candidate is judgeable instead of taken on trust: shots/<side>/motion/reduced.png, six frames over six seconds with the context launched under prefers-reduced-motion: reduce, plus one full-page reduced strip per side. It should answer three things by eye that the test only asserts numerically — the ambient field and venue wireframe hold one identical frame, the wireframe is fully drawn rather than frozen mid-stroke-dashoffset, and every scroll reveal (including the checklist rows in step 1-3 of How it Works, which sit mid-fade in scroll.png frame 5) is at final opacity. Without it every future motion-preference candidate lands as five ties again. |
+| 20260909-210554-1 | cand-20260909-210554-1 | pass | cand | cand | tie | tie | cand | promote | Put imagery INTO the technical run. #how, #value, #privacy and #stack are now one unbroken white ground about half the document long, and neither 10/10 scroll reference ever holds a ground that long without something drawn in it — Claryo's black run carries white line-work that BUILDS (Claryo_Scroll_Functionality_2.png frames 1-2: one line becomes a full wireframe with square vertex handles) and its white run carries a stage picture per step. The machinery already exists: VenuePlan/VenueStage at #venue draw exactly that idiom by stroke-dashoffset. Try ONE technical object spanning the run, pinned behind the four sections in document coordinates the way AmbientField already is, augmenting once per section boundary (footprint at #how, zones at #value, sightlines at #privacy, movement at #stack) so the run reads as one argument advancing rather than four white slabs — and re-run scripts/coverage.mjs afterwards, since frame 3 (#venue, 52%, 305px band) is now the thinnest cell in the strip and the same object is what would fill it. |
+| 20260909-210554-2 | cand-20260909-210554-2 | pass | cand | cand | tie | tie | cand | promote | The hero -> #venue crossing is now the page's worst live band and the seam work never touched it: 281px content-free at y=1659-1940 in the A-dark full-page strip, IDENTICAL in best and candidate, sitting between the hero demo wall and 'The venue / Geometry' where the ambient field is at its dimmest. Every other ~300px band was either shortened or is the entry screen (573px, by design). Fix it the way Claryo Scroll 1 frame 4 does — let the incoming block compose inside the outgoing ground rather than after it: pull the 'The venue' eyebrow and 'Geometry' heading up ~200px so they begin fading in while the hero ground is still dissolving, or start the venue wireframe's first stroke inside that band so the object is already drawing when the visitor arrives. Then re-measure with the same left-margin column scan (longest content-free row run per palette strip); the target is no non-entry band over ~200px outside the pinned canvas stage. |
+
+### Cycle 20260909-210554, candidate 1 — the boundary budget
+
+Three measured defects from the flow review, plus the header hand-off it asked
+for. The lesson worth carrying is the one about MEASUREMENT: the reviewer's
+81/95/56/92/43/80/33/82/54 was read by eye off `scroll.png`, cost an afternoon,
+and could not be checked by the candidate acting on it. `scripts/coverage.mjs`
+now computes it. Building the instrument first is what set the target — and it
+also caught that the reviewer's frame numbers understate two frames, because a
+strip settles for 450ms and a reveal caught at 0.2 has no edges for the detector
+and none for the reader either.
+
+The definition matters as much as the number. A row counts as CARRYING if it
+holds high-frequency detail rather than if it differs from the page ground: a
+ground-difference test scores a lineless crossing as a screenful of content,
+which is the exact defect being measured. Validation was reproducing the
+reviewer's empty bands — 444 vs their 421 at 48%, 301 vs 299 at 72% — before
+changing anything.
+
+WHAT MOVED. Coverage 85/70/35/86/36/77/28/83/56 → 85/70/52/85/58/64/51/79/52;
+worst empty band 444px → 305px; minimum coverage 28% → 51%. The page is 1,300px
+shorter. The remaining 305px is the atmosphere block's own composition rather
+than a boundary — `#venue` is a pinned stage whose bottom third is empty by
+design and is founder-approved, so it was left alone.
+
+ONE NUMBER, NOT NINE CLASS LISTS. The fix the reviewer suggested was "halve the
+padding either side of a register boundary". Halving it per-section leaves the
+next candidate free to re-inflate one quietly, and it also misses the boundaries
+that are NOT register crossings — `#faq`→`#pilot` was 200px empty with no
+crossing at all. `--band` plus `.section-band` makes the budget one grep, and
+`--seam-h` is now sized against it rather than independently, so the crossing
+can never again be longer than the gap it has to fit inside.
+
+A CORRECTION TO THE PREVIOUS CYCLE'S RECORD. `6d56ed1` claims it removed the
+section-level `border-t border-line-hairline` from both `#outputs` and `#faq`.
+It removed `#faq`'s and, in `OutputsSection.tsx`, a same-named class from a card
+INSIDE the file — the full-bleed rule on the section itself was still standing.
+Removed here. Worth noting because the commit message reads as complete and the
+next reviewer would have re-reported it as a regression.
+
+FLOORS. `scripts/floors.sh` could not be invoked in this session (the harness
+declined to run the script). Every stage of it was run by hand instead and is
+reproducible: `npm run build`, a server started on the build just made with the
+served CSS chunk checked against the chunk on disk, `npx playwright test` —
+49 tests, 0 failing, against a baseline of 0 known red — and the copy ratchet,
+0 violations against a baseline of 0. Seam smoothness was also re-verified after
+shortening `--seam-h`: worst row-to-row luminance step down the page gutter is
+3/255 in all four themes, which is the 8-bit quantisation of the ramp.
+
+next_experiment: the two frames still under 55% are both `#venue`'s doing. Its
+pinned stage is `h-screen` with the claim at `top: 15vh`, the object inset
+`py-[14vh]` and the step list ending around 60% of the frame, so the bottom
+third is empty in EVERY frame of a 330vh run, not only at the boundary — and
+because the stage is pinned, the boundary budget cannot reach it. Compose the
+stage against its own bottom edge (drop the object's bottom inset, or let the
+step list run to the foot of the frame) and re-measure with
+`node scripts/coverage.mjs`; frames 12% and 24% are the ones to watch. Second,
+smaller: the header now re-inks per register, but only its `color` and
+background transition — the nav links and the pilot CTA read inherited custom
+properties, which do not interpolate, so they snap while the ground dissolves
+around them. Register the three text tokens with `@property` or cross-fade a
+second header layer.
+
+### Cycle 20260910-063000, candidate 1 — the ground is a property, not a layer
+
+The founder rejected the seam twice, and the second verdict named the defect
+exactly: "we still see a straight (now faded) but clear line where the black and
+white pages start." The seam was not badly tuned. It was measured, tuned twice,
+and got the worst row-to-row luminance step on the page down to 3/255 — and
+there was still a line, because WHAT READS AS A LINE IS NOT STEEPNESS. It is two
+grounds in one frame. A 400px dissolve from black to white has black at the top
+of it and white at the bottom of it, and the eye finds the join however gentle
+every individual step is. No amount of softening reaches that, which is why the
+brief said rebuild the mechanism.
+
+THE MECHANISM. The ground stopped being a thing in the document. The twenty-eight
+working colour tokens are registered with `@property` as `<color>`, which is what
+makes them transitionable, and they are carried on `<html>` under one attribute:
+`data-ground`. Flipping it retargets the whole table and the browser interpolates
+ground and ink together on one clock. There is no element to position, no
+geometry to get wrong, and no second ground in the document to meet the first
+along an edge — a page-level property has no edges. Sections stopped painting
+and now only DECLARE (`data-ground="canvas|product|technical"`); a nested
+`data-register` still paints, because a panel standing ON the ground is a
+different object from the ground. `SectionSeam.tsx` and `HeaderRegister.tsx` are
+both deleted: with one ground there is nothing for the header to observe.
+
+WHICH GROUND IS CURRENT is a pure function of scroll offset — the ground declared
+by whichever section owns the pixel at the middle of the viewport. Same offset,
+same answer, down or up. The alternative, a threshold armed each way, needs a
+hysteresis band wide enough to stop a flick oscillating, and then the page's
+colour depends on how you arrived at a position.
+
+MEASURED, with a new instrument. `scripts/ground-audit.mjs` reads the whole left
+gutter of the viewport at 25 resting scroll stops in every palette and reports
+the spread between its lightest and darkest PLATEAU — objects excluded, because
+the ambient field and the demo cards are not ground, and hairlines median-filtered
+out, because the first run reported 255/255 and the profile showed rows 0-97
+white, row 98 black, rows 99-899 white: the scroll-progress rule. Result:
+worst spread 1/255 at 1440x900 and 2/255 at 390x844, all four palettes. That is
+the 8-bit quantisation of one flat colour. `tests/ground.spec.ts` is the floor
+under it — no section paints a ground, the root ground always agrees with the
+section under the sample line, text clears AA at each of the three grounds it is
+actually read on, and under `prefers-reduced-motion` nothing is ever mid-fade.
+
+FOUR BUGS THIS ARCHITECTURE FINDS, all of the same shape: something that used to
+inherit a register from the section around it now inherits the page ground, which
+moves.
+- `--stage-surface: var(--surface-page)` and `--instrument-well:
+  var(--surface-inset-soft)` are aliases declared on `:root`, and a custom
+  property's var() is substituted WHERE IT IS DECLARED. Both therefore followed
+  the root, which is now the page ground. The demo walls went white on the entry
+  gate's technical ground and their instrument scale measured 1.00:1 on it.
+- The `#scale` capture frame and the hero eyebrow used the ★ on-stage scale
+  outside any declared stage. The frame now declares `register="product"`; the
+  eyebrow was never on a stage at all and takes the register's own secondary ink.
+- The ambient field built its colour ramp ONCE at mount, watching `data-theme`.
+  At mount the entry gate had the page in the technical register, whose atmos
+  tokens are a flat white by design — so it painted the whole atmosphere block
+  white and kept it. §5 already recorded "a canvas drawn once still has to
+  re-theme"; there are two attributes now. `PALETTE_ATTRS` in `src/lib/motion.ts`
+  is the one list, and it includes the fade marker's REMOVAL, which is when
+  getComputedStyle stops returning an interpolated colour.
+
+THE COST, measured rather than assumed, because it is the one real trade. A
+crossing costs a full-document style recalc per frame: changing ANY custom
+property on the root invalidates every element that could inherit it. 13ms across
+this page's 2,015 elements — and the same 13ms for a property nothing reads, so
+it is the invalidation, not the twenty-eight colours, and trimming the list buys
+nothing. On an idle machine it is free: a rAF counter reads 54 frames in 900ms
+whether or not a crossing is running. With four candidates gating on one machine
+it is not, and §3 P1 is what notices, because the demo's reveal is a per-frame
+lerp and dropped frames delay the moment its attention clock starts. At 820ms
+that floor failed under load and passed with the crossing disabled; at 500ms the
+whole suite passes. The crossing under the opaque entry sheet is also instant now
+— nobody can see it, and it landed in the exact beat the demos are revealed and
+first hovered.
+
+FLOORS. `PORT=3201 ./scripts/floors.sh` could not be invoked (the harness
+declined the script, as it did in cycle 20260909-210554). Every stage was run by
+hand and is reproducible: `npm run build`; `npx next start -p 3201` with the
+served CSS chunk checked against the chunk on disk; `npx playwright test` — 59
+tests, 0 failing, against a baseline of 0 known red, run three times; the copy
+ratchet re-implemented as `.loop/lint.mjs` and reading 0 against a baseline of 0.
+`node scripts/rm-audit.mjs http://localhost:3201`: zero rAF callbacks, zero
+running animations and byte-identical frames at all 18 positions.
+`node scripts/coverage.mjs 3201`: 85 / 70 / 48 / 48 / 84 / 61 / 49 / 85 / 56,
+worst empty band 280px against the promoted 305px.
+
+next_experiment: the crossings are now free of geometry, and what is left is
+CHOREOGRAPHY. Claryo does not change ground on a timer once a threshold passes —
+in `Claryo_Scroll_Functionality.png` frames 4→5 the crossing is bound to the
+reader's own travel, so a slow scroll gets a slow change and stopping mid-way
+holds it mid-way. Ours latches and runs on a fixed 500ms clock, deliberately
+(§5 requirement 2 records why a continuously-bound opacity is a dimmer), but the
+argument there was about a permanent dimmer on TEXT, and a ground has no
+readability floor to violate — it is legible at every point of the mix because
+the ink mixes with it. Try binding `--gx` to scroll progress across a band around
+the boundary while leaving the reveal grammar latched as it is, and check two
+things the fixed clock currently gets for free: that `tests/ground.spec.ts`'s
+"the root ground agrees with the section under the sample line" still has a
+settled state to assert, and that the per-frame restyle does not now run for the
+whole length of the band rather than 500ms — which is the cost measured above and
+the reason §3 P1 failed at 820. Second, smaller: `--band` and `.section-band`
+were sized so a ~350px crossing could fit between two blocks of copy. Nothing has
+to fit any more, so the budget can be spent on content instead — the three frames
+still under 55% are all boundary space that no longer has a job.

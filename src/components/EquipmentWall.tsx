@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { token } from "@/lib/palette";
+import { onRedraw, stillQuery } from "@/lib/motion";
 import React, { useEffect, useRef, useState } from "react";
 import BenchPressWireframe from "@/components/BenchPressWireframe";
 import StairmasterVideo from "@/components/StairmasterVideo";
@@ -120,11 +121,21 @@ export default function EquipmentWall({
       });
       return () => cancelAnimationFrame(id);
     }
+    // §5 SCOPE, ambient vs interaction — the same contract as the painting
+    // wall, because these are the same instrument on a different surface. Under
+    // prefers-reduced-motion the pointer still drives utilisation and workout
+    // time; what stops is the clock the wall was running on its own, which is
+    // what makes the rolling trace advance on an untouched page.
+    const still = stillQuery();
     let raf: number | null = null;
+
+    /** Engaged, or at rest? Below REST there is no utilisation now and none
+     *  incoming, so another frame would move the time axis and nothing else. */
+    const REST = 0.002;
 
     const compute = () => {
       const displayEl = displayRef.current;
-      if (!displayEl) return;
+      if (!displayEl) return false;
 
       const last = lastPointerRef.current;
 
@@ -184,54 +195,104 @@ export default function EquipmentWall({
         samplesRef.current = samplesRef.current.filter((s) => s.t > cutoff);
       }
 
+      const ctx = fit();
       const canvas = chartRef.current;
-      if (canvas) {
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          const cw = canvas.clientWidth || 260;
-          const ch = canvas.clientHeight || 44;
-          if (canvas.width !== cw || canvas.height !== ch) {
-            canvas.width = cw;
-            canvas.height = ch;
-          }
-          const w = canvas.width;
-          const h = canvas.height;
-          ctx.clearRect(0, 0, w, h);
+      if (ctx && canvas) {
+        const w = canvas.width;
+        const h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
 
-          if (samplesRef.current.length >= 2) {
-            const padding = 2;
-            const plotW = w - padding * 2;
-            const plotH = h - padding * 2;
-            const tMin = now - chartWindowSeconds;
-            const tMax = now;
-            const tRange = tMax - tMin;
-            if (tRange >= 0.01) {
-              ctx.strokeStyle = token(chartToken);
-              ctx.lineWidth = 1;
-              ctx.beginPath();
-              for (let i = 0; i < samplesRef.current.length; i++) {
-                const s = samplesRef.current[i];
-                const x = padding + ((s.t - tMin) / tRange) * plotW;
-                const y = padding + plotH - s.v * plotH;
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-              }
-              ctx.stroke();
+        if (samplesRef.current.length >= 2) {
+          const padding = 2;
+          const plotW = w - padding * 2;
+          const plotH = h - padding * 2;
+          const tMin = now - chartWindowSeconds;
+          const tMax = now;
+          const tRange = tMax - tMin;
+          if (tRange >= 0.01) {
+            ctx.strokeStyle = token(chartToken);
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            for (let i = 0; i < samplesRef.current.length; i++) {
+              const s = samplesRef.current[i];
+              const x = padding + ((s.t - tMin) / tRange) * plotW;
+              const y = padding + plotH - s.v * plotH;
+              if (i === 0) ctx.moveTo(x, y);
+              else ctx.lineTo(x, y);
             }
+            ctx.stroke();
           }
         }
       }
+
+      return currentRevealRef.current > REST || targetRevealRef.current > REST;
+    };
+
+    /** Match the backing store to the box; hand back a context to draw in. */
+    const fit = () => {
+      const canvas = chartRef.current;
+      const ctx = canvas?.getContext("2d");
+      if (!canvas || !ctx) return null;
+      const cw = canvas.clientWidth || 260;
+      const ch = canvas.clientHeight || 44;
+      if (canvas.width !== cw || canvas.height !== ch) {
+        canvas.width = cw;
+        canvas.height = ch;
+      }
+      return ctx;
+    };
+
+    /** The instrument at rest: ten seconds of an unused machine, which is what
+     *  the live trace decays to. §5 asks for static AND complete, so the well
+     *  holds a baseline rather than nothing. */
+    const drawRest = () => {
+      const ctx = fit();
+      const canvas = chartRef.current;
+      if (!ctx || !canvas) return;
+      const padding = 2;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = token(chartToken);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padding, canvas.height - padding);
+      ctx.lineTo(canvas.width - padding, canvas.height - padding);
+      ctx.stroke();
+    };
+
+    /** Back to rest, and off the frame clock until a pointer arrives. */
+    const park = () => {
+      if (raf != null) cancelAnimationFrame(raf);
+      raf = null;
+      currentRevealRef.current = 0;
+      targetRevealRef.current = 0;
+      workoutStartRef.current = null;
+      lastWorkoutUpdateRef.current = 0;
+      samplesRef.current = [];
+      setReveal(0);
+      setWorkoutSeconds(0);
+      drawRest();
+    };
+
+    const loop = () => {
+      const engaged = compute();
+      if (still?.matches && !engaged) {
+        park();
+        return;
+      }
+      raf = requestAnimationFrame(loop);
+    };
+
+    const start = () => {
+      if (raf == null) raf = requestAnimationFrame(loop);
     };
 
     const onPointer = (e: PointerEvent) => {
       lastPointerRef.current = { x: e.clientX, y: e.clientY, active: true };
+      start();
     };
 
-    const loop = () => {
-      compute();
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
+    if (still?.matches) drawRest();
+    else start();
 
     // Same listener set as the painting wall — deliberately no pointerleave,
     // which would drop utilisation while the pointer sits still.
@@ -240,10 +301,20 @@ export default function EquipmentWall({
     window.addEventListener("pointerover", onPointer, opts);
     window.addEventListener("pointerenter", onPointer, opts);
 
+    const onPref = () => {
+      if (!still?.matches) start();
+    };
+    still?.addEventListener("change", onPref);
+    const offRedraw = onRedraw(() => {
+      if (raf == null) drawRest();
+    });
+
     return () => {
       window.removeEventListener("pointermove", onPointer, opts);
       window.removeEventListener("pointerover", onPointer, opts);
       window.removeEventListener("pointerenter", onPointer, opts);
+      still?.removeEventListener("change", onPref);
+      offRedraw();
       if (raf != null) cancelAnimationFrame(raf);
     };
   }, [chartToken, kind, isStatic, active]);
@@ -287,11 +358,7 @@ export default function EquipmentWall({
       ctx.stroke();
 
       ctx.fillStyle = token("chart-label");
-      const fontFamily =
-        typeof document !== "undefined"
-          ? getComputedStyle(document.body).fontFamily
-          : "system-ui, sans-serif";
-      ctx.font = `400 11px ${fontFamily}`;
+      ctx.font = `400 11px ${getComputedStyle(document.body).fontFamily}`;
       ctx.textAlign = "center";
       ctx.textBaseline = "alphabetic";
       for (const { month, index } of CHART_LABELS) {
@@ -301,8 +368,10 @@ export default function EquipmentWall({
     };
 
     draw();
-    window.addEventListener("resize", draw);
-    return () => window.removeEventListener("resize", draw);
+    // Resize AND theme: this chart is drawn once, and the capture harness flips
+    // data-theme on the root after mount, so without the second trigger a
+    // variant screenshot shows this sparkline in the previous theme's ink.
+    return onRedraw(draw);
   }, [isStatic, chartToken, staticChartValues]);
 
   const displaySize = isMini
