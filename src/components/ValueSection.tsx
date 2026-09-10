@@ -2,7 +2,6 @@
 
 import FloorLedger from "@/components/FloorLedger";
 import Reveal from "@/components/Reveal";
-import SectionSeam from "@/components/SectionSeam";
 import { useVertical } from "@/components/VerticalContext";
 
 type Card = { title: string; desc: string };
@@ -62,10 +61,18 @@ export default function ValueSection() {
   return (
     <section
       id="value"
-      data-register="canvas"
-      className="relative px-6 pb-40 pt-40 md:pb-52 md:pt-48"
+      // TECHNICAL, not canvas, and no seam. This section used to declare canvas
+      // between #how and #privacy, which both declare technical: the page went
+      // black, white, black across three consecutive sections, and the two
+      // crossings cost 403px of empty ramp in and 406px out for 489px of
+      // content. Claryo changes ground when the ARGUMENT changes — problem to
+      // solution, solution to applications — never for one beat inside a run.
+      // #how, #value, #privacy and #stack are one run: what the system does,
+      // what it answers, what it refuses to hold, where it plugs in. The page
+      // now crosses into that ground once, at #how, and out of it once, at #use.
+      data-register="technical"
+      className="section-band relative px-6"
     >
-      <SectionSeam from="technical" to="canvas" />
       <div className="relative mx-auto max-w-6xl">
         {/* The answer to #problem, drawn on the same object. The ledger there
             has one track carrying data and four empty rails; here it is the

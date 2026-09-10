@@ -335,6 +335,16 @@ the loop does not rebuild them, and so their §5 conflicts are visible.
 - **Value section (`#value`)** — `[BUILT]`. Eyebrow, heading, four outcome
   cards and a closing line; switches per vertical. Overlaps the Revenue
   generation item above. `src/components/ValueSection.tsx`.
+  REGISTER CHANGED 09 Sep 2026, canvas → TECHNICAL, and its seam deleted. It
+  declared canvas between `#how` and `#privacy`, which both declare technical,
+  so the page went black, white, black across three consecutive sections and the
+  two crossings cost 403px of empty ramp in and 406px out for 489px of content —
+  more page than the section itself. Claryo changes ground when the ARGUMENT
+  changes, never for one beat inside a run. `#how`, `#value`, `#privacy` and
+  `#stack` are one run — what the system does, what it answers, what it refuses
+  to hold, where it plugs in — so the page crosses into that ground once, at
+  `#how`, and out of it once, at `#use`. `#privacy`'s seam went with it: nothing
+  changes across that boundary any more.
   §5 CONFLICT: three cards use "X, not Y"; eyebrow is ALL-CAPS.
   VISUAL ADDED 09 Sep 2026: `src/components/FloorLedger.tsx`, ONE object shared
   with `#problem` and shown in two states. A day in the venue, one track per
@@ -349,6 +359,14 @@ the loop does not rebuild them, and so their §5 conflicts are visible.
   sections, and both carry an Illustrative chip (§4d rule 2).
 - **How it works (`#how`)** — `[BUILT]`. Four steps per vertical; the
   subject of P4. `src/components/HowItWorks.tsx`.
+  CORRECTED 09 Sep 2026. `data-register="product"` sat on the CARD WRAPPER of
+  any step carrying a demo, and only step 4 does, so three light bordered cards
+  were followed by a borderless black slab at the same radius: the spine that
+  the section is built around threaded three cards and a different component.
+  The register belongs to the demo INSIDE the card — a nested product-register
+  stage, the same rule PrivacyStage, FloorLedger and the Outputs beats already
+  follow — so all four steps now carry one ground, one border and one radius,
+  and only the stage holding the two Insight readings is dark.
 - **Museum use cases (`#use`)** — `[BUILT]`. Three cards.
   `src/components/UseCases.tsx`.
   VISUAL ADDED 09 Sep 2026: `src/components/UseCaseGlyph.tsx`. §5's standard
@@ -667,6 +685,60 @@ register change is under 1% of the range it traverses; the same measurement on
 the band version reads 48%. Use cases, the pilot form and the footer now all
 declare the canvas register, which removes the last undeclared change on the
 page — the one between the last section and the closing CTA.
+
+THE BOUNDARY BUDGET, 09 Sep 2026. The seams were correct and the page was still
+failing requirement (a): the flow reviewer measured content coverage across the
+nine scroll frames at 85 / 70 / 35 / 86 / 36 / 77 / 28 / 83 / 56 percent, with
+single unbroken empty bands of 444, 329 and 301 CSS px. Every band was a section
+boundary and every boundary was built the same way — a closing `pb-40 md:pb-52`
+meeting an opening `pt-40 md:pt-48`, about 400px of ground with nothing on it,
+which is exactly enough for the ~350px crossing to happen in front of nothing.
+Neither Claryo scroll reference ever does that: in
+`Claryo_Scroll_Functionality.png` frames 4→5 the dark ground climbs while the
+white section's headline and body are still on screen, and in `_2.png` frames
+4→5 the outgoing row is still leaving the top edge as the next heading arrives
+at the bottom. Consecutive frames always overlap in content.
+
+The closing and opening space is now ONE GOVERNED NUMBER, `--band` in
+globals.css, applied through `.section-band` — 96px below 768, 112px above, so
+the widest boundary gap on the page is 224px. It is a token rather than nine
+Tailwind class lists so the budget is auditable: one grep says what every
+boundary costs. `.section-band` also carries the anchor clearance the old
+padding used to supply by accident.
+
+`--seam-h` is sized against that budget rather than independently. The crossing
+has a fully ambiguous middle — roughly 0.36 to 0.72 of its length, where neither
+register's text colour would be legible — and that stretch has to fit between
+the last line above the boundary and the first line below it. At 42vh it spans
+boundary-76 to boundary+60 against a 112px pad, and no copy is read through it
+at any viewport height.
+
+`scripts/coverage.mjs` is the instrument, and it exists because the numbers
+above cost a reviewer an afternoon and could not be checked. It reports coverage
+and the longest unbroken empty band per frame, at the same nine scroll positions
+and the same viewport the motion strip uses. A row counts as CARRYING if it
+holds high-frequency detail, not if it differs from the page ground — a
+ground-difference test scores a lineless crossing as a screenful of content,
+which is the exact defect being measured. Measured after this change: 85 / 70 /
+52 / 85 / 58 / 64 / 51 / 79 / 52, worst band 305px, and that last one is the
+atmosphere block's own composition rather than a boundary — `#venue` is a pinned
+stage whose bottom third is empty by design, and it is founder-approved.
+
+THE HEADER OBSERVES WHAT IS UNDER IT, 09 Sep 2026. `HeaderRegister.tsx`. §4
+already built half of this for the entry view; after selection the header
+reverted to the ROOT ground and held it for the whole page, so over a section of
+opposite polarity it painted a band across the top of every frame — the reviewer
+measured its edge stepping 53 → 114 → 255 across 3 CSS px, inverted in
+light-canvas. The border went in the previous cycle and the band stayed. The
+header now takes the register of the section its own foot is standing on. Two
+things are load-bearing and should not be re-derived: the switch line is the
+header's FOOT, because the seam is weighted 56% above the boundary and its alpha
+passes half at very nearly the boundary itself, so switching there puts the
+header's change at the same moment and the same place on screen as the ground's;
+and the header's fill stays TRANSLUCENT rather than taking the register block's
+opaque `background`, because the seam beneath it is still ramping for ~170px
+after the switch and a flat fill of the arrived-at register held over a ground
+that is still crossing is the band again, one register later.
 
 Three consequences worth stating so they are not re-discovered:
 - Reveals LATCH. Scrolling back up must not un-tell the argument.

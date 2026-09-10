@@ -369,7 +369,14 @@ export default function OutputsSection() {
     <section
       id="outputs"
       data-register="canvas"
-      className="border-t border-line-hairline px-6 py-24"
+      // The section-level `border-t border-line-hairline` is gone. The flow
+      // review cited it as a full-bleed 1px rule at y=11263 in all four strips,
+      // sitting inside 308px of empty ground between two canvas sections —
+      // nothing changes across this boundary, so the rule was not marking a
+      // transition, it was the transition. The previous cycle's fix took the
+      // matching one off #faq and a same-named class off a card inside this
+      // file, and left this one standing.
+      className="section-band px-6"
     >
       <div className="mx-auto max-w-6xl">
         <div className="text-xs font-medium tracking-wide text-fg-muted">Outputs</div>

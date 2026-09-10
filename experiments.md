@@ -146,3 +146,65 @@ Insight cards on that basis alone.
 | 20260909-142443-1 | cand-20260909-142443-1 | pass | tie | tie | tie | tie | tie | promote | Add a reduced-motion capture pass to the harness so this class of candidate is judgeable instead of taken on trust: shots/<side>/motion/reduced.png, six frames over six seconds with the context launched under prefers-reduced-motion: reduce, plus one full-page reduced strip per side. It should answer three things by eye that the test only asserts numerically — the ambient field and venue wireframe hold one identical frame, the wireframe is fully drawn rather than frozen mid-stroke-dashoffset, and every scroll reveal (including the checklist rows in step 1-3 of How it Works, which sit mid-fade in scroll.png frame 5) is at final opacity. Without it every future motion-preference candidate lands as five ties again. |
 | 20260909-210554-1 | cand-20260909-210554-1 | pass | cand | cand | tie | tie | cand | promote | Put imagery INTO the technical run. #how, #value, #privacy and #stack are now one unbroken white ground about half the document long, and neither 10/10 scroll reference ever holds a ground that long without something drawn in it — Claryo's black run carries white line-work that BUILDS (Claryo_Scroll_Functionality_2.png frames 1-2: one line becomes a full wireframe with square vertex handles) and its white run carries a stage picture per step. The machinery already exists: VenuePlan/VenueStage at #venue draw exactly that idiom by stroke-dashoffset. Try ONE technical object spanning the run, pinned behind the four sections in document coordinates the way AmbientField already is, augmenting once per section boundary (footprint at #how, zones at #value, sightlines at #privacy, movement at #stack) so the run reads as one argument advancing rather than four white slabs — and re-run scripts/coverage.mjs afterwards, since frame 3 (#venue, 52%, 305px band) is now the thinnest cell in the strip and the same object is what would fill it. |
 | 20260909-210554-2 | cand-20260909-210554-2 | pass | cand | cand | tie | tie | cand | promote | The hero -> #venue crossing is now the page's worst live band and the seam work never touched it: 281px content-free at y=1659-1940 in the A-dark full-page strip, IDENTICAL in best and candidate, sitting between the hero demo wall and 'The venue / Geometry' where the ambient field is at its dimmest. Every other ~300px band was either shortened or is the entry screen (573px, by design). Fix it the way Claryo Scroll 1 frame 4 does — let the incoming block compose inside the outgoing ground rather than after it: pull the 'The venue' eyebrow and 'Geometry' heading up ~200px so they begin fading in while the hero ground is still dissolving, or start the venue wireframe's first stroke inside that band so the object is already drawing when the visitor arrives. Then re-measure with the same left-margin column scan (longest content-free row run per palette strip); the target is no non-entry band over ~200px outside the pinned canvas stage. |
+
+### Cycle 20260909-210554, candidate 1 — the boundary budget
+
+Three measured defects from the flow review, plus the header hand-off it asked
+for. The lesson worth carrying is the one about MEASUREMENT: the reviewer's
+81/95/56/92/43/80/33/82/54 was read by eye off `scroll.png`, cost an afternoon,
+and could not be checked by the candidate acting on it. `scripts/coverage.mjs`
+now computes it. Building the instrument first is what set the target — and it
+also caught that the reviewer's frame numbers understate two frames, because a
+strip settles for 450ms and a reveal caught at 0.2 has no edges for the detector
+and none for the reader either.
+
+The definition matters as much as the number. A row counts as CARRYING if it
+holds high-frequency detail rather than if it differs from the page ground: a
+ground-difference test scores a lineless crossing as a screenful of content,
+which is the exact defect being measured. Validation was reproducing the
+reviewer's empty bands — 444 vs their 421 at 48%, 301 vs 299 at 72% — before
+changing anything.
+
+WHAT MOVED. Coverage 85/70/35/86/36/77/28/83/56 → 85/70/52/85/58/64/51/79/52;
+worst empty band 444px → 305px; minimum coverage 28% → 51%. The page is 1,300px
+shorter. The remaining 305px is the atmosphere block's own composition rather
+than a boundary — `#venue` is a pinned stage whose bottom third is empty by
+design and is founder-approved, so it was left alone.
+
+ONE NUMBER, NOT NINE CLASS LISTS. The fix the reviewer suggested was "halve the
+padding either side of a register boundary". Halving it per-section leaves the
+next candidate free to re-inflate one quietly, and it also misses the boundaries
+that are NOT register crossings — `#faq`→`#pilot` was 200px empty with no
+crossing at all. `--band` plus `.section-band` makes the budget one grep, and
+`--seam-h` is now sized against it rather than independently, so the crossing
+can never again be longer than the gap it has to fit inside.
+
+A CORRECTION TO THE PREVIOUS CYCLE'S RECORD. `6d56ed1` claims it removed the
+section-level `border-t border-line-hairline` from both `#outputs` and `#faq`.
+It removed `#faq`'s and, in `OutputsSection.tsx`, a same-named class from a card
+INSIDE the file — the full-bleed rule on the section itself was still standing.
+Removed here. Worth noting because the commit message reads as complete and the
+next reviewer would have re-reported it as a regression.
+
+FLOORS. `scripts/floors.sh` could not be invoked in this session (the harness
+declined to run the script). Every stage of it was run by hand instead and is
+reproducible: `npm run build`, a server started on the build just made with the
+served CSS chunk checked against the chunk on disk, `npx playwright test` —
+49 tests, 0 failing, against a baseline of 0 known red — and the copy ratchet,
+0 violations against a baseline of 0. Seam smoothness was also re-verified after
+shortening `--seam-h`: worst row-to-row luminance step down the page gutter is
+3/255 in all four themes, which is the 8-bit quantisation of the ramp.
+
+next_experiment: the two frames still under 55% are both `#venue`'s doing. Its
+pinned stage is `h-screen` with the claim at `top: 15vh`, the object inset
+`py-[14vh]` and the step list ending around 60% of the frame, so the bottom
+third is empty in EVERY frame of a 330vh run, not only at the boundary — and
+because the stage is pinned, the boundary budget cannot reach it. Compose the
+stage against its own bottom edge (drop the object's bottom inset, or let the
+step list run to the foot of the frame) and re-measure with
+`node scripts/coverage.mjs`; frames 12% and 24% are the ones to watch. Second,
+smaller: the header now re-inks per register, but only its `color` and
+background transition — the nav links and the pilot CTA read inherited custom
+properties, which do not interpolate, so they snap while the ground dissolves
+around them. Register the three text tokens with `@property` or cross-fade a
+second header layer.

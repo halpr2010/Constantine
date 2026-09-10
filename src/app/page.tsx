@@ -14,6 +14,7 @@ import FaqSection from "@/components/FaqSection";
 import PilotForm from "@/components/PilotForm";
 import ScrollProgress from "@/components/ScrollProgress";
 import ScrollStage from "@/components/ScrollStage";
+import HeaderRegister from "@/components/HeaderRegister";
 import Reveal from "@/components/Reveal";
 import { GhostSprite } from "@/components/GhostFigure";
 import { VerticalProvider } from "@/components/VerticalContext";
@@ -37,14 +38,20 @@ export default function Home() {
         {/* One driver for every [data-reveal] below. Mounted inside the
             provider so it re-scans when the switcher rebuilds the page. */}
         <ScrollStage />
+        {/* The other half of the entry view's register hand-off, extended to
+            the whole page: the header observes the section under its own foot
+            and takes that section's register. See HeaderRegister.tsx. */}
+        <HeaderRegister />
 
-        {/* Header. NO bottom border: it held the root ground after selection, so
-            over a section of opposite polarity it painted a solid band with a
-            razor edge — luminance stepping 53 -> 114 -> 255 across 3px, and
-            inverted in light-canvas. §5 requires ground changes with no visible
-            dividing line, and a permanent rule across the page is the most
-            visible one there is. ScrollProgress's filled portion is the only
-            rule at the header's foot now. */}
+        {/* Header. NO bottom border, and no ground of its own: it held the root
+            ground after selection, so over a section of opposite polarity it
+            painted a solid band with a razor edge — luminance stepping
+            53 -> 114 -> 255 across 3px, and inverted in light-canvas. §5
+            requires ground changes with no visible dividing line, and a
+            permanent rule across the page is the most visible one there is. The
+            border went first; HeaderRegister takes the band that was left.
+            ScrollProgress's filled portion is the only rule at the header's
+            foot now. */}
         {/* `data-entry-chrome` hands the header to the entry view's register
             while the question stands, so it disappears into the light ground
             instead of laying a dark bar across it (globals.css, entry block).
@@ -169,7 +176,7 @@ export default function Home() {
             nothing changes: the canvas runs straight through to the bottom.
             The form itself is never wrapped in a reveal — a control that is
             dimmed while it holds focus is a trap. */}
-        <section id="pilot" data-register="canvas" className="px-6 pb-24 pt-32">
+        <section id="pilot" data-register="canvas" className="section-band px-6">
           <div className="mx-auto max-w-xl">
             <Reveal grammar="focus">
               <h2 className="text-3xl font-semibold leading-tight md:text-4xl">

@@ -2,7 +2,6 @@
 
 import PrivacyStage from "@/components/PrivacyStage";
 import Reveal from "@/components/Reveal";
-import SectionSeam from "@/components/SectionSeam";
 import { useVertical } from "@/components/VerticalContext";
 
 /**
@@ -32,9 +31,13 @@ export default function PrivacySection() {
     <section
       id="privacy"
       data-register="technical"
-      className="relative px-6 pb-32 pt-32 md:pb-40 md:pt-40"
+      className="section-band relative px-6"
     >
-      <SectionSeam from="canvas" to="technical" />
+      {/* NO SEAM. #value above now declares the technical register too, so
+          nothing changes across this boundary — the ground has been black since
+          #how opened it and runs unbroken to the end of #stack. The seam that
+          used to sit here was crossing back from a canvas #value that had itself
+          crossed away from #how one screen earlier. */}
       <div className="relative mx-auto max-w-6xl">
         <div className="grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-14">
           <div>

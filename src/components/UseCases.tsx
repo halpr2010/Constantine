@@ -70,7 +70,7 @@ export default function UseCases() {
     <section
       id="use"
       data-register="canvas"
-      className="relative px-6 pb-40 pt-40 md:pb-52 md:pt-48"
+      className="section-band relative px-6"
     >
       <SectionSeam from="technical" to="canvas" />
       <div className="relative mx-auto max-w-6xl">

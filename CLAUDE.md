@@ -52,6 +52,13 @@ Run `./scripts/floors.sh` before claiming anything works. Two rule kinds:
 Never edit a baseline in `.loop/` to make a gate pass. Baselines are rewritten
 only by `--baseline` on `best`, when work is promoted.
 
+`scripts/coverage.mjs` is not a gate — it is the instrument behind §5's "every
+scroll surfaces something". It reports content coverage and the longest empty
+band per scroll frame, at the same nine positions and the same viewport
+`motion-strip.mjs` uses, so a claim about page rhythm can be checked rather than
+asserted. Run it before and after anything that changes section spacing,
+register assignment or the seam.
+
 ## Colour
 
 Never write a hex, `rgb()` or `rgba()` literal in a component, a canvas, or
