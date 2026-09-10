@@ -7,9 +7,20 @@ import {
   type Vertical,
 } from "@/components/VerticalContext";
 
+/**
+ * The labels answer the question directly. "Are you a… Museums & Galleries" did
+ * not parse — Claryo's answers are ROLES, so its question completes naturally,
+ * while ours are venue types. The question is now "What kind of space do you
+ * run?", which takes venue types as written.
+ *
+ * The pair is deliberately parallel: two plural nouns of the same length, where
+ * the old set put "Museums & Galleries" against a bare "Gyms". "Gyms & health
+ * clubs" also widens who self-identifies, which matters on the one screen where
+ * a visitor decides the site is not for them.
+ */
 const CHOICES: [Vertical, string][] = [
-  ["museums", "Museums & Galleries"],
-  ["gyms", "Gyms"],
+  ["museums", "Museums & galleries"],
+  ["gyms", "Gyms & health clubs"],
 ];
 
 /**
@@ -22,7 +33,7 @@ const CHOICES: [Vertical, string][] = [
  * is 88px (a 56px wordmark plus its padding), so a 95px entry track has to land
  * near 0.68 to sit inside it with air; 0.8 would leave 6px. Below 768 the entry
  * track is still 81px and 0.8 is as far as it can shrink before
- * "Museums & Galleries" stops being comfortably readable.
+ * "Gyms & health clubs" stops being comfortably readable.
  */
 const dockScale = () => (window.innerWidth >= 768 ? 0.68 : 0.8);
 /**

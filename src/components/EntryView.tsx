@@ -99,7 +99,7 @@ export default function EntryView() {
         id="entry-question"
         className="entry-question text-balance text-5xl font-semibold tracking-tight text-fg-primary md:text-6xl"
       >
-        Are you a…
+        What kind of space do you run?
       </p>
     </div>
   );

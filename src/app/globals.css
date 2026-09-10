@@ -521,14 +521,19 @@ html[data-entry="entering"] [data-entry-chrome] {
    object on the screen. The desktop step now runs 95 / 68 / 19.
    Symmetric flanks: the old asymmetric pl-9/pr-7 existed only to clear an
    absolutely positioned dot, and the marker has been inline since 08 Sep. */
+/* Base is the SMALL-SCREEN case. "Gyms & health clubs" against "Museums &
+   galleries" is two 19-character labels, and at the previous 0.9375rem/1.05rem
+   the track reached both viewport edges at 390 with no margin at all. The type
+   and the horizontal padding both come down so the track keeps air either side;
+   768 and up is unchanged, where the longer pair fits comfortably. */
 .vsel-choice {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   white-space: nowrap;
   border-radius: 9999px;
-  padding: 0.7rem 1.05rem;
-  font-size: 0.9375rem;
+  padding: 0.7rem 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   letter-spacing: -0.01em;
   transition: color 200ms ease;
