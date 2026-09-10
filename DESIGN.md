@@ -628,9 +628,16 @@ to every block. Sections may pin while content advances.
 TWO REQUIREMENTS ADDED 08 Sep 2026 from founder-scored video
 (`Claryo_Scroll_Functionality_2.png`, 10/10):
 
-1. NO VISIBLE DIVIDING LINE between grounds. Scrolling far enough leaves the
-   page simply having become white, or black. Today each register change lands
-   as a hard colour edge, which is the specific thing rejected.
+1. ONE GROUND AT A TIME. CORRECTED 10 Sep 2026 after the founder rejected the
+   seam approach twice. This is not "soften the boundary" - it is "have no
+   boundary to soften". The whole page carries a single ground; crossing a
+   threshold cross-fades that entire ground while the foreground inverts with
+   it, so two grounds are never on screen together. See
+   design-refs/Claryo-Ground-Black.png and -White.png: the same content, once
+   on black with white type and once on white with black type, unmoved.
+   Per-section grounds with a transition band between them CANNOT satisfy this,
+   because a boundary is always somewhere in view; softening it produced the
+   "straight (now faded) but clear line" the founder rejected.
 2. A REVEAL ENDS IN A READABLE STATE. Measured on the first scroll-flow
    candidate: 44 text elements never reached full opacity while sitting 80px
    clear of both viewport edges after a 700ms settle — headings at 0.14, body

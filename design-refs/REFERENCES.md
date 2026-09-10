@@ -29,6 +29,22 @@ How to use it:
 | **10** | PlayVision Hero Stat | `Playvision_Video_and_Hero_Stat.png` | Hero layout | Product-demo video + hero stat layout. Build the layout now; the video slot stays a placeholder until real footage exists (§4d). Open `Playvision-Hero-Video.png` alongside the strip: it is the same screen at full resolution and is where the geometry is legible (one dark field edge to edge, a ~26rem copy column, the clip running off the right edge with no outer border). | — |
 | **8** | Slingshot Ambience | `Slingshot_Ambience.png` | Ambience mechanism | Grainy, swirling, many brand-consistent colours, reacting to the cursor. | **Bounded.** Visible edges where the field starts and stops. Ours must be unbounded. |
 
+### Ground change — the mechanism, corrected 10 Sep 2026
+
+`Claryo-Ground-Black.png` and `Claryo-Ground-White.png` are the SAME CONTENT at
+two moments: identical heading, identical three cards. In one the whole page is
+black with white type; in the other the whole page is white with black type.
+
+The content did not move. **The ground under the entire page changed, and the
+foreground inverted with it.** There is never a boundary between two grounds
+anywhere on screen, because only one ground exists at a time.
+
+This is not what we built. Ours gives each section its own ground with a
+transition band between them, so a boundary is always somewhere in view;
+softening it produced a faded line instead of a hard one, which the founder
+rejected: "we still see a straight (now faded) but clear line where the black
+and white pages start."
+
 ## Anti-references
 
 | Score | Reference | Strip | What went wrong — build the opposite |
