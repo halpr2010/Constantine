@@ -406,6 +406,24 @@ html[data-entry="entering"] [data-entry-aside] {
     border-color 400ms ease;
 }
 
+/* THE HEADER OBSERVES WHAT IS UNDER IT (HeaderRegister.tsx). After selection
+   it used to hold the ROOT ground for the rest of the page, so over a section
+   of the opposite polarity it painted a band — the border went in the previous
+   cycle and the band stayed. It now carries the register of the section its own
+   foot is standing on, and crosses on the same 400ms transition the entry
+   hand-off already uses.
+
+   The ground stays TRANSLUCENT rather than taking the register block's own
+   opaque `background`. The seam beneath the header is still ramping for ~180px
+   after the crossing point, and a flat fill of the arrived-at register held over
+   a ground that is still crossing is the band again, one register later. At 80%
+   the real ground shows through and the header tracks the crossing instead of
+   announcing it. Specificity beats the [data-register] blocks below, which is
+   the whole point of the rule. */
+header[data-register] {
+  background: color-mix(in srgb, var(--surface-page) 80%, transparent);
+}
+
 /* No rule across the entry screen. The reference's entry frame carries the
    wordmark and nothing else, and §5's first scroll requirement is that grounds
    never meet along a visible line. The hairline was drawn at 8% of the entry's
@@ -781,6 +799,57 @@ html[data-entry="entering"] [data-entry-chrome] {
   }
 }
 
+/* ---------------------------------------------------------------------------
+   THE BOUNDARY BUDGET — §5, "every scroll should surface something".
+
+   Measured with `node scripts/coverage.mjs` on the promoted build: coverage
+   across the nine scroll frames read 85 / 70 / 35 / 86 / 36 / 77 / 28 / 83 / 56
+   percent, with single unbroken empty bands of 444px, 329px and 301px. Every
+   one of those bands is a section boundary, and every boundary was built the
+   same way — a closing `pb-40 md:pb-52` meeting an opening `pt-40 md:pt-48`,
+   about 400px of ground with nothing standing on it. The seam then spends its
+   whole ~350px travel inside that gap, so the ground change gets a frame to
+   itself.
+
+   That is the one thing neither Claryo scroll reference ever does. In
+   Claryo_Scroll_Functionality.png frames 4→5 the dark ground climbs while the
+   white section's headline and body are still on screen; in _2.png frames 4→5
+   the outgoing pain-point row is still leaving the top edge as the next heading
+   arrives at the bottom. Consecutive frames always overlap in content, and the
+   crossing happens BEHIND live copy.
+
+   So the closing and opening space is one governed number rather than a
+   Tailwind pair chosen per section. At 2 x --band the widest boundary gap is
+   224px against a 760px frame, which puts the outgoing section's last block and
+   the incoming section's heading both inside the seam's travel — the seam
+   dissolves behind them instead of in front of nothing. It is a token and not
+   nine class lists so that the budget is auditable: one grep says what every
+   boundary costs, and coverage.mjs says whether that is still enough.
+   --------------------------------------------------------------------------- */
+:root {
+  --band: 6rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --band: 7rem;
+  }
+}
+
+.section-band {
+  padding-block: var(--band);
+  /* The closing space used to double as anchor clearance. At 224px it no
+     longer can, so the clearance is stated: the fixed header is ~88px at md+
+     and ~138px at 390, where the docked vertical track takes its own row. */
+  scroll-margin-top: 9.5rem;
+}
+
+@media (min-width: 768px) {
+  .section-band {
+    scroll-margin-top: 6rem;
+  }
+}
+
 /* The register transition — see src/components/SectionSeam.tsx.
 
    It sits ABOVE its own section, in the closing space of the section before,
@@ -789,12 +858,20 @@ html[data-entry="entering"] [data-entry-chrome] {
    background, so the two agree by construction rather than by a declared
    colour that can drift out of step. */
 .section-seam {
-  /* Nearly half a viewport. The point is not softness for its own sake: at
-     this length the fully ambiguous middle of the crossing — the part where
-     neither register's text colour would be legible — is about 160px, which
-     fits inside the closing and opening padding either side of the boundary,
-     so no copy is ever read through it. */
-  --seam-h: clamp(16rem, 46vh, 30rem);
+  /* Sized against the boundary budget above, which is what changed here. The
+     point was never softness for its own sake: the crossing has a fully
+     ambiguous middle — the part where neither register's text colour would be
+     legible — running from about 0.36 to 0.72 of this length, and that stretch
+     has to fit between the last line of the outgoing section and the first line
+     of the incoming one. That gap used to be ~400px and is now 2 x --band, so
+     the crossing shortens with it: at 42vh the ambiguous middle spans
+     boundary-76 to boundary+60 against a 112px closing and opening pad, and no
+     copy is read through it at any viewport height. Shortening a dissolve
+     steepens it, so this is the floor rather than a preference: measured down
+     the page gutter at 1440 in all four themes, the worst row-to-row luminance
+     step anywhere on the page is 3/255, which is the 8-bit quantisation of the
+     ramp itself rather than an edge. §5's no-dividing-line rule still holds. */
+  --seam-h: clamp(15rem, 42vh, 28rem);
   /* How much of the crossing happens BEFORE the boundary. Weighted upward so
      the page has mostly become its new colour by the time the new section's
      first line arrives, which is the Claryo behaviour: in

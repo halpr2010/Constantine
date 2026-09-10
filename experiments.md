@@ -144,3 +144,65 @@ Insight cards on that basis alone.
 
 | 20260909-134701-1 | cand-20260909-134701-1 | pass | cand | cand | tie | tie | cand | promote | Close the standing red: tests/reveal.spec.ts fails any <section> over 300 characters with no img/svg/canvas/video/figure/table/[data-visual] child, and PRIVACY is the loudest — museums-privacy-1440 and -390 show ~811 characters of prose under three guarantee pills with nothing to look at in all four palettes, which is the Slingshot 2/10 defect verbatim. Build the founder's ask there: anonymised GhostFigures reusing the volumetric idiom already in Outputs (Playvision_People_Movement.png is the 10/10), faces never resolving, with the no-tracking claim SHOWN — e.g. the figures carrying only zone/dwell numbers that detach and aggregate as they cross, so what leaves the frame is visibly a count and not a person — sized to compose within one viewport so the viewport-fit floor does not go red in exchange. Then walk the other over-300-char section the same test names and give it its own visual rather than a second copy of the figures. |
 | 20260909-142443-1 | cand-20260909-142443-1 | pass | tie | tie | tie | tie | tie | promote | Add a reduced-motion capture pass to the harness so this class of candidate is judgeable instead of taken on trust: shots/<side>/motion/reduced.png, six frames over six seconds with the context launched under prefers-reduced-motion: reduce, plus one full-page reduced strip per side. It should answer three things by eye that the test only asserts numerically — the ambient field and venue wireframe hold one identical frame, the wireframe is fully drawn rather than frozen mid-stroke-dashoffset, and every scroll reveal (including the checklist rows in step 1-3 of How it Works, which sit mid-fade in scroll.png frame 5) is at final opacity. Without it every future motion-preference candidate lands as five ties again. |
+
+### Cycle 20260909-210554, candidate 1 — the boundary budget
+
+Three measured defects from the flow review, plus the header hand-off it asked
+for. The lesson worth carrying is the one about MEASUREMENT: the reviewer's
+81/95/56/92/43/80/33/82/54 was read by eye off `scroll.png`, cost an afternoon,
+and could not be checked by the candidate acting on it. `scripts/coverage.mjs`
+now computes it. Building the instrument first is what set the target — and it
+also caught that the reviewer's frame numbers understate two frames, because a
+strip settles for 450ms and a reveal caught at 0.2 has no edges for the detector
+and none for the reader either.
+
+The definition matters as much as the number. A row counts as CARRYING if it
+holds high-frequency detail rather than if it differs from the page ground: a
+ground-difference test scores a lineless crossing as a screenful of content,
+which is the exact defect being measured. Validation was reproducing the
+reviewer's empty bands — 444 vs their 421 at 48%, 301 vs 299 at 72% — before
+changing anything.
+
+WHAT MOVED. Coverage 85/70/35/86/36/77/28/83/56 → 85/70/52/85/58/64/51/79/52;
+worst empty band 444px → 305px; minimum coverage 28% → 51%. The page is 1,300px
+shorter. The remaining 305px is the atmosphere block's own composition rather
+than a boundary — `#venue` is a pinned stage whose bottom third is empty by
+design and is founder-approved, so it was left alone.
+
+ONE NUMBER, NOT NINE CLASS LISTS. The fix the reviewer suggested was "halve the
+padding either side of a register boundary". Halving it per-section leaves the
+next candidate free to re-inflate one quietly, and it also misses the boundaries
+that are NOT register crossings — `#faq`→`#pilot` was 200px empty with no
+crossing at all. `--band` plus `.section-band` makes the budget one grep, and
+`--seam-h` is now sized against it rather than independently, so the crossing
+can never again be longer than the gap it has to fit inside.
+
+A CORRECTION TO THE PREVIOUS CYCLE'S RECORD. `6d56ed1` claims it removed the
+section-level `border-t border-line-hairline` from both `#outputs` and `#faq`.
+It removed `#faq`'s and, in `OutputsSection.tsx`, a same-named class from a card
+INSIDE the file — the full-bleed rule on the section itself was still standing.
+Removed here. Worth noting because the commit message reads as complete and the
+next reviewer would have re-reported it as a regression.
+
+FLOORS. `scripts/floors.sh` could not be invoked in this session (the harness
+declined to run the script). Every stage of it was run by hand instead and is
+reproducible: `npm run build`, a server started on the build just made with the
+served CSS chunk checked against the chunk on disk, `npx playwright test` —
+49 tests, 0 failing, against a baseline of 0 known red — and the copy ratchet,
+0 violations against a baseline of 0. Seam smoothness was also re-verified after
+shortening `--seam-h`: worst row-to-row luminance step down the page gutter is
+3/255 in all four themes, which is the 8-bit quantisation of the ramp.
+
+next_experiment: the two frames still under 55% are both `#venue`'s doing. Its
+pinned stage is `h-screen` with the claim at `top: 15vh`, the object inset
+`py-[14vh]` and the step list ending around 60% of the frame, so the bottom
+third is empty in EVERY frame of a 330vh run, not only at the boundary — and
+because the stage is pinned, the boundary budget cannot reach it. Compose the
+stage against its own bottom edge (drop the object's bottom inset, or let the
+step list run to the foot of the frame) and re-measure with
+`node scripts/coverage.mjs`; frames 12% and 24% are the ones to watch. Second,
+smaller: the header now re-inks per register, but only its `color` and
+background transition — the nav links and the pilot CTA read inherited custom
+properties, which do not interpolate, so they snap while the ground dissolves
+around them. Register the three text tokens with `@property` or cross-fade a
+second header layer.

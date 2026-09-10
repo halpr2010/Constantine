@@ -178,7 +178,7 @@ export default function HowItWorks() {
     <section
       id="how"
       data-register="technical"
-      className="relative px-6 pb-40 pt-40 md:pb-52 md:pt-48"
+      className="section-band relative px-6"
     >
       <SectionSeam from="canvas" to="technical" />
       <div className="relative mx-auto max-w-6xl">
@@ -232,10 +232,15 @@ export default function HowItWorks() {
               grammar="advance"
               lag={0.06 * i}
             >
-            <div
-              data-register={step.paintings || step.equipment ? "product" : undefined}
-              className="flex flex-col gap-6 rounded-xl border border-line-card bg-surface-card p-6 md:flex-row md:items-center md:gap-8 md:p-8"
-            >
+            {/* The card is the sequence device and every step gets the same
+                one. The register used to sit HERE when a step carried a demo,
+                and only step 4 does, so three light bordered cards were
+                followed by a borderless black slab at the same radius: the
+                spine threaded three cards and a different component. The
+                register belongs to the demo INSIDE the card — a nested
+                product-register stage, the same rule PrivacyStage, FloorLedger
+                and the Outputs beats already follow. */}
+            <div className="flex flex-col gap-6 rounded-xl border border-line-card bg-surface-card p-6 md:flex-row md:items-center md:gap-8 md:p-8">
               <div className="flex-1">
                 <div className="flex items-baseline gap-2">
                   <span className="text-xl font-semibold text-fg-secondary">
@@ -278,7 +283,10 @@ export default function HowItWorks() {
               </div>
 
               {step.paintings ? (
-                <div className="flex shrink-0 flex-row flex-nowrap items-start gap-4 md:gap-6">
+                <div
+                  data-register="product"
+                  className="flex shrink-0 flex-row flex-nowrap items-start gap-4 overflow-hidden rounded-lg border border-line-card p-3 md:gap-6"
+                >
                   <div className="w-[280px] shrink-0 md:w-[300px]">
                     <div className="h-[440px] w-full">
                       <PaintingWall
@@ -320,7 +328,10 @@ export default function HowItWorks() {
                   </div>
                 </div>
               ) : step.equipment ? (
-                <div className="flex shrink-0 flex-row flex-nowrap items-start gap-4 md:gap-6">
+                <div
+                  data-register="product"
+                  className="flex shrink-0 flex-row flex-nowrap items-start gap-4 overflow-hidden rounded-lg border border-line-card p-3 md:gap-6"
+                >
                   <div className="w-[280px] shrink-0 md:w-[300px]">
                     <div className="h-[440px] w-full">
                       <EquipmentWall

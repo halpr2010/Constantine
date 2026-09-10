@@ -33,7 +33,7 @@ export default function ProblemSection() {
     <section
       id="problem"
       data-register="canvas"
-      className="relative px-6 pb-40 pt-40 md:pb-52 md:pt-48"
+      className="section-band relative px-6"
     >
       <SectionSeam from="product" to="canvas" />
       {/* Top-down cascade: the claim resolves first, then its evidence lands a
