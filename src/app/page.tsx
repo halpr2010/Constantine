@@ -2,6 +2,7 @@ import EntryView from "@/components/EntryView";
 import HeroSection from "@/components/HeroSection";
 import VerticalSwitcher from "@/components/VerticalSwitcher";
 import VenueStage from "@/components/VenueStage";
+import HeroStat from "@/components/HeroStat";
 import ProblemSection from "@/components/ProblemSection";
 import HowItWorks from "@/components/HowItWorks";
 import ValueSection from "@/components/ValueSection";
@@ -123,6 +124,15 @@ export default function Home() {
             and therefore no seam; #problem's existing product → canvas seam
             closes it again. */}
         <VenueStage />
+
+        {/* The PlayVision hero-stat block. It sits directly under the
+            atmosphere run and shares its product register, so the two read as
+            one continuous ground and neither needs a seam; #problem's existing
+            product → canvas seam still closes the run. Placement is the
+            reference's own: the stat is the beat immediately after the hero,
+            answering "what is this thing actually recording" before #problem
+            starts the commercial argument. */}
+        <HeroStat />
 
         <ProblemSection />
 

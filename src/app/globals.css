@@ -690,6 +690,53 @@ html[data-entry="entering"] [data-entry-chrome] {
   --reveal-dur: 420ms;
 }
 
+/* ---------------------------------------------------------------------------
+   #scale — the PlayVision hero-stat block (HeroStat.tsx).
+
+   In Playvision_Video_and_Hero_Stat.png the clip runs off the right edge of
+   the screen; it has no outer edge, which is what stops the block reading as
+   two cards parked beside each other. Reproducing that means the row cannot
+   live inside a centred max-width container, so the alignment is done with
+   padding instead: the left pad lands the copy column exactly where every
+   other section's `mx-auto max-w-6xl px-6` content starts (half the leftover
+   width, plus the same 1.5rem gutter), and the right pad is zero so the last
+   grid column reaches the viewport. Below lg the frame stops bleeding and the
+   rule is a plain gutter on both sides.
+   --------------------------------------------------------------------------- */
+.statbleed {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+@media (min-width: 1024px) {
+  .statbleed {
+    padding-left: max(1.5rem, calc((100vw - 72rem) / 2 + 1.5rem));
+    padding-right: 0;
+  }
+}
+
+/* §4d rule 1: the slot's box is declared once and does not move when a clip
+   lands in it. Both ratios come from the component as custom properties so the
+   pending state and a future <video> are laid out by the same rule. */
+.media-slot {
+  aspect-ratio: var(--slot-aspect-sm, var(--slot-aspect, 16 / 9));
+}
+@media (min-width: 768px) {
+  .media-slot {
+    aspect-ratio: var(--slot-aspect, 16 / 9);
+  }
+}
+
+/* The unexposed frame has to read as a lit rectangle standing in the section's
+   ground, the way the reference's clip does. --surface-inset is the register's
+   card fill and it is TRANSLUCENT, so one pass of it over the product ground is
+   barely a step; two stacked passes is a visible frame and is still nothing but
+   the register's own token, so it re-themes with everything else. A hardcoded
+   grey here would be the exact defect CLAUDE.md's colour rule exists to stop. */
+.capture-frame {
+  background-color: var(--surface-inset);
+  background-image: linear-gradient(var(--surface-inset), var(--surface-inset));
+}
+
 /* The transition is attached only once the driver has armed an element, one
    frame after it writes --r: 0. Arming and dimming in the same style recalc
    would leave the transition nothing to run from and the element would snap.

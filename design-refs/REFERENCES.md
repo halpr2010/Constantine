@@ -26,7 +26,7 @@ How to use it:
 | **10** | Claryo Ambience + Scroll 3 | `Claryo_Ambiance_and_Scroll_Functionality_3.png` | **Ambience** + stepped diagram | THE ambience target: bright purple blooms on **pure black**, continuously moving, obvious. A white technical wireframe sits on top and augments per step while the step text accumulates. | — |
 | ~~10~~ **DROPPED** | ~~Claryo Interactive~~ | `Claryo_Interactive_functionality.png` | ~~Card hover~~ | **WITHDRAWN by founder, 09 Sep 2026: "scrap this idea and do not retry". Three working options were built and all three declined. Not to be queued again.** | — |
 | **10** | PlayVision People | `Playvision_People_Movement.png` | Figures + scroll data | Animated figures, bodies annotated, insights surfacing on scroll; the data bound to each figure changes as you scroll. The deck framing around it is NOT wanted. | — |
-| **10** | PlayVision Hero Stat | `Playvision_Video_and_Hero_Stat.png` | Hero layout | Product-demo video + hero stat layout. Build the layout now; the video slot stays a placeholder until real footage exists (§4d). | — |
+| **10** | PlayVision Hero Stat | `Playvision_Video_and_Hero_Stat.png` | Hero layout | Product-demo video + hero stat layout. Build the layout now; the video slot stays a placeholder until real footage exists (§4d). Open `Playvision-Hero-Video.png` alongside the strip: it is the same screen at full resolution and is where the geometry is legible (one dark field edge to edge, a ~26rem copy column, the clip running off the right edge with no outer border). | — |
 | **8** | Slingshot Ambience | `Slingshot_Ambience.png` | Ambience mechanism | Grainy, swirling, many brand-consistent colours, reacting to the cursor. | **Bounded.** Visible edges where the field starts and stops. Ours must be unbounded. |
 
 ## Anti-references
@@ -60,7 +60,7 @@ Status, 08 Sep 2026:
 | Claryo Ambience + custom objects | BUILT — field + augmenting venue plan at `#venue` |
 | Claryo Interactive (card raise on hover) | **DROPPED — founder withdrew the requirement** |
 | PlayVision People | on `best` (Outputs figures) |
-| PlayVision Hero Stat | NOT BUILT |
+| PlayVision Hero Stat | BUILT 09 Sep 2026 — `#scale`, stat + §4d slot (DESIGN.md §4) |
 | Slingshot Ambience (8/10, unbounded correction) | folded into the ambience task |
 
 ## What the loop still needs from a new reference

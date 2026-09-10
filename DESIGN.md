@@ -223,6 +223,41 @@ only `[UNBUILT]` and `[PARTIAL]` items. `[SLOT-BUILT — awaiting media]`
   and deep links (`#privacy`) and crawlers must never land behind an
   unanswered question — the selector cannot gate content from a direct link,
   which is also what keeps the existing floors meaningful.
+- **Hero stat + product-demo slot** *(PlayVision, 10/10)* — `[BUILT]` 09 Sep
+  2026, with the media slot `[SLOT-BUILT — awaiting media]`.
+  `src/components/HeroStat.tsx` (the block), `MediaSlot.tsx` (the §4d swap and
+  playback contract), `CaptureOverlay.tsx` (the pending state), the
+  `.statbleed` / `.media-slot` / `.capture-frame` rules in `globals.css`, and
+  `tests/media.spec.ts` (the §4d rule 5 floor). Sits at `#scale` between
+  `#venue` and `#problem`, in the product register, so it shares the
+  atmosphere block's ground and neither needs a seam.
+  Reference: `design-refs/strips/Playvision_Video_and_Hero_Stat.png`, with
+  `design-refs/Playvision-Hero-Video.png` for the geometry. See the §6
+  PlayVision entry for what the picture actually shows, which is not what §6
+  said before this cycle.
+  DECISIONS, for the next candidate.
+  1. **The stat is a reading, and the layout says so.** In the reference the
+     number is a headline standing beside a picture and nothing binds the two.
+     Here the number is stated at display scale top left, a leader runs out of
+     the frame's left edge toward it, and the arithmetic that produces it is
+     laid along the FOOT of the whole block as a four-cell instrument rail
+     crossing under both columns. The stat therefore sits above the media and
+     is derived beneath it.
+  2. **The figure is a specification, and it shows its working.** 345,600 is
+     4 Hz times 86,400 seconds, which is arithmetic on our own sample rate
+     rather than anything a venue produced. §9 forbids fabricated results and
+     the honest way past that is not a disclaimer, it is publishing the
+     derivation: the rail names both factors and the product, so a reader can
+     check the number instead of trusting it. The fourth cell is `identities
+     kept 0`, which is §3 P5 restated as a quantity. The figure is identical in
+     both verticals on purpose — a number that does not move when the room
+     changes is visibly a spec.
+  3. **The placeholder states its emptiness by drawing the instrument with
+     nothing in it.** No still, no render, no simulated feed, no figure: crop
+     marks and a thirds grid on the register's own ground, two authored zones,
+     and a reading card whose every value is a BLANK RULE rather than a dash,
+     so no glyph can be misread as a measurement. The corner tally reads
+     `frames 0 · readings 0`, both true. The absence is legible as data.
 - **Depth dial** *(Claryo's autonomy dial, adapted)* — `[UNBUILT]`.
 - **Outputs** — the data → insight → action three-beat *(PlayVision)* —
   `[BUILT]` 07 Sep 2026, figures rebuilt 08 Sep 2026.
@@ -439,8 +474,10 @@ required because §5 mandates adoption. Do not "fix" one to match the other.
 | Hero walkthrough | Constantine live in a museum | Silhouettes + engagement overlays on real gallery footage, ~30–45s, product/atmosphere register. Claryo hero-video pattern. |
 | Measure step clip | Engagement zones drawn live | Zones drawing over anonymised venue footage, ~15s, sits in P4's Measure step. PlayVision annotated-footage pattern. |
 | Outputs capture | Dashboard fragment in motion | Fragment updating from live floor data, ~15s, outputs section. |
+| Scale capture | The one camera the stat is counting | One fixed wide of a whole gallery or gym floor, 30–45s, 16:9, product register, at `#scale`. It must be a WIDE that holds the zones the overlay draws, since the block's whole argument is that this single view produces 345,600 readings a day. Anonymisation is not optional here: pipeline output only, no recognisable face in any frame (§9). Drop the file in `/public`, pass `src` and `poster` to `MediaSlot` in `HeroStat.tsx`, and nothing else changes. |
 
-All three are `[UNBUILT]` as slots today.
+The first three are `[UNBUILT]` as slots today. Scale capture is
+`[SLOT-BUILT — awaiting media]` and is therefore NOT a target (§4d rule 4).
 
 ## 5. Visual language (v2 — founder-stated, no longer assumed)
 
@@ -874,6 +911,19 @@ strips in /design-refs/strips/, which is what the loop reads.
   The fragment is the payload and it differs per row (a result list, bars
   plus stat tiles, a tagged timeline), which is what makes the three-beat
   read as a sequence.
+  PARTLY UN-CORRECTED 09 Sep 2026, against
+  `design-refs/strips/Playvision_Video_and_Hero_Stat.png` and
+  `design-refs/Playvision-Hero-Video.png`. The 07 Sep correction was right
+  about the three workflow frames and wrong to conclude the hero stat does not
+  exist: it is a DIFFERENT screen, and the strip above is a picture of it. One
+  dark field edge to edge; a ~26rem copy column standing on the left of it
+  carrying eyebrow, a numeral about four times body size, three lines of prose,
+  a hairline, then a marked eyebrow over four short capability lines; and the
+  clip occupying the right ~60% and running off the right edge of the screen,
+  with no border and no radius on that outer edge. The bullets ARE bullets, and
+  they are the one part to ignore — §5 bans the mono-caps eyebrow above them
+  and the site has its own marked-list idiom. Everything else in that frame is
+  the layout the founder called perfect. Built at `#scale`; see §4.
 - **Slingshot AI (slingshotai.com)** — MECHANISMS + VOICE. Take: scroll
   progress bar; cursor-reactive liquid background (mechanism only, our
   hues, subordinated to hero demo); single-CTA discipline. Ignore:
