@@ -4,7 +4,6 @@ import Image from "next/image";
 import PaintingWall from "@/components/MonaLisaWall";
 import EquipmentWall from "@/components/EquipmentWall";
 import Reveal from "@/components/Reveal";
-import SectionSeam from "@/components/SectionSeam";
 import { useVertical } from "@/components/VerticalContext";
 
 type Step = {
@@ -177,10 +176,9 @@ export default function HowItWorks() {
   return (
     <section
       id="how"
-      data-register="technical"
+      data-ground="technical"
       className="section-band relative px-6"
     >
-      <SectionSeam from="canvas" to="technical" />
       <div className="relative mx-auto max-w-6xl">
         <Reveal grammar="focus">
           <h2 className="text-3xl font-semibold leading-tight md:text-4xl">

@@ -19,6 +19,26 @@ place off-stage.
 Scope note: 47 distinct colour expressions across 10 files. The table below
 absorbs all of them.
 
+**THE WORKING TOKENS ARE REGISTERED PROPERTIES, 10 Sep 2026.** §5 requirement 1
+makes the page carry ONE ground that cross-fades, and the way it does that is by
+declaring the twenty-eight tokens below with `@property … syntax: "<color>"` so
+they can be transitioned on `<html>` (see THE PAGE GROUND in `globals.css`).
+Three obligations follow, and all three have already been broken once:
+
+1. **A new colour token joins the transition list.** Add it to all three
+   register blocks AND to the `@property` set and `transition-property`, or it
+   snaps while everything around it fades.
+2. **An alias is substituted where it is DECLARED.** `--stage-surface:
+   var(--surface-page)` and `--instrument-well: var(--surface-inset-soft)` were
+   both written on `:root` and therefore resolved against the ROOT — which is
+   now the page ground rather than a theme constant, so both followed the reader
+   down the page and the demo walls went white on the entry gate. Item 6 below
+   is right that an alias cannot drift; it is only safe when what it points at
+   is declared on the same element.
+3. **`--stage-surface` is a theme literal in all four themes now**, not an
+   alias, which is exactly what keeps the ★ demotion rule below meaningful: the
+   stage has to be theme-level for the instrument whites to hold their value.
+
 ---
 
 ## R1 · Canvas register — page ground and reading surfaces
@@ -106,7 +126,9 @@ define all three registers from day one, per §5.
 5. **`ParticleField.tsx`: delete.** Dead, and the §5 ambient background
    should be built fresh against the reduced-motion floor.
 6. **`--wall-backdrop`: alias `--stage-surface`.** An alias cannot drift; a
-   copy is what produced the seam twice.
+   copy is what produced the seam twice. Still true, and safe, because
+   `--stage-surface` is now a literal per theme — see obligation 2 in the scope
+   note above for the version of this that was not safe.
 
 ## Correction to a figure I gave earlier
 

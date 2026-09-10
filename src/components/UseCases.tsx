@@ -1,7 +1,6 @@
 "use client";
 
 import Reveal from "@/components/Reveal";
-import SectionSeam from "@/components/SectionSeam";
 import UseCaseGlyph, { GlyphKind } from "@/components/UseCaseGlyph";
 import { useVertical } from "@/components/VerticalContext";
 
@@ -69,10 +68,9 @@ export default function UseCases() {
   return (
     <section
       id="use"
-      data-register="canvas"
+      data-ground="canvas"
       className="section-band relative px-6"
     >
-      <SectionSeam from="technical" to="canvas" />
       <div className="relative mx-auto max-w-6xl">
         <Reveal grammar="focus">
           <h2 className="text-3xl font-semibold leading-tight md:text-4xl">

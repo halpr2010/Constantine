@@ -70,7 +70,7 @@ export default function ValueSection() {
       // #how, #value, #privacy and #stack are one run: what the system does,
       // what it answers, what it refuses to hold, where it plugs in. The page
       // now crosses into that ground once, at #how, and out of it once, at #use.
-      data-register="technical"
+      data-ground="technical"
       className="section-band relative px-6"
     >
       <div className="relative mx-auto max-w-6xl">

@@ -202,7 +202,7 @@ export default function FaqSection() {
   return (
     <section
       id="faq"
-      data-register="canvas"
+      data-ground="canvas"
       data-testid="viewport-section"
       // The header is fixed and ~88px tall; without scroll-mt an anchor jump
       // to #faq lands the eyebrow and heading underneath it.

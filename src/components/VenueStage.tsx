@@ -188,7 +188,7 @@ export default function VenueStage() {
   }, []);
 
   return (
-    <section id="venue" data-register="product" className="relative">
+    <section id="venue" data-ground="product" className="relative">
       {/* The run is scroll length and nothing else; everything visible lives in
           the pinned stage inside it. Shorter at 390, where the same four steps
           cost the reader four times as much thumb travel. */}

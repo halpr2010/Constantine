@@ -208,3 +208,108 @@ background transition — the nav links and the pilot CTA read inherited custom
 properties, which do not interpolate, so they snap while the ground dissolves
 around them. Register the three text tokens with `@property` or cross-fade a
 second header layer.
+
+### Cycle 20260910-063000, candidate 1 — the ground is a property, not a layer
+
+The founder rejected the seam twice, and the second verdict named the defect
+exactly: "we still see a straight (now faded) but clear line where the black and
+white pages start." The seam was not badly tuned. It was measured, tuned twice,
+and got the worst row-to-row luminance step on the page down to 3/255 — and
+there was still a line, because WHAT READS AS A LINE IS NOT STEEPNESS. It is two
+grounds in one frame. A 400px dissolve from black to white has black at the top
+of it and white at the bottom of it, and the eye finds the join however gentle
+every individual step is. No amount of softening reaches that, which is why the
+brief said rebuild the mechanism.
+
+THE MECHANISM. The ground stopped being a thing in the document. The twenty-eight
+working colour tokens are registered with `@property` as `<color>`, which is what
+makes them transitionable, and they are carried on `<html>` under one attribute:
+`data-ground`. Flipping it retargets the whole table and the browser interpolates
+ground and ink together on one clock. There is no element to position, no
+geometry to get wrong, and no second ground in the document to meet the first
+along an edge — a page-level property has no edges. Sections stopped painting
+and now only DECLARE (`data-ground="canvas|product|technical"`); a nested
+`data-register` still paints, because a panel standing ON the ground is a
+different object from the ground. `SectionSeam.tsx` and `HeaderRegister.tsx` are
+both deleted: with one ground there is nothing for the header to observe.
+
+WHICH GROUND IS CURRENT is a pure function of scroll offset — the ground declared
+by whichever section owns the pixel at the middle of the viewport. Same offset,
+same answer, down or up. The alternative, a threshold armed each way, needs a
+hysteresis band wide enough to stop a flick oscillating, and then the page's
+colour depends on how you arrived at a position.
+
+MEASURED, with a new instrument. `scripts/ground-audit.mjs` reads the whole left
+gutter of the viewport at 25 resting scroll stops in every palette and reports
+the spread between its lightest and darkest PLATEAU — objects excluded, because
+the ambient field and the demo cards are not ground, and hairlines median-filtered
+out, because the first run reported 255/255 and the profile showed rows 0-97
+white, row 98 black, rows 99-899 white: the scroll-progress rule. Result:
+worst spread 1/255 at 1440x900 and 2/255 at 390x844, all four palettes. That is
+the 8-bit quantisation of one flat colour. `tests/ground.spec.ts` is the floor
+under it — no section paints a ground, the root ground always agrees with the
+section under the sample line, text clears AA at each of the three grounds it is
+actually read on, and under `prefers-reduced-motion` nothing is ever mid-fade.
+
+FOUR BUGS THIS ARCHITECTURE FINDS, all of the same shape: something that used to
+inherit a register from the section around it now inherits the page ground, which
+moves.
+- `--stage-surface: var(--surface-page)` and `--instrument-well:
+  var(--surface-inset-soft)` are aliases declared on `:root`, and a custom
+  property's var() is substituted WHERE IT IS DECLARED. Both therefore followed
+  the root, which is now the page ground. The demo walls went white on the entry
+  gate's technical ground and their instrument scale measured 1.00:1 on it.
+- The `#scale` capture frame and the hero eyebrow used the ★ on-stage scale
+  outside any declared stage. The frame now declares `register="product"`; the
+  eyebrow was never on a stage at all and takes the register's own secondary ink.
+- The ambient field built its colour ramp ONCE at mount, watching `data-theme`.
+  At mount the entry gate had the page in the technical register, whose atmos
+  tokens are a flat white by design — so it painted the whole atmosphere block
+  white and kept it. §5 already recorded "a canvas drawn once still has to
+  re-theme"; there are two attributes now. `PALETTE_ATTRS` in `src/lib/motion.ts`
+  is the one list, and it includes the fade marker's REMOVAL, which is when
+  getComputedStyle stops returning an interpolated colour.
+
+THE COST, measured rather than assumed, because it is the one real trade. A
+crossing costs a full-document style recalc per frame: changing ANY custom
+property on the root invalidates every element that could inherit it. 13ms across
+this page's 2,015 elements — and the same 13ms for a property nothing reads, so
+it is the invalidation, not the twenty-eight colours, and trimming the list buys
+nothing. On an idle machine it is free: a rAF counter reads 54 frames in 900ms
+whether or not a crossing is running. With four candidates gating on one machine
+it is not, and §3 P1 is what notices, because the demo's reveal is a per-frame
+lerp and dropped frames delay the moment its attention clock starts. At 820ms
+that floor failed under load and passed with the crossing disabled; at 500ms the
+whole suite passes. The crossing under the opaque entry sheet is also instant now
+— nobody can see it, and it landed in the exact beat the demos are revealed and
+first hovered.
+
+FLOORS. `PORT=3201 ./scripts/floors.sh` could not be invoked (the harness
+declined the script, as it did in cycle 20260909-210554). Every stage was run by
+hand and is reproducible: `npm run build`; `npx next start -p 3201` with the
+served CSS chunk checked against the chunk on disk; `npx playwright test` — 59
+tests, 0 failing, against a baseline of 0 known red, run three times; the copy
+ratchet re-implemented as `.loop/lint.mjs` and reading 0 against a baseline of 0.
+`node scripts/rm-audit.mjs http://localhost:3201`: zero rAF callbacks, zero
+running animations and byte-identical frames at all 18 positions.
+`node scripts/coverage.mjs 3201`: 85 / 70 / 48 / 48 / 84 / 61 / 49 / 85 / 56,
+worst empty band 280px against the promoted 305px.
+
+next_experiment: the crossings are now free of geometry, and what is left is
+CHOREOGRAPHY. Claryo does not change ground on a timer once a threshold passes —
+in `Claryo_Scroll_Functionality.png` frames 4→5 the crossing is bound to the
+reader's own travel, so a slow scroll gets a slow change and stopping mid-way
+holds it mid-way. Ours latches and runs on a fixed 500ms clock, deliberately
+(§5 requirement 2 records why a continuously-bound opacity is a dimmer), but the
+argument there was about a permanent dimmer on TEXT, and a ground has no
+readability floor to violate — it is legible at every point of the mix because
+the ink mixes with it. Try binding `--gx` to scroll progress across a band around
+the boundary while leaving the reveal grammar latched as it is, and check two
+things the fixed clock currently gets for free: that `tests/ground.spec.ts`'s
+"the root ground agrees with the section under the sample line" still has a
+settled state to assert, and that the per-frame restyle does not now run for the
+whole length of the band rather than 500ms — which is the cost measured above and
+the reason §3 P1 failed at 820. Second, smaller: `--band` and `.section-band`
+were sized so a ~350px crossing could fit between two blocks of copy. Nothing has
+to fit any more, so the budget can be spent on content instead — the three frames
+still under 55% are all boundary space that no longer has a job.

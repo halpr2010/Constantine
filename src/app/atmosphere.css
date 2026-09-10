@@ -62,16 +62,27 @@
    globals.css is. A [data-register] block must remap the FULL working set or
    the section inherits the parent register's values, so all three are here in
    the same edit. */
+/* Claimed by both scopes, exactly as the working-token table in globals.css is:
+   `html[data-ground]` is the page ground, `[data-register]` a nested stage. The
+   field is mounted at #venue, which declares the product ground, so the ramp it
+   reads is normally the root's — and it has to CROSS with the root rather than
+   snap when the ground changes, or the one thing the field is built not to have
+   (an edge where it starts) would appear as a rectangle for the length of every
+   crossing. The three tokens are registered as <color> in globals.css and sit in
+   the transition list beside --surface-page for that reason. */
+html[data-ground="canvas"],
 [data-register="canvas"] {
   --atmos-base: var(--c-atmos-base);
   --atmos-mid: var(--c-atmos-mid);
   --atmos-core: var(--c-atmos-core);
 }
+html[data-ground="product"],
 [data-register="product"] {
   --atmos-base: var(--p-atmos-base);
   --atmos-mid: var(--p-atmos-mid);
   --atmos-core: var(--p-atmos-core);
 }
+html[data-ground="technical"],
 [data-register="technical"] {
   --atmos-base: var(--t-atmos-base);
   --atmos-mid: var(--t-atmos-mid);

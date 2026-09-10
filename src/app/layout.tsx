@@ -57,14 +57,23 @@ export default function RootLayout({
             to be settled BEFORE first paint, or the entry view flashes up and
             jumps away. Any value written by an earlier build is cleared, so a
             visitor who chose before this change is not kept out of the gate for
-            good. Silent on failure: a blocked origin just gets asked. */}
+            good. Silent on failure: a blocked origin just gets asked.
+
+            `data-ground` is stamped in the same breath and for the same reason.
+            The page's ground is a root attribute now (§5, THE PAGE GROUND in
+            globals.css) and GroundDriver only resolves it after hydration, so
+            without this the first paint is the theme's own root ground and the
+            page crosses into its real one a frame later. The gate opens on
+            technical; a deep link lands on the hero, which is product. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
               "try{var d=document.documentElement;" +
               "try{localStorage.removeItem('constantine:vertical');}catch(e){}" +
-              "if(location.hash){d.setAttribute('data-entry','answered');}" +
-              "else{d.setAttribute('data-entry','asking');}}catch(e){}",
+              "if(location.hash){d.setAttribute('data-entry','answered');" +
+              "d.setAttribute('data-ground','product');}" +
+              "else{d.setAttribute('data-entry','asking');" +
+              "d.setAttribute('data-ground','technical');}}catch(e){}",
           }}
         />
         {children}

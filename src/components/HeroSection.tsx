@@ -2,7 +2,6 @@
 
 import PaintingWall from "@/components/MonaLisaWall";
 import EquipmentWall from "@/components/EquipmentWall";
-import SectionSeam from "@/components/SectionSeam";
 import { useVertical, type Vertical } from "@/components/VerticalContext";
 
 // Cross-fade through black: the outgoing set fades out, the hero holds black
@@ -13,7 +12,7 @@ const BLACK_HOLD_MS = 140;
 export default function HeroSection() {
   // One source of truth, shared with every section below the hero. The hero
   // now only reads it; the entry view's track is what writes it (§4).
-  const { vertical, answered } = useVertical();
+  const { vertical } = useVertical();
 
   // Title, subtitle and chips are deliberately identical on both tabs: the hero
   // states what Constantine does for any physical space, and the demo below it
@@ -43,12 +42,17 @@ export default function HeroSection() {
 
   return (
     <section
-      data-register="product"
+      // The hero DECLARES the product ground; it does not paint one. Once the
+      // entry sheet goes out of the flow this is the first thing in the
+      // document, so it is also what GroundDriver reads at the moment of the
+      // click — the page crosses from the gate's technical ground to product
+      // under a still-opaque sheet, which is where the old build hid the same
+      // hand-off.
+      data-ground="product"
       // The view the entry question resolves into (§4). It no longer runs a
       // fade of its own: the entry ground is lifted off a hero that has been
       // sitting here, fully rendered, since the click, so the ground going IS
-      // this view arriving. The attribute stays because the crossing seam below
-      // is sized off it.
+      // this view arriving.
       data-entry-target=""
       className="relative flex min-h-screen w-full flex-col justify-center overflow-x-clip"
       // A wall's card is wider than its column by design (up to ~140px each
@@ -56,16 +60,12 @@ export default function HeroSection() {
       // before the switcher existed, without leaving a horizontal scrollbar.
       style={{ overflowClipMargin: "150px" }}
     >
-      {/* Only while the gate is up. The entry view paints the technical
-          register's light ground (§4), so a visitor who scrolls past the
-          question instead of answering it would otherwise meet exactly the hard
-          register edge §5 forbids. Once the question is answered the entry view
-          is out of flow and the hero is the first thing in the document — a seam
-          there would wash the top of the hero with a ground that is no longer
-          above it, so it is not rendered. `answered` flips as the tab lands, at
-          which point the entry ground is still fully opaque overhead, so this
-          unmounts unseen rather than popping mid-drift. */}
-      {!answered && <SectionSeam from="technical" to="product" />}
+      {/* The crossing out of the entry ground used to be rendered here as a
+          seam, because the gate paints a light ground and a visitor who scrolled
+          past the question instead of answering it would otherwise meet a hard
+          register edge. It is gone: the gate declares technical, this declares
+          product, and the crossing is the same page-wide ground fade every other
+          boundary now gets. */}
 
       {/* pt clears the header. Below lg the docked vertical track gets its own
           header row (page.tsx), which takes the fixed header to 138px at 390w
@@ -73,7 +73,13 @@ export default function HeroSection() {
       <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-10 px-6 py-16 pt-40 md:grid-cols-12 md:items-center lg:pt-24">
         {/* LEFT */}
         <div className="md:col-span-5 md:pr-2">
-          <div className="text-sm font-semibold tracking-wide text-instrument-fg-weak">
+          {/* --instrument-* is ★ on-stage-only (TOKENS.md). This eyebrow is not
+              on a stage — it stands on the PAGE ground, which is now a token
+              that changes as the reader scrolls, so a fixed white at 70% was
+              only ever correct while the ground under it happened to be dark.
+              The register's own secondary ink is the same value in the product
+              register and right in the other two. */}
+          <div className="text-sm font-semibold tracking-wide text-fg-secondary">
             CONSTANTINE
           </div>
 
