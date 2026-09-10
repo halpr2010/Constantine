@@ -69,3 +69,10 @@ design-refs/*.MOV
 design-refs/*.MP4
 .work/
 .burst/
+
+# Competitor reference material: screenshots and frame strips of Claryo,
+# Slingshot, Pocket and PlayVision, extracted from founder recordings. The
+# repo is PUBLIC, and this is a detailed study of other companies' sites under
+# Constantine's own name — it stays on disk, where the loop reads it, and out
+# of the published history. Nothing here is needed to build the site.
+design-refs/
