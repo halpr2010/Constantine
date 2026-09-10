@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { PALETTE_ATTRS } from "@/lib/motion";
 import { rgbBytes, tokenOn } from "@/lib/palette";
 
 /**
@@ -330,9 +331,17 @@ export default function AmbientField({
       buildLut();
       draw(performance.now());
     });
+    // Every attribute that changes what a token resolves to, not just the
+    // theme. The page ground is one of them now (§5, THE PAGE GROUND) and it
+    // changes as the visitor scrolls: this LUT was built once at mount, while
+    // the entry gate had the page standing in the technical register, whose
+    // atmos tokens are a flat white by design — so the field painted the whole
+    // atmosphere block white and kept it. PALETTE_ATTRS includes the fade
+    // marker's removal, which is when the crossing has settled and
+    // getComputedStyle stops handing back an interpolated colour.
     themeWatch.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ["data-theme"],
+      attributeFilter: PALETTE_ATTRS,
     });
 
     return () => {

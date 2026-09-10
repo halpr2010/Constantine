@@ -72,6 +72,17 @@ export default function EntryView() {
       ref={ref}
       data-testid="vertical-selector"
       data-entry-view=""
+      // BOTH, and they do different jobs. `data-ground` declares that while the
+      // gate owns the middle of the screen the whole page stands in the
+      // technical register, so a visitor who scrolls past the question rather
+      // than answering it crosses to the hero's product ground the same way
+      // every other boundary crosses. `data-register` paints: this sheet has to
+      // stay opaquely technical through the drift, after the page ground below
+      // it has already become product, which is exactly what makes the crossing
+      // invisible. GroundDriver stops reading this element once `data-state` is
+      // "leaving", because by then it is out of the flow and owns no scroll
+      // offset.
+      data-ground="technical"
       data-register="technical"
       data-state={leaving ? "leaving" : "asking"}
       className="entry-view"

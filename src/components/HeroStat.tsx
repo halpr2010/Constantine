@@ -124,7 +124,7 @@ export default function HeroStat() {
   return (
     <section
       id="scale"
-      data-register="product"
+      data-ground="product"
       className="relative overflow-hidden py-28 md:py-36"
     >
       {/* The copy column stands on the site's own max-w-6xl left edge while the
@@ -193,9 +193,20 @@ export default function HeroStat() {
         </div>
 
         <Reveal grammar="settle" lag={0.1}>
+          {/* A NESTED PRODUCT-REGISTER STAGE, declared 10 Sep 2026. The frame
+              and its pending overlay are drawn in the ★ on-stage-only
+              instrument scale, and they used to receive the product register
+              from the section around them. Sections no longer carry a register
+              — they declare the PAGE ground and paint nothing — so anything
+              drawn in the instrument scale has to claim its own stage or it
+              inherits whatever ground the reader has scrolled to. This is the
+              same rule PrivacyStage, FloorLedger and the Outputs beats already
+              follow, and §4d's registry already calls this slot product
+              register, so it is the declaration catching up with the spec. */}
           <MediaSlot
             label={c.slotLabel}
             aspectSm="3 / 2"
+            register="product"
             className="capture-frame rounded-xl border border-line-card lg:rounded-r-none lg:border-r-0"
           >
             <CaptureOverlay

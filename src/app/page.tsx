@@ -14,7 +14,7 @@ import FaqSection from "@/components/FaqSection";
 import PilotForm from "@/components/PilotForm";
 import ScrollProgress from "@/components/ScrollProgress";
 import ScrollStage from "@/components/ScrollStage";
-import HeaderRegister from "@/components/HeaderRegister";
+import GroundDriver from "@/components/GroundDriver";
 import Reveal from "@/components/Reveal";
 import { GhostSprite } from "@/components/GhostFigure";
 import { VerticalProvider } from "@/components/VerticalContext";
@@ -24,7 +24,11 @@ export default function Home() {
   return (
     // `relative` is load-bearing: the vertical switcher is positioned against
     // main while the entry question stands, so it scrolls with the entry view.
-    <main className="relative min-h-screen bg-surface-page text-fg-primary">
+    // No ground and no ink of its own: <body> paints the page ground and sets
+    // its ink from the same registered tokens (globals.css, THE PAGE GROUND).
+    // Repeating them here made three elements fill the viewport with the same
+    // animating colour during every crossing.
+    <main className="relative min-h-screen">
       {/* The three ghost poses, serialised ONCE for the whole document. It
           lives here rather than inside Outputs because #privacy now uses the
           same figures and sits above it: a <use> whose referenced <defs> comes
@@ -38,20 +42,26 @@ export default function Home() {
         {/* One driver for every [data-reveal] below. Mounted inside the
             provider so it re-scans when the switcher rebuilds the page. */}
         <ScrollStage />
-        {/* The other half of the entry view's register hand-off, extended to
-            the whole page: the header observes the section under its own foot
-            and takes that section's register. See HeaderRegister.tsx. */}
-        <HeaderRegister />
+        {/* THE PAGE'S ONE GROUND (§5 requirement 1, rebuilt 10 Sep 2026).
+            Each section below declares a register with `data-ground`; this
+            reads whichever one owns the middle of the viewport and writes it to
+            <html>, where twenty-eight registered colour tokens cross-fade the
+            whole page — ground and ink together — in one transition. No
+            section paints a ground of its own any more, so there is never a
+            boundary between two grounds anywhere on screen. See
+            GroundDriver.tsx and THE PAGE GROUND in globals.css. */}
+        <GroundDriver />
 
-        {/* Header. NO bottom border, and no ground of its own: it held the root
-            ground after selection, so over a section of opposite polarity it
-            painted a solid band with a razor edge — luminance stepping
-            53 -> 114 -> 255 across 3px, and inverted in light-canvas. §5
-            requires ground changes with no visible dividing line, and a
-            permanent rule across the page is the most visible one there is. The
-            border went first; HeaderRegister takes the band that was left.
+        {/* Header. NO bottom border, and no ground of its own. It used to hold
+            the ROOT ground after selection, so over a section of opposite
+            polarity it painted a solid band with a razor edge — luminance
+            stepping 53 -> 114 -> 255 across 3px, and inverted in light-canvas.
+            The border went first and an observer component took the band. Both
+            are gone now: `bg-surface-page/80` reads the same registered token
+            the page ground does, so the header can only ever be 80% of exactly
+            what is behind it, in every frame of a crossing included.
             ScrollProgress's filled portion is the only rule at the header's
-            foot now. */}
+            foot. */}
         {/* `data-entry-chrome` hands the header to the entry view's register
             while the question stands, so it disappears into the light ground
             instead of laying a dark bar across it (globals.css, entry block).
@@ -176,7 +186,7 @@ export default function Home() {
             nothing changes: the canvas runs straight through to the bottom.
             The form itself is never wrapped in a reveal — a control that is
             dimmed while it holds focus is a trap. */}
-        <section id="pilot" data-register="canvas" className="section-band px-6">
+        <section id="pilot" data-ground="canvas" className="section-band px-6">
           <div className="mx-auto max-w-xl">
             <Reveal grammar="focus">
               <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
@@ -192,7 +202,7 @@ export default function Home() {
           </div>
         </section>
 
-        <footer data-register="canvas" className="px-6 pb-10 pt-16">
+        <footer data-ground="canvas" className="px-6 pb-10 pt-16">
           <div className="mx-auto flex max-w-6xl items-center justify-between">
             <div className="flex items-center gap-6 text-sm text-fg-muted">
               <a href="/" className="hover:text-fg-secondary">

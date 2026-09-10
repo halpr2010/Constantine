@@ -368,7 +368,7 @@ export default function OutputsSection() {
   return (
     <section
       id="outputs"
-      data-register="canvas"
+      data-ground="canvas"
       // The section-level `border-t border-line-hairline` is gone. The flow
       // review cited it as a full-bleed 1px rule at y=11263 in all four strips,
       // sitting inside 308px of empty ground between two canvas sections —

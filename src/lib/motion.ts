@@ -19,6 +19,12 @@
  *    frame picked that up for free; code that draws once does not, and a
  *    variant screenshot would then show the demo's chart in the previous
  *    theme's ink. `onRedraw` is the replacement for that accident.
+ *    EXTENDED 10 Sep 2026: `data-theme` is no longer the only attribute on the
+ *    root that changes what a token resolves to. The page ground is one as well
+ *    (§5, THE PAGE GROUND), and it changes several times as the visitor
+ *    scrolls. The ambient field cached its colour ramp against `data-theme`
+ *    alone and rendered the whole atmosphere block white, because the ramp it
+ *    happened to be built with at mount was the entry gate's technical one.
  */
 
 /** True when the visitor has asked for reduced motion. */
@@ -37,6 +43,18 @@ export function stillQuery(): MediaQueryList | null {
 }
 
 /**
+ * Every attribute on the root that changes what a token resolves to. One list,
+ * so a canvas cannot subscribe to some of them and miss the rest.
+ *
+ * `data-ground-fade` is in here for its REMOVAL rather than its arrival:
+ * GroundDriver drops it when a crossing finishes, which is the moment
+ * getComputedStyle stops returning an interpolated value and starts returning
+ * the ground the page has arrived at. Watching the ground alone would redraw
+ * once, at the start, with the colour being left behind.
+ */
+export const PALETTE_ATTRS = ["data-theme", "data-ground", "data-ground-fade"];
+
+/**
  * Everything that invalidates a canvas which is not redrawn every frame: the
  * box changed size, or the palette under it changed. Returns an unsubscribe.
  */
@@ -46,7 +64,7 @@ export function onRedraw(draw: () => void): () => void {
   const theme = new MutationObserver(draw);
   theme.observe(document.documentElement, {
     attributes: true,
-    attributeFilter: ["data-theme"],
+    attributeFilter: PALETTE_ATTRS,
   });
   return () => {
     window.removeEventListener("resize", draw);

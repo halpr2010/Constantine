@@ -35,8 +35,17 @@
 
   /* R2 · product / atmosphere — the stage the demos are rendered on.
      Independent of --surface-page by design: the walls keep their dark stage
-     even when the canvas register goes light. Equal here, hence variant zero. */
-  --stage-surface: var(--surface-page);
+     even when the canvas register goes light. Variant zero's stage is the same
+     colour its page happens to be, which is why this used to be written as
+     `var(--surface-page)`.
+     STATED AS A LITERAL, 10 Sep 2026. --surface-page is now the PAGE GROUND, a
+     registered token that changes as the reader scrolls, so the alias made the
+     demo stage follow the ground: on the gate's white technical ground the
+     walls went white and their instrument scale — white at 60% — measured
+     1.00:1 against it. The three other themes always stated their stage
+     outright; this one now does too, and the ★ demotion rule in TOKENS.md holds
+     again because the stage is theme-level in all four. */
+  --stage-surface: #050505;
   --wall-backdrop: var(--stage-surface); /* alias, never a copy */
 
   /* ★ on-stage-only (TOKENS.md demotion rule) */
@@ -48,7 +57,16 @@
      the last theme-specific token still painting inside components. It read
      as a dark rectangle on every light ground and every light register.
      --surface-inset-soft is remapped per theme and per register, so the
-     chart well now follows whatever it sits on. */
+     chart well now follows whatever it sits on.
+     RESTATED PER REGISTER, 10 Sep 2026, and it turns out this was never doing
+     what the paragraph above claims. A custom property's var() is substituted
+     where it is DECLARED, so an alias written once on :root resolved against
+     the root's --surface-inset-soft and not against the register the well was
+     standing in — invisible while the root ground was the theme's own dark
+     base, and immediately visible once --surface-page became the page ground:
+     on the gate's white technical ground the Outputs tiles took a white fill
+     and their green delta measured 1.52:1 on it. The declaration is repeated in
+     each register block below, so the substitution happens there. */
   --instrument-well: var(--surface-inset-soft);
   --chart-label: rgba(255, 255, 255, 0.75);
   --chart-1: rgba(239, 68, 68, 0.8);
@@ -140,8 +158,14 @@ html {
 }
 
 body {
+  /* Both read the WORKING tokens, which are now registered custom properties
+     carried on <html> and interpolated when the ground changes (see THE PAGE
+     GROUND below). Painting the page from --surface-page rather than from a
+     theme literal is what makes the whole document one ground. --foreground is
+     kept for Tailwind's --color-foreground mapping; the ink here has to be the
+     ground's own ink or the two would cross-fade out of step. */
   background: var(--surface-page);
-  color: var(--foreground);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -390,39 +414,31 @@ html[data-entry="entering"] [data-entry-aside] {
   transition: opacity 400ms ease;
 }
 
-/* The header takes the entry ground rather than the page's, so it disappears
-   into the light screen instead of laying a dark bar across it. It holds that
-   ground through the drift as well, because the entry ground is still standing
-   underneath it until the tab lands. It stays PAINTED rather than transparent
-   because an unanswered visitor can scroll on past the gate, and a transparent
-   header with technical ink over the dark hero would be unreadable.
-   The crossing back to the page's register is a transition rather than a swap:
-   it fires as the tab lands, in the same beat as the ground lifting, and §5
-   forbids a register change that resolves into a hard edge. */
+/* The header used to be handed the ENTRY's register while the question stood,
+   so it disappeared into the light screen instead of laying a dark bar across
+   it, and it crossed back to the page's register on this 400ms transition as
+   the tab landed. Both halves are gone, 10 Sep 2026, because the page ground
+   makes them redundant and then wrong: while the gate owns the middle of the
+   screen the PAGE is technical, so a header reading `bg-surface-page/80` is
+   already the entry's own ground; and pinning it to technical until `data-entry`
+   flipped left a light band standing over the hero for anyone who scrolled past
+   the question without answering it, which is the band this whole rewrite
+   exists to remove. The header now has no ground of its own in any state — it
+   is 80% of whatever the page is, in every frame of every crossing.
+   Only the border stays on a transition of its own: it is switched by the rule
+   below rather than by a token, so it has nothing to interpolate with. */
 [data-entry-chrome] {
-  transition:
-    background-color 400ms ease,
-    color 400ms ease,
-    border-color 400ms ease;
+  transition: border-color 400ms ease;
 }
 
-/* THE HEADER OBSERVES WHAT IS UNDER IT (HeaderRegister.tsx). After selection
-   it used to hold the ROOT ground for the rest of the page, so over a section
-   of the opposite polarity it painted a band — the border went in the previous
-   cycle and the band stayed. It now carries the register of the section its own
-   foot is standing on, and crosses on the same 400ms transition the entry
-   hand-off already uses.
-
-   The ground stays TRANSLUCENT rather than taking the register block's own
-   opaque `background`. The seam beneath the header is still ramping for ~180px
-   after the crossing point, and a flat fill of the arrived-at register held over
-   a ground that is still crossing is the band again, one register later. At 80%
-   the real ground shows through and the header tracks the crossing instead of
-   announcing it. Specificity beats the [data-register] blocks below, which is
-   the whole point of the rule. */
-header[data-register] {
-  background: color-mix(in srgb, var(--surface-page) 80%, transparent);
-}
+/* THE HEADER NEEDS NO OBSERVER ANY MORE. HeaderRegister.tsx existed because
+   each section owned its own ground: the header held the ROOT ground for the
+   whole page and therefore painted a band of the opposite polarity across the
+   top of every frame over a section that disagreed with it, so it had to watch
+   what was under its own foot and re-ink. With one page-level ground there is
+   nothing to disagree with — the header's `bg-surface-page/80` reads the same
+   registered token as the page it floats over, so it cross-fades in the same
+   frames, by construction rather than by observation. The component is gone. */
 
 /* No rule across the entry screen. The reference's entry frame carries the
    wordmark and nothing else, and §5's first scroll requirement is that grounds
@@ -435,17 +451,12 @@ html[data-entry="entering"] [data-entry-chrome] {
   border-bottom-color: transparent;
 }
 
-/* The crossing out of the entry ground, rendered by the hero only while the
-   question stands (HeroSection). The site-wide seam spends 56% of nearly half a
-   viewport ABOVE the boundary, which on a section that IS one viewport puts a
-   quarter of the entry screen under a grey wash — the reference screen is white
-   to its edges. Shorter, and weighted below the boundary: the change then reads
-   as the foot of the screen darkening rather than as a band across it, and it
-   still never resolves into the dividing line §5 forbids. */
-[data-entry-target] > .section-seam {
-  --seam-h: clamp(11rem, 26vh, 18rem);
-  --seam-up: calc(var(--seam-h) * 0.34);
-}
+/* No crossing is rendered between the gate and the hero any more. The gate
+   declares data-ground="technical" and the hero declares data-ground="product",
+   so an unanswered visitor who scrolls past the question crosses the same way
+   every other boundary on the page crosses: the whole ground fades under them.
+   The seam this replaced was the entry's own special case of the mechanism that
+   is now site-wide. */
 
 /* The one vertical control. Absolutely positioned in the document while the
    question stands, so it scrolls with the entry view; VerticalSwitcher
@@ -897,98 +908,130 @@ html[data-entry="entering"] [data-entry-chrome] {
   }
 }
 
-/* The register transition — see src/components/SectionSeam.tsx.
+/* ---------------------------------------------------------------------------
+   THE PAGE GROUND (§5 requirement 1, rewritten 10 Sep 2026).
 
-   It sits ABOVE its own section, in the closing space of the section before,
-   and composites its register's ground over whatever is painted there. At the
-   section boundary it is fully opaque and hands off to the section's own
-   background, so the two agree by construction rather than by a declared
-   colour that can drift out of step. */
-.section-seam {
-  /* Sized against the boundary budget above, which is what changed here. The
-     point was never softness for its own sake: the crossing has a fully
-     ambiguous middle — the part where neither register's text colour would be
-     legible — running from about 0.36 to 0.72 of this length, and that stretch
-     has to fit between the last line of the outgoing section and the first line
-     of the incoming one. That gap used to be ~400px and is now 2 x --band, so
-     the crossing shortens with it: at 42vh the ambiguous middle spans
-     boundary-76 to boundary+60 against a 112px closing and opening pad, and no
-     copy is read through it at any viewport height. Shortening a dissolve
-     steepens it, so this is the floor rather than a preference: measured down
-     the page gutter at 1440 in all four themes, the worst row-to-row luminance
-     step anywhere on the page is 3/255, which is the 8-bit quantisation of the
-     ramp itself rather than an edge. §5's no-dividing-line rule still holds. */
-  --seam-h: clamp(15rem, 42vh, 28rem);
-  /* How much of the crossing happens BEFORE the boundary. Weighted upward so
-     the page has mostly become its new colour by the time the new section's
-     first line arrives, which is the Claryo behaviour: in
-     design-refs/strips/Claryo_Scroll_Functionality.png frames 4→5 the dark
-     ground has climbed the white section well before any dark content shows. */
-  --seam-up: calc(var(--seam-h) * 0.56);
-  --seam-down: calc(var(--seam-h) - var(--seam-up));
-  --seam-glow: var(--p-edge);
-  position: absolute;
-  top: calc(-1 * var(--seam-up));
-  left: 0;
-  right: 0;
-  height: var(--seam-h);
-  pointer-events: none;
-  background-repeat: no-repeat;
-  /* Three layers, back to front: the outgoing ground held under the lower half
-     of the crossing, the incoming ground dissolving in over the whole of it,
-     and the bloom on top. The hold is what lets the crossing continue PAST the
-     boundary — the section's own background-color is the incoming ground and
-     would otherwise assert itself at y=0, which is precisely the point at which
-     a transition turns back into an edge. It ends where the dissolve reaches
-     full opacity, so its own bottom edge is covered. */
-  background-position:
-    0 0,
-    0 0,
-    0 var(--seam-up);
-  background-size:
-    100% var(--seam-h),
-    100% var(--seam-h),
-    100% var(--seam-down);
-  background-image:
-    /* Wider than the viewport and pushed off-centre, so no part of its falloff
-       resolves into a horizontal. It fades out at 85% of the crossing and in at
-       19%, both well short of the ends — a bloom still carrying alpha where the
-       ground has finished is itself a visible step, which is what put a line
-       across the first version of this. Its job is to tint the middle: black to
-       white then crosses through the product register's own hue instead of
-       through neutral grey, the "fog bank" both previous seams were rejected
-       for. */
-    radial-gradient(
-      120% 44% at 36% 52%,
-      var(--seam-glow),
-      color-mix(in oklab, var(--seam-glow) 38%, transparent) 44%,
-      transparent 76%
-    ),
-    /* An eased alpha curve rather than a straight ramp: a linear fade holds its
-       steepest slope right through the middle. These stops spend the change at
-       the ends, where the grounds being left and arrived at hide it. */
-      linear-gradient(
-        to bottom,
-        color-mix(in srgb, var(--seam-b) 0%, transparent) 0,
-        color-mix(in srgb, var(--seam-b) 2%, transparent)
-          calc(var(--seam-h) * 0.12),
-        color-mix(in srgb, var(--seam-b) 7%, transparent)
-          calc(var(--seam-h) * 0.24),
-        color-mix(in srgb, var(--seam-b) 17%, transparent)
-          calc(var(--seam-h) * 0.36),
-        color-mix(in srgb, var(--seam-b) 33%, transparent)
-          calc(var(--seam-h) * 0.48),
-        color-mix(in srgb, var(--seam-b) 54%, transparent)
-          calc(var(--seam-h) * 0.6),
-        color-mix(in srgb, var(--seam-b) 74%, transparent)
-          calc(var(--seam-h) * 0.72),
-        color-mix(in srgb, var(--seam-b) 89%, transparent)
-          calc(var(--seam-h) * 0.82),
-        color-mix(in srgb, var(--seam-b) 97%, transparent)
-          calc(var(--seam-h) * 0.92),
-        var(--seam-b) var(--seam-h)
-      ),
-    linear-gradient(var(--seam-a), var(--seam-a));
+   WHAT WAS HERE BEFORE, and why it is gone. `.section-seam` was a gradient
+   sheet sitting in the closing space of each section, dissolving the incoming
+   register's ground over the outgoing one. It was measured, tuned twice, and
+   got the worst row-to-row luminance step on the page down to 3/255. The
+   founder rejected it twice anyway, and the second verdict says exactly why:
+   "we still see a straight (now faded) but clear line where the black and white
+   pages start." A dissolve between two grounds still has two grounds, so a
+   boundary is somewhere on screen in every frame of the crossing; softening it
+   changes what the line looks like, never whether there is one.
+
+   design-refs/Claryo-Ground-Black.png and -White.png are the same heading and
+   the same three cards, once white-on-black and once black-on-white, unmoved.
+   Nothing in that pair is a transition between two areas. The ground under the
+   ENTIRE page changed and the foreground inverted with it.
+
+   SO THE GROUND IS NOT A LAYER. It is the value of the working tokens, carried
+   on <html> and inherited by everything. Registering them below as <color>
+   custom properties is what makes them transitionable: flipping one attribute,
+   `data-ground` on the root, retargets all twenty-eight at once and the browser
+   interpolates ground and ink together on one clock. There is no element to
+   position, no geometry to get wrong, and no second ground in the document to
+   meet the first along an edge — a page-level property has no edges.
+
+   Three consequences worth stating so they are not re-derived:
+
+   1. THE FOREGROUND INVERTS BECAUSE IT IS THE SAME SWITCH. Ink, hairlines, card
+      fills, the CTA and the accents are in the transition list beside the
+      ground. A backdrop layer would have had to be paired with a separate
+      token swap for the text, and the two would drift; here they cannot.
+   2. NESTED REGISTERS ARE UNAFFECTED, and that is what keeps the founder's
+      approved work alive. `[data-register]` on a PANEL (PrivacyStage, the
+      FloorLedger, the Outputs stages, the #stack hub, the demo walls) still
+      remaps the tokens for its own subtree, statically. Those are bounded
+      objects standing on the ground, not the ground itself; a dark instrument
+      panel on a light page is §5's own composition rule. Only TOP-LEVEL
+      sections changed vocabulary — from `data-register`, which paints, to
+      `data-ground`, which declares and paints nothing.
+   3. THE FADE RUNS ON ITS OWN CLOCK, not on scroll offset. §5 requirement 2
+      exists because binding opacity continuously to scroll position makes a
+      dimmer that is only correct at one offset. Scroll decides WHEN the ground
+      changes; the transition then runs to completion and latches, exactly as
+      the reveal grammar does.
+
+   REDUCED MOTION. GroundDriver never sets `data-ground-fade` under the
+   preference and this block is switched off besides, so the ground resolves
+   instantly to whatever the scroll position implies. The page is always at one
+   settled ground, never mid-fade — which is the state the floor photographs.
+   --------------------------------------------------------------------------- */
+
+@property --surface-page { syntax: "<color>"; inherits: true; initial-value: #050505; }
+@property --surface-card { syntax: "<color>"; inherits: true; initial-value: rgba(24, 24, 27, 0.4); }
+@property --surface-control { syntax: "<color>"; inherits: true; initial-value: rgba(24, 24, 27, 0.6); }
+@property --surface-inset { syntax: "<color>"; inherits: true; initial-value: #09090b; }
+@property --surface-inset-soft { syntax: "<color>"; inherits: true; initial-value: rgba(9, 9, 11, 0.3); }
+@property --border-hairline { syntax: "<color>"; inherits: true; initial-value: rgba(39, 39, 42, 0.5); }
+@property --border-card { syntax: "<color>"; inherits: true; initial-value: #27272a; }
+@property --border-input { syntax: "<color>"; inherits: true; initial-value: #3f3f46; }
+@property --border-input-focus { syntax: "<color>"; inherits: true; initial-value: #52525b; }
+@property --text-primary { syntax: "<color>"; inherits: true; initial-value: #fafafa; }
+@property --text-secondary { syntax: "<color>"; inherits: true; initial-value: #a1a1aa; }
+@property --text-muted-list { syntax: "<color>"; inherits: true; initial-value: #a1a1aa; }
+@property --text-muted { syntax: "<color>"; inherits: true; initial-value: #9d9da7; }
+@property --text-emphasis { syntax: "<color>"; inherits: true; initial-value: #d4d4d8; }
+@property --text-emphasis-strong { syntax: "<color>"; inherits: true; initial-value: #e4e4e7; }
+@property --text-subtle { syntax: "<color>"; inherits: true; initial-value: #52525b; }
+@property --marker-weak { syntax: "<color>"; inherits: true; initial-value: #52525b; }
+@property --action-bg { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
+@property --action-bg-hover { syntax: "<color>"; inherits: true; initial-value: #e4e4e7; }
+@property --action-fg { syntax: "<color>"; inherits: true; initial-value: #000000; }
+@property --accent-positive { syntax: "<color>"; inherits: true; initial-value: #10b981; }
+@property --accent-positive-soft { syntax: "<color>"; inherits: true; initial-value: #34d399; }
+@property --accent-negative { syntax: "<color>"; inherits: true; initial-value: #ef4444; }
+@property --accent-negative-soft { syntax: "<color>"; inherits: true; initial-value: #f87171; }
+@property --conduit { syntax: "<color>"; inherits: true; initial-value: #60a5fa; }
+/* The ambient field's ramp is in the same list, so the atmosphere crosses with
+   the page instead of snapping one frame ahead of it. --atmos-base is defined
+   to equal the current ground (atmosphere.css); if it did not cross-fade in
+   step, the one boundary the field is built to have — none — would reappear as
+   a rectangle for the length of every crossing. */
+@property --atmos-base { syntax: "<color>"; inherits: true; initial-value: #0a0a0d; }
+@property --atmos-mid { syntax: "<color>"; inherits: true; initial-value: #4b2f8f; }
+@property --atmos-core { syntax: "<color>"; inherits: true; initial-value: #c3a6ff; }
+
+:root {
+  /* One number for the crossing, mirrored as GROUND_MS in GroundDriver.tsx,
+     which carries the measurement behind it. Long enough to read as the page
+     BECOMING the other colour rather than as a cut; short enough that the
+     per-frame restyle a page-level token change costs never takes frames the
+     §3 demos need. */
+  --ground-dur: 500ms;
+  /* Symmetric ease. A front-loaded curve would put the ambiguous middle — the
+     stretch where neither ink is fully resolved — early in the crossing and
+     hold it, which is the "fog bank" the seam was rejected for twice; the
+     ambiguity is unavoidable in a cross-fade, so it is spent as fast as the
+     ends allow and lingered on at neither. */
+  --ground-ease: cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+/* The transition is armed by GroundDriver for the duration of a crossing and
+   disarmed afterwards, rather than standing permanently on the root. That is
+   load-bearing for two things that are not the ground: the capture harness and
+   tests/themes.spec.ts flip `data-theme` AFTER mount, which changes every token
+   in this list — a standing transition would make the whole suite sample the
+   page mid-fade — and the first paint of a session must land on its ground
+   rather than crossing into it from the initial values above. */
+html[data-ground-fade] {
+  transition-property: --surface-page, --surface-card, --surface-control,
+    --surface-inset, --surface-inset-soft, --border-hairline, --border-card,
+    --border-input, --border-input-focus, --text-primary, --text-secondary,
+    --text-muted-list, --text-muted, --text-emphasis, --text-emphasis-strong,
+    --text-subtle, --marker-weak, --action-bg, --action-bg-hover, --action-fg,
+    --accent-positive, --accent-positive-soft, --accent-negative,
+    --accent-negative-soft, --conduit, --atmos-base, --atmos-mid, --atmos-core;
+  transition-duration: var(--ground-dur);
+  transition-timing-function: var(--ground-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-ground-fade] {
+    transition: none;
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -1046,6 +1089,33 @@ html[data-entry="entering"] [data-entry-chrome] {
   }
 }
 
+/* ---------------------------------------------------------------------------
+   ONE TABLE, TWO SCOPES.
+
+   Each block below is claimed by two selectors and the body is written once.
+
+   `html[data-ground="X"]` is THE PAGE GROUND. GroundDriver writes it from the
+   register declared by whichever section owns the middle of the viewport, and
+   the registered properties above interpolate the whole table when it changes.
+   Everything in the document that has not claimed a register of its own reads
+   these values, which is the entire mechanism: one ground, page-wide, always.
+
+   `[data-register="X"]` is a NESTED STAGE — a panel that stands on the ground
+   rather than being it. It sets the same table statically for its own subtree,
+   which is how a dark product-register instrument keeps reading correctly on a
+   white page and vice versa. Specificity keeps them from arguing: the root
+   selector is (0,1,1) so it beats the theme blocks for the working tokens, and
+   a nested block is a different element so it simply wins for its own subtree.
+
+   The last two declarations changed with this rewrite. They used to name the
+   register's source variable directly (`background: var(--c-surf)`), which is
+   correct for a static panel and WRONG for the root — a shorthand pointing at a
+   theme literal cannot interpolate, so the ground would have snapped while the
+   ink faded. Pointing both at the register's own working token instead means
+   the static case resolves to exactly what it did before, and the root case
+   paints whatever the transition currently holds.
+   --------------------------------------------------------------------------- */
+html[data-ground="canvas"],
 [data-register="canvas"] {
   --surface-page: var(--c-surf); --surface-card: var(--c-card);
   --action-bg: var(--c-action); --action-bg-hover: var(--c-action-hover);
@@ -1057,12 +1127,13 @@ html[data-entry="entering"] [data-entry-chrome] {
   --text-emphasis: var(--c-fg2); --text-emphasis-strong: var(--c-fg);
   --text-subtle: var(--c-fg3); --marker-weak: var(--c-fg3);
   --surface-inset: var(--c-card); --surface-inset-soft: var(--c-card);
+  --instrument-well: var(--surface-inset-soft);
   --border-input: var(--c-edge); --border-input-focus: var(--c-fg3);
   --accent-positive: var(--c-pos); --accent-negative: var(--c-neg);
   --accent-positive-soft: var(--c-pos); --accent-negative-soft: var(--c-neg);
   --conduit: var(--c-conduit);
-  background: var(--c-surf); color: var(--c-fg);
 }
+html[data-ground="product"],
 [data-register="product"] {
   --surface-page: var(--p-surf); --surface-card: var(--p-card);
   --action-bg: var(--p-action); --action-bg-hover: var(--p-action-hover);
@@ -1074,11 +1145,11 @@ html[data-entry="entering"] [data-entry-chrome] {
   --text-emphasis: var(--p-fg2); --text-emphasis-strong: var(--p-fg);
   --text-subtle: var(--p-fg3); --marker-weak: var(--p-fg3);
   --surface-inset: var(--p-card); --surface-inset-soft: var(--p-card);
+  --instrument-well: var(--surface-inset-soft);
   --border-input: var(--p-edge); --border-input-focus: var(--p-fg3);
   --accent-positive: var(--p-pos); --accent-negative: var(--p-neg);
   --accent-positive-soft: var(--p-pos); --accent-negative-soft: var(--p-neg);
   --conduit: var(--p-conduit);
-  background: var(--p-surf); color: var(--p-fg);
 }
 /* The header joins this list while the entry question stands, and stays in it
    through the drift ("entering"), because the entry ground is still standing
@@ -1087,9 +1158,8 @@ html[data-entry="entering"] [data-entry-chrome] {
    for the page's. Sharing the selector rather than copying the block is what
    keeps the remap FULL — a partial one leaves text at the parent theme's values
    and washes the header out. */
-[data-register="technical"],
-html[data-entry="asking"] [data-entry-chrome],
-html[data-entry="entering"] [data-entry-chrome] {
+html[data-ground="technical"],
+[data-register="technical"] {
   --surface-page: var(--t-surf); --surface-card: var(--t-card);
   --action-bg: var(--t-action); --action-bg-hover: var(--t-action-hover);
   --action-fg: var(--t-action-fg);
@@ -1100,9 +1170,22 @@ html[data-entry="entering"] [data-entry-chrome] {
   --text-emphasis: var(--t-fg2); --text-emphasis-strong: var(--t-fg);
   --text-subtle: var(--t-fg3); --marker-weak: var(--t-fg3);
   --surface-inset: var(--t-card); --surface-inset-soft: var(--t-card);
+  --instrument-well: var(--surface-inset-soft);
   --border-input: var(--t-edge); --border-input-focus: var(--t-fg3);
   --accent-positive: var(--t-pos); --accent-negative: var(--t-neg);
   --accent-positive-soft: var(--t-pos); --accent-negative-soft: var(--t-neg);
   --conduit: var(--t-conduit);
-  background: var(--t-surf); color: var(--t-fg);
+}
+
+/* ONLY A NESTED STAGE PAINTS. The three blocks above are claimed by <html> as
+   well, and the page ground is painted once, by <body>. Three elements each
+   filling the viewport with the same animating colour is three full-page
+   repaints per frame of every crossing for one visible result; measured with a
+   rAF counter, a crossing costs zero frames either way, but the cheapest
+   version of a mechanism that touches every element on the page is the one
+   worth keeping. A panel that declares a register still fills its own box —
+   that is what makes it a stage rather than a hole. */
+[data-register] {
+  background-color: var(--surface-page);
+  color: var(--text-primary);
 }

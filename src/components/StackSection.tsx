@@ -523,12 +523,12 @@ export default function StackSection() {
   return (
     <section
       id="stack"
-      data-register="technical"
+      data-ground="technical"
       data-testid="viewport-section"
       // The header is fixed and ~88px tall; without scroll-mt an anchor jump
       // to #stack lands the eyebrow underneath it.
       //
-      // No SectionSeam: #privacy above already declares the technical
+      // No crossing here: #privacy above already declares the technical
       // register, so nothing changes across this boundary and there is nothing
       // to dissolve. Its closing padding is the space between the two, which
       // is also what keeps this section's own box inside one 844px screen.

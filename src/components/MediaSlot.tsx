@@ -34,6 +34,7 @@ export default function MediaSlot({
   aspect = "16 / 9",
   aspectSm,
   label,
+  register,
   className,
   children,
 }: {
@@ -51,6 +52,11 @@ export default function MediaSlot({
   aspectSm?: string;
   /** What the footage shows, for anyone who cannot see it. */
   label: string;
+  /** The register the frame is a stage IN. A slot is drawn in the ★
+      on-stage-only instrument scale, and since sections declare the PAGE
+      ground rather than carrying a register of their own, a slot that does not
+      claim one inherits whatever ground the reader has scrolled to. */
+  register?: "canvas" | "product" | "technical";
   className?: string;
   /** The pending state. Rendered only while `src` is absent. */
   children: ReactNode;
@@ -80,6 +86,7 @@ export default function MediaSlot({
   return (
     <div
       data-testid="media-slot"
+      data-register={register}
       data-aspect={aspect}
       data-aspect-sm={aspectSm ?? aspect}
       data-slot-state={src ? "filled" : "pending"}

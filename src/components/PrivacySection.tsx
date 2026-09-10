@@ -30,7 +30,7 @@ export default function PrivacySection() {
   return (
     <section
       id="privacy"
-      data-register="technical"
+      data-ground="technical"
       className="section-band relative px-6"
     >
       {/* NO SEAM. #value above now declares the technical register too, so

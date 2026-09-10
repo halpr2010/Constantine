@@ -57,7 +57,7 @@ scroll surfaces something". It reports content coverage and the longest empty
 band per scroll frame, at the same nine positions and the same viewport
 `motion-strip.mjs` uses, so a claim about page rhythm can be checked rather than
 asserted. Run it before and after anything that changes section spacing,
-register assignment or the seam.
+register assignment or the ground sequence.
 
 ## Colour
 
@@ -77,11 +77,35 @@ on your own initiative, and do not add a theme-specific token to a component:
 `text-instrument-fg` on the step numerals is exactly how they ended up
 invisible at 1.00:1 in every theme.
 
-**Registers, not global themes.** Sections claim ground with
-`data-register="canvas|product|technical"`. A `[data-register]` block must
-remap the FULL working-token set — a partial remap leaves text at the parent
-theme's values and washes the section out. When you add a token, add it to all
-three register blocks in the same edit.
+**One ground, declared per section.** REWRITTEN 10 Sep 2026 — this used to read
+"Sections claim ground with `data-register`", and that architecture is what the
+founder rejected twice (§5 requirement 1). There are now two scopes and they do
+different jobs:
+
+- A TOP-LEVEL SECTION declares `data-ground="canvas|product|technical"` and
+  paints nothing. `GroundDriver` reads whichever declaration owns the middle of
+  the viewport and writes it to `<html>`, where the whole token table
+  cross-fades. Exactly one ground exists at any moment and it covers the
+  viewport, so no boundary between two grounds can appear on screen.
+- A NESTED PANEL claims `data-register="..."` and does paint. That is a stage
+  standing on the ground — PrivacyStage, FloorLedger, the Outputs beats, the
+  #stack hub, the demo walls, the #scale capture frame.
+
+Both scopes read the same table at the foot of `globals.css`, which must remap
+the FULL working-token set — a partial remap leaves text at the parent's values
+and washes the section out. When you add a colour token, add it to all three
+register blocks AND register it with `@property` in the THE PAGE GROUND block,
+or it will snap while everything around it fades.
+
+Two traps this architecture sets, both already sprung once:
+- Anything drawn in the ★ on-stage scale (`--instrument-*`) must be inside a
+  declared stage. There is no section register to inherit any more.
+- A `:root` alias written as `var(--some-working-token)` is substituted where it
+  is DECLARED, so it follows the ROOT — which is now the page ground, not a
+  theme constant. `--stage-surface` and `--instrument-well` were both written
+  that way and both followed the reader down the page.
+- A canvas that caches token values must watch `PALETTE_ATTRS`
+  (`src/lib/motion.ts`), not just `data-theme`.
 
 ## Media and honesty
 

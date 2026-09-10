@@ -105,8 +105,10 @@ only `[UNBUILT]` and `[PARTIAL]` items. `[SLOT-BUILT — awaiting media]`
   `src/components/EntryView.tsx` (the question),
   `VerticalSwitcher.tsx` (the track, its markers and its drift),
   `VerticalContext.tsx` (the answer, remembered), the entry block in
-  `src/app/globals.css`, the seam in `HeroSection.tsx`, and the dock slots and
-  header attributes in `src/app/page.tsx`.
+  `src/app/globals.css`, and the dock slots and header attributes in
+  `src/app/page.tsx`. The crossing out of the gate was a seam in
+  `HeroSection.tsx` until 10 Sep 2026; the gate now simply declares
+  `data-ground="technical"` and the hero `product`, and the page ground does it.
   HOW IT WAS BUILT, for the next candidate: the track is ONE DOM node in both
   places rather than two that hand off. It is absolutely positioned in the
   document while the question stands, so it scrolls like content; on selection
@@ -638,6 +640,72 @@ TWO REQUIREMENTS ADDED 08 Sep 2026 from founder-scored video
    Per-section grounds with a transition band between them CANNOT satisfy this,
    because a boundary is always somewhere in view; softening it produced the
    "straight (now faded) but clear line" the founder rejected.
+
+   BUILT 10 Sep 2026. `src/components/GroundDriver.tsx` (which register is
+   current), THE PAGE GROUND block in `src/app/globals.css` (what a register
+   costs in tokens, and how it crosses), the ground table at the foot of the
+   same file, `src/app/atmosphere.css`, and `tests/ground.spec.ts` plus
+   `scripts/ground-audit.mjs` as the floor and the instrument. `SectionSeam.tsx`
+   and `HeaderRegister.tsx` are deleted.
+
+   THE MECHANISM, stated so it is not re-derived. THE GROUND IS NOT A LAYER — it
+   is the value of the working tokens. Twenty-eight of them are registered with
+   `@property` as `<color>`, which is what makes them transitionable, and they
+   are carried on `<html>` under one attribute, `data-ground`. Flipping that
+   attribute retargets the whole table at once and the browser interpolates
+   ground and ink together on one clock. There is no element to position, no
+   geometry to get wrong, and no second ground in the document to meet the first
+   along an edge: a page-level property has no edges. Sections no longer paint.
+   They DECLARE, with `data-ground="canvas|product|technical"`, and the register
+   vocabulary is otherwise untouched.
+
+   Four things a later candidate should not have to re-derive:
+
+   1. WHICH GROUND IS CURRENT IS A PURE FUNCTION OF SCROLL OFFSET: it is the
+      ground declared by whichever section owns the pixel at the middle of the
+      viewport. Same offset, same answer, going down or coming back up, with no
+      hysteresis band to tune and no way for the two directions to disagree. A
+      threshold armed one way and a second armed the other needs a band wide
+      enough to stop a flick oscillating, and then the page's colour depends on
+      how you arrived at a position, which is not one ground.
+   2. A NESTED `data-register` STILL PAINTS, and that is what keeps the approved
+      work alive. PrivacyStage, the FloorLedger, the Outputs stages, the #stack
+      hub, the demo walls and the #scale capture frame are bounded objects
+      standing ON the ground rather than being it, and a dark instrument panel on
+      a light page is §5's own composition rule. Only TOP-LEVEL sections changed
+      vocabulary.
+   3. ANYTHING DRAWN IN THE ★ ON-STAGE SCALE MUST CLAIM A STAGE. Under the old
+      architecture a panel inherited its section's register for free. Sections
+      have none now, so `--instrument-*` used outside a declared stage resolves
+      against whatever ground the reader has scrolled to. Two places were caught
+      this way and both are fixed at the source rather than by exception: the
+      #scale capture frame declares `register="product"`, and the hero eyebrow —
+      which is not on a stage at all — now uses the register's own secondary ink.
+      Two `:root` ALIASES were the same bug one level down: `--stage-surface` and
+      `--instrument-well` were written as `var(--surface-page)` and
+      `var(--surface-inset-soft)`, and a custom property's var() is substituted
+      where it is DECLARED, so both silently followed the page ground. The demo
+      walls went white on the entry gate's technical ground.
+   4. A CANVAS THAT CACHES TOKENS MUST WATCH THE GROUND, not only the theme.
+      §5 already recorded "a canvas drawn once still has to re-theme"; there are
+      two attributes now. The ambient field built its colour ramp once at mount,
+      while the entry gate had the page standing in technical — whose atmos
+      tokens are a flat white by design — and painted the entire atmosphere block
+      white and kept it. `PALETTE_ATTRS` in `src/lib/motion.ts` is the one list,
+      and it includes the fade marker's REMOVAL, which is the moment
+      getComputedStyle stops handing back an interpolated colour.
+
+   THE CROSSING COSTS A FULL-DOCUMENT RESTYLE PER FRAME, and that is inherent
+   rather than a defect of this implementation: changing ANY custom property on
+   the root invalidates every element that could inherit it. Measured at 13ms
+   across this page's 2,015 elements — and the same 13ms for a property nothing
+   reads, so it is the invalidation and not the twenty-eight colours. On an idle
+   machine it is free (a rAF counter reads 54 frames in 900ms whether or not a
+   crossing is running); with four candidates gating on one machine it is not,
+   and §3 P1 is what notices, because the demo's reveal is a per-frame lerp and
+   dropped frames delay the moment its attention clock starts. Hence 500ms
+   rather than 820, and hence no fade at all for the crossing that happens under
+   the opaque entry sheet, where there is no picture to buy.
 2. A REVEAL ENDS IN A READABLE STATE. Measured on the first scroll-flow
    candidate: 44 text elements never reached full opacity while sitting 80px
    clear of both viewport edges after a 700ms settle — headings at 0.14, body
@@ -666,8 +734,9 @@ element in its final revealed state.
 
 BUILT 08 Sep 2026, REBUILT the same day against the two requirements above.
 `src/components/ScrollStage.tsx` (the driver), `Reveal.tsx` (the grammar
-vocabulary), `SectionSeam.tsx` (register transitions), and the disclosure block
-in `globals.css`.
+vocabulary), and the disclosure block in `globals.css`. Register transitions
+were `SectionSeam.tsx` until 10 Sep 2026 and are now the page ground; see
+requirement 1 above.
 
 The first build bound opacity CONTINUOUSLY to where an element sat in the
 viewport, on the reasoning that the page should answer the visitor's own
@@ -683,15 +752,22 @@ it resolves. No grammar here fades from zero. That keeps the page from reading
 as empty mid-scroll, and it is also what keeps the content inside
 `copy.spec.ts`'s visible-text walk, which drops anything at opacity 0.
 
-Register transitions are a DISSOLVE STRADDLING THE BOUNDARY, not a band laid
-after it. Each section's seam starts most of a viewport above its own top edge
-and reaches full opacity some way inside it, holding the outgoing ground
-underneath the lower half so the crossing has something to dissolve out of.
-Measured down a content-free column, the worst single-row luminance step at any
-register change is under 1% of the range it traverses; the same measurement on
-the band version reads 48%. Use cases, the pilot form and the footer now all
-declare the canvas register, which removes the last undeclared change on the
-page — the one between the last section and the closing CTA.
+SUPERSEDED 10 Sep 2026, and the paragraph is kept because the lesson in it is
+the reason requirement 1 was rewritten. It used to read: "Register transitions
+are a DISSOLVE STRADDLING THE BOUNDARY, not a band laid after it… measured down
+a content-free column, the worst single-row luminance step at any register
+change is under 1% of the range it traverses; the same measurement on the band
+version reads 48%." That measurement was true and the founder rejected the
+result anyway, twice. What reads as a line is not steepness — it is TWO GROUNDS
+IN ONE FRAME. A 400px dissolve from black to white has black at the top of it
+and white at the bottom, and the eye finds the join however gentle every
+individual step is. `scripts/ground-audit.mjs` measures the property that
+actually matters instead: the spread between the lightest and darkest plateau
+in the viewport's gutter at rest. Across 25 scroll stops in all four palettes it
+now reads 0-1/255 at 1440x900 and 0-2/255 at 390x844.
+Use cases, the pilot form and the footer all declare the canvas ground, which
+removes the last undeclared change on the page — the one between the last
+section and the closing CTA.
 
 THE BOUNDARY BUDGET, 09 Sep 2026. The seams were correct and the page was still
 failing requirement (a): the flow reviewer measured content coverage across the
@@ -713,12 +789,13 @@ Tailwind class lists so the budget is auditable: one grep says what every
 boundary costs. `.section-band` also carries the anchor clearance the old
 padding used to supply by accident.
 
-`--seam-h` is sized against that budget rather than independently. The crossing
-has a fully ambiguous middle — roughly 0.36 to 0.72 of its length, where neither
-register's text colour would be legible — and that stretch has to fit between
-the last line above the boundary and the first line below it. At 42vh it spans
-boundary-76 to boundary+60 against a 112px pad, and no copy is read through it
-at any viewport height.
+`--seam-h` was sized against that budget rather than independently, because the
+crossing had a fully ambiguous middle — the stretch where neither register's text
+colour would be legible — and it had to fit between the last line above the
+boundary and the first line below it. GONE 10 Sep 2026 with the seam. The budget
+survives it and is now doing only the job it was named for: `--band` governs how
+much empty page a section boundary is allowed to cost, and nothing has to fit
+inside that gap any more, because the crossing has no length in the document.
 
 `scripts/coverage.mjs` is the instrument, and it exists because the numbers
 above cost a reviewer an afternoon and could not be checked. It reports coverage
@@ -726,26 +803,29 @@ and the longest unbroken empty band per frame, at the same nine scroll positions
 and the same viewport the motion strip uses. A row counts as CARRYING if it
 holds high-frequency detail, not if it differs from the page ground — a
 ground-difference test scores a lineless crossing as a screenful of content,
-which is the exact defect being measured. Measured after this change: 85 / 70 /
-52 / 85 / 58 / 64 / 51 / 79 / 52, worst band 305px, and that last one is the
-atmosphere block's own composition rather than a boundary — `#venue` is a pinned
-stage whose bottom third is empty by design, and it is founder-approved.
+which is the exact defect being measured. Measured when the budget landed:
+85 / 70 / 52 / 85 / 58 / 64 / 51 / 79 / 52, worst band 305px. Re-measured after
+the ground change, 10 Sep 2026: 85 / 70 / 48 / 48 / 84 / 61 / 49 / 85 / 56,
+worst band 280px. The nine frames land at different content than they did — the
+page is a little shorter without the seams' clearance — so read the two summary
+numbers rather than the sequence: the worst empty band is 25px better and total
+coverage is level. The remaining bands are the atmosphere block's own
+composition rather than boundaries; `#venue` is a pinned stage whose bottom
+third is empty by design, and it is founder-approved.
 
-THE HEADER OBSERVES WHAT IS UNDER IT, 09 Sep 2026. `HeaderRegister.tsx`. §4
-already built half of this for the entry view; after selection the header
-reverted to the ROOT ground and held it for the whole page, so over a section of
-opposite polarity it painted a band across the top of every frame — the reviewer
-measured its edge stepping 53 → 114 → 255 across 3 CSS px, inverted in
-light-canvas. The border went in the previous cycle and the band stayed. The
-header now takes the register of the section its own foot is standing on. Two
-things are load-bearing and should not be re-derived: the switch line is the
-header's FOOT, because the seam is weighted 56% above the boundary and its alpha
-passes half at very nearly the boundary itself, so switching there puts the
-header's change at the same moment and the same place on screen as the ground's;
-and the header's fill stays TRANSLUCENT rather than taking the register block's
-opaque `background`, because the seam beneath it is still ramping for ~170px
-after the switch and a flat fill of the arrived-at register held over a ground
-that is still crossing is the band again, one register later.
+THE HEADER NEEDS NO OBSERVER, 10 Sep 2026. `HeaderRegister.tsx` is deleted, and
+so is the entry view's separate hand-off of the header's register. Both existed
+to solve the same problem: each section owned a ground, the header held the ROOT
+one for the whole page, and over a section of opposite polarity it painted a band
+across the top of every frame — the reviewer measured its edge stepping
+53 → 114 → 255 across 3 CSS px, inverted in light-canvas. With one page-level
+ground there is nothing left to disagree with. The header's `bg-surface-page/80`
+reads the same registered token the page does, so it is 80% of exactly what is
+behind it in every frame of every crossing, by construction rather than by
+observation. Keeping the observer would have been actively wrong in one state:
+pinning the header to the gate's technical register until `data-entry` flipped
+left a light band standing over the dark hero for a visitor who scrolled past the
+question instead of answering it.
 
 Three consequences worth stating so they are not re-discovered:
 - Reveals LATCH. Scrolling back up must not un-tell the argument.

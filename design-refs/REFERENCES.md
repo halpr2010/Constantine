@@ -45,6 +45,16 @@ softening it produced a faded line instead of a hard one, which the founder
 rejected: "we still see a straight (now faded) but clear line where the black
 and white pages start."
 
+BUILT 10 Sep 2026. The ground is no longer a layer at all: the working colour
+tokens are registered with `@property` and carried on `<html>` under one
+attribute, so a register change retargets the whole table and the browser
+cross-fades ground and ink together. Sections declare which register is current
+and paint nothing. `scripts/ground-audit.mjs` is the instrument — across 25
+scroll stops in all four palettes the lightest and darkest plateau in a resting
+viewport differ by 0-1/255 at 1440x900 and 0-2/255 at 390x844, which is the
+8-bit quantisation of one flat colour. See DESIGN.md §5 requirement 1 for the
+mechanism and the four things not to re-derive.
+
 ## Anti-references
 
 | Score | Reference | Strip | What went wrong — build the opposite |

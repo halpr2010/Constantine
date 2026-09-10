@@ -2,7 +2,6 @@
 
 import FloorLedger from "@/components/FloorLedger";
 import Reveal from "@/components/Reveal";
-import SectionSeam from "@/components/SectionSeam";
 import { useVertical } from "@/components/VerticalContext";
 
 const MUSEUM = {
@@ -32,10 +31,9 @@ export default function ProblemSection() {
   return (
     <section
       id="problem"
-      data-register="canvas"
+      data-ground="canvas"
       className="section-band relative px-6"
     >
-      <SectionSeam from="product" to="canvas" />
       {/* Top-down cascade: the claim resolves first, then its evidence lands a
           line at a time. The section argues that a signal exists and goes
           unrecorded, so the copy surfaces the way the signal would. */}
