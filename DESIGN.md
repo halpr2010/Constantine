@@ -1072,6 +1072,13 @@ D1–D5 and regresses on none. D6 is pass/fail, not comparative.
 
 ### 8a. Withdrawn requirements — do not queue these again
 
+- **Claryo hero (purple/steel ↔ black-and-white technical within the hero)** —
+  WITHDRAWN by founder 10 Sep 2026: "no Hero — neither of these work and please
+  do not retry." Four candidates were built; two were rejected by the gate (one
+  for regressing the §3 demos at 390w) and both survivors were declined. The
+  reference row is marked DROPPED in REFERENCES.md so the work-plan rule does
+  not resurrect it as an unbuilt 10/10. The hero keeps the founder-approved
+  ambient field and venue wireframe it already has.
 - **Corner next-section preview** *(Claryo, paired with the scroll bar in §5)* —
   WITHDRAWN by founder 09 Sep 2026: "do not promote the next-section preview we
   will not be using this feature." A candidate was built and promoted; it is not

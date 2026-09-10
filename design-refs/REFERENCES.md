@@ -20,7 +20,7 @@ How to use it:
 | Score | Reference | Strip | Attribute | What to take | Why not 10 |
 |---|---|---|---|---|---|
 | **10** | Claryo Selector | `Clary_Selector.png` | Entry view | "Are you a…" centred on white, three pills; hover colourises the pill; on selection the tab **drifts to the top right** and the chosen view **fades in cleanly**. Constantine's opening screen should be this, with Museums & Galleries / Gyms. | — |
-| **10** | Claryo Hero | `Claryo_Ambient_Hero_Page.png` | Hero after selection | Background alternates between white technical line-work on full black and polished purple/steel imagery. Everything moves and settles cleanly. Not a 1:1 clone — the model for what a hero becomes once a vertical is chosen. | — |
+| ~~10~~ **DROPPED** | ~~Claryo Hero~~ | `Claryo_Ambient_Hero_Page.png` | ~~Hero after selection~~ | Background alternates between white technical line-work on full black and polished purple/steel imagery. Everything moves and settles cleanly. Not a 1:1 clone — the model for what a hero becomes once a vertical is chosen. | — |
 | **10** | Claryo Scroll | `Claryo_Scroll_Functionality.png` | Scroll behaviour | Every scroll either changes the ground (purple/steel ↔ black-and-white technical) or fades in new content. Each scroll surfaces something. | — |
 | **10** | Claryo Scroll 2 | `Claryo_Scroll_Functionality_2.png` | Stepped sections | Plan → Monitor → Orchestrate: previous step fades out, next fades in with its own imagery. Ground changes black↔white **without a visible dividing line** — scroll far enough and the page has simply become white, or black. | — |
 | **10** | Claryo Ambience + Scroll 3 | `Claryo_Ambiance_and_Scroll_Functionality_3.png` | **Ambience** + stepped diagram | THE ambience target: bright purple blooms on **pure black**, continuously moving, obvious. A white technical wireframe sits on top and augments per step while the step text accumulates. | — |
@@ -53,10 +53,10 @@ Status, 08 Sep 2026:
 
 | Reference | Built? |
 |---|---|
-| Claryo Selector | on `best`, refinements queued |
-| Claryo Hero (purple/steel ↔ technical) | NOT BUILT — queued |
-| Claryo Scroll | partially — cross-fade behaviour queued |
-| Claryo Scroll 2 | partially — same |
+| Claryo Selector | on `best`, refined |
+| Claryo Hero (purple/steel ↔ technical) | **DROPPED — founder declined both candidates** |
+| Claryo Scroll | on `best` |
+| Claryo Scroll 2 | on `best` |
 | Claryo Ambience + custom objects | BUILT — field + augmenting venue plan at `#venue` |
 | Claryo Interactive (card raise on hover) | **DROPPED — founder withdrew the requirement** |
 | PlayVision People | on `best` (Outputs figures) |
