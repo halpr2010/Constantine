@@ -48,7 +48,9 @@ export default function DemoStationWireframe({ util }: { util: number }) {
     let raf = 0;
     let last = performance.now();
     const loop = (now: number) => {
-      const dt = Math.min(0.05, (now - last) / 1000);
+      // Clamped at zero for the same reason as StoreJourney: rAF's first
+      // timestamp of a run can predate the performance.now() beside it.
+      const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
       last = now;
       const u = utilRef.current;
       const period = SCAN_PERIOD_BASE + (SCAN_PERIOD_FAST - SCAN_PERIOD_BASE) * u;

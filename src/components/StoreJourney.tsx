@@ -103,7 +103,14 @@ export default function StoreJourney({ active = true }: { active?: boolean }) {
     if (!active || still) return;
     let last = performance.now();
     const loop = (now: number) => {
-      const dt = Math.min(0.05, (now - last) / 1000);
+      // Clamped at zero as well as at 0.05. requestAnimationFrame's timestamp
+      // is the moment the FRAME began, which can predate the performance.now()
+      // captured just above it in the effect body — so the first dt of a run is
+      // routinely negative by a few tens of milliseconds. That drove `phase`
+      // below zero, Math.floor took the index to -1, and every zone read an
+      // undefined level: four "<circle> attribute r: NaN" errors on the frame
+      // the card starts, then silence once the next dt pulled it positive.
+      const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
       last = now;
       setPhase((p) => (p + dt / STEP_S) % (HOURS.length * 2));
       raf.current = requestAnimationFrame(loop);
@@ -113,8 +120,11 @@ export default function StoreJourney({ active = true }: { active?: boolean }) {
   }, [active, still]);
 
   // The first pass through HOURS is the weekday, the second the weekend.
-  const weekend = phase >= HOURS.length;
-  const local = phase % HOURS.length;
+  // Positive modulo throughout: a negative phase must never reach an array
+  // index, whatever the clock does.
+  const wrapped = ((phase % (HOURS.length * 2)) + HOURS.length * 2) % (HOURS.length * 2);
+  const weekend = wrapped >= HOURS.length;
+  const local = wrapped % HOURS.length;
   const i = Math.floor(local);
   const f = local - i;
   const j = (i + 1) % HOURS.length;
