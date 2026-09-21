@@ -28,6 +28,8 @@ import type { CSSProperties } from "react";
  * palettes exactly as the reference is.
  */
 
+import type { Vertical } from "@/components/VerticalContext";
+
 export const STEPS = 4;
 
 type Cone = { x: number; y: number; a: number };
@@ -162,6 +164,73 @@ const GYM: Geometry = {
   ],
 };
 
+/**
+ * An open-plan flagship: one long floor off a street entrance, a product floor
+ * either side of the main run, a service bar against the back wall and a seated
+ * lounge in the far corner. Deliberately generic — no fixture here belongs to
+ * any one brand or category.
+ */
+const RETAIL: Geometry = {
+  footprint:
+    "M110 528 L110 96 L470 96 L470 150 L556 150 L556 96 L790 96 L790 528 " +
+    "L540 528 L540 470 L440 470 L440 528 Z",
+  walls: [
+    "M110 210 L300 210",
+    "M360 210 L470 210",
+    "M556 210 L790 210",
+    "M620 210 L620 360",
+    "M620 414 L620 528",
+    "M110 400 L300 400",
+  ],
+  bays: [
+    // Product floor: two runs of low display tables either side of the walk-up.
+    [160, 250, 64, 26],
+    [244, 250, 64, 26],
+    [328, 250, 64, 26],
+    [160, 310, 64, 26],
+    [244, 310, 64, 26],
+    [328, 310, 64, 26],
+    // Demo stations, stood clear of the wall so guests can work around them.
+    [452, 258, 40, 72],
+    [452, 360, 40, 72],
+    // The service bar along the back.
+    [664, 250, 100, 30],
+    [664, 300, 100, 30],
+    // Lounge seating.
+    [668, 430, 44, 44],
+    [724, 430, 44, 44],
+  ],
+  zones: [
+    { x: 196, y: 168, t: "Entrance", ex: "Threshold", exx: 300, exy: 130 },
+    { x: 238, y: 372, t: "Product floor", ex: "Display table 03", exx: 316, exy: 244 },
+    { x: 486, y: 200, t: "Demo station", ex: "Station 02", exx: 430, exy: 348 },
+    { x: 700, y: 214, t: "Experience bar", ex: "Bar seat 04", exx: 652, exy: 242 },
+    { x: 706, y: 506, t: "Lounge", ex: "Lounge chair 02", exx: 640, exy: 424 },
+  ],
+  cameras: [
+    { x: 122, y: 108, a: 46 },
+    { x: 778, y: 108, a: 134 },
+    { x: 778, y: 516, a: 216 },
+    { x: 122, y: 516, a: 314 },
+    { x: 513, y: 158, a: 90 },
+  ],
+  flow:
+    "M492 520 L492 440 L440 380 L330 336 L240 288 L330 232 L452 214 " +
+    "L560 236 L680 288 L700 400 L700 470",
+  dwell: [
+    { x: 240, y: 288, r: 26 },
+    { x: 452, y: 214, r: 24 },
+    { x: 680, y: 288, r: 22 },
+    { x: 700, y: 452, r: 20 },
+  ],
+};
+
+const GEOMETRY: Record<Vertical, Geometry> = {
+  museums: MUSEUM,
+  gyms: GYM,
+  retail: RETAIL,
+};
+
 /** A camera's field of view: two rays and the arc that closes them. */
 function cone({ x, y, a }: Cone, reach = 176, half = 25) {
   const r = (d: number) => [
@@ -191,12 +260,12 @@ export default function VenuePlan({
   progress,
   className = "",
 }: {
-  vertical: "museums" | "gyms";
+  vertical: Vertical;
   /** One 0..1 draw fraction per step, from the stage's scroll position. */
   progress: number[];
   className?: string;
 }) {
-  const g = vertical === "gyms" ? GYM : MUSEUM;
+  const g = GEOMETRY[vertical];
   const [p0, p1, p2, p3] = progress;
   const ease = (f: number) => (f <= 0 ? 0 : f >= 1 ? 1 : f * f * (3 - 2 * f));
 

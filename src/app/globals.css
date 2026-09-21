@@ -470,6 +470,14 @@ html[data-entry="entering"] [data-entry-chrome] {
   left: 50%;
   z-index: 60;
   transform: translate3d(-50%, 0, 0);
+  /* An absolutely positioned box anchored at left:50% shrink-to-fits against
+     the space REMAINING to its right — half the container. That was invisible
+     while the track was a single nowrap row that simply overflowed; the moment
+     it could wrap, a 1280 desktop wrapped it at 640. Sizing to max-content and
+     clamping to the viewport gives one row wherever one row fits, and wrapping
+     only when it genuinely does not. */
+  width: max-content;
+  max-width: calc(100vw - 2rem);
 }
 
 .vsel-lift {
@@ -489,17 +497,27 @@ html[data-entry="entering"] [data-entry-chrome] {
   position: relative;
   display: flex;
   align-items: center;
+  /* Three choices do not fit one row on a phone: the labels alone run past
+     500px and a 375 viewport offers ~343. The track wraps instead of
+     truncating, so at 375 it lands as two rows, and the radius relaxes from a
+     pill to a rounded rect the moment it stops being one line — a 9999px
+     radius on a two-row block bows the ends out. */
+  flex-wrap: wrap;
+  justify-content: center;
   padding: var(--vsel-pad);
-  border-radius: 9999px;
+  border-radius: 2rem;
   background: color-mix(in oklab, var(--text-primary) 6%, var(--surface-page));
 }
 
 /* Inset to the track's own padding, so the raised pill reads as a label
    lifting out of the track rather than as a second capsule on top of it. */
+/* Positioned from the track's padding box on BOTH axes now: offsetTop/offsetLeft
+   are measured against the track, so the pill is placed by transform and sized
+   explicitly rather than stretched between top/bottom insets. It has to be able
+   to change rows, not just slide along one. */
 .vsel-pill {
   position: absolute;
-  top: var(--vsel-pad);
-  bottom: var(--vsel-pad);
+  top: 0;
   left: 0;
   border-radius: 9999px;
   background: var(--surface-page);
@@ -511,6 +529,7 @@ html[data-entry="entering"] [data-entry-chrome] {
   transition:
     transform 320ms cubic-bezier(0.3, 0, 0.2, 1),
     width 320ms cubic-bezier(0.3, 0, 0.2, 1),
+    height 320ms cubic-bezier(0.3, 0, 0.2, 1),
     opacity 180ms ease;
 }
 
@@ -529,13 +548,18 @@ html[data-entry="entering"] [data-entry-chrome] {
 .vsel-choice {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  /* Tightened for the third choice. With two labels the small-screen step had
+     room to spare; with three it decided whether the entry track stacks two
+     rows or three, and the docked track is a header row on a phone — every row
+     it gains is screen the hero loses. These values put the two shorter labels
+     on one line at 375 and leave the longest on its own. */
+  gap: 0.3rem;
   white-space: nowrap;
   border-radius: 9999px;
-  padding: 0.7rem 0.75rem;
-  font-size: 0.8125rem;
+  padding: 0.6rem 0.5rem;
+  font-size: 0.78125rem;
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.012em;
   transition: color 200ms ease;
 }
 

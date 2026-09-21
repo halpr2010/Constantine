@@ -2,7 +2,7 @@
 
 import FloorLedger from "@/components/FloorLedger";
 import Reveal from "@/components/Reveal";
-import { useVertical } from "@/components/VerticalContext";
+import { useVertical, type Vertical } from "@/components/VerticalContext";
 
 const MUSEUM = {
   heading: "Your visitor numbers stop at the gallery door.",
@@ -24,9 +24,25 @@ const GYM = {
   ],
 };
 
+const RETAIL = {
+  heading: "Between the door and the till, nothing is measured.",
+  lede: "Flagship and experiential stores are judged on transactions, but they're built for engagement. Traffic counters give you entries. POS gives you sales. The experience itself is dark.",
+  points: [
+    "Door counters end at the threshold and never reach the floor.",
+    "POS records the purchase and nothing that led to it.",
+    "The zones built to hold attention are the ones with no instrument.",
+  ],
+};
+
+const COPY: Record<Vertical, typeof MUSEUM> = {
+  museums: MUSEUM,
+  gyms: GYM,
+  retail: RETAIL,
+};
+
 export default function ProblemSection() {
   const { vertical } = useVertical();
-  const copy = vertical === "gyms" ? GYM : MUSEUM;
+  const copy = COPY[vertical];
 
   return (
     <section

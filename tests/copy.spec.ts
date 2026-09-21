@@ -31,11 +31,13 @@ async function visibleText(page: Page) {
   });
 }
 
-for (const vertical of ["museums", "gyms"] as const) {
+for (const vertical of ["museums", "gyms", "retail"] as const) {
   test.describe(`§5 copy floors — ${vertical}`, () => {
     test.beforeEach(async ({ page }) => {
       await page.goto(BASE, { waitUntil: "networkidle" });
-      if (vertical === "gyms") await page.getByTestId("hero-tab-gyms").click();
+      if (vertical !== "museums") {
+        await page.getByTestId(`hero-tab-${vertical}`).click();
+      }
       await page.waitForTimeout(700); // the cross-fade holds both panels briefly
     });
 

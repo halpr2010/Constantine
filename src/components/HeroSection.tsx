@@ -2,6 +2,7 @@
 
 import PaintingWall from "@/components/MonaLisaWall";
 import EquipmentWall from "@/components/EquipmentWall";
+import StoreJourney from "@/components/StoreJourney";
 import { useVertical, type Vertical } from "@/components/VerticalContext";
 
 // Cross-fade through black: the outgoing set fades out, the hero holds black
@@ -9,17 +10,41 @@ import { useVertical, type Vertical } from "@/components/VerticalContext";
 const FADE_MS = 400;
 const BLACK_HOLD_MS = 140;
 
+/**
+ * Museums and gyms deliberately SHARE a headline: the hero states what
+ * Constantine does for any physical space and the demo below it is what changes
+ * with the vertical. Retail is the exception, and a considered one — a flagship
+ * buyer is not shopping for behavioural analytics in the abstract, they are
+ * defending a floor that was signed off as a brand investment and is reported
+ * on as a shop. The line has to meet that argument where it already is.
+ *
+ * The first two entries are the exact strings both tabs carried before retail
+ * existed, so neither renders differently for this change.
+ */
+const HERO: Record<Vertical, { headline: string; subtitle: string }> = {
+  museums: {
+    headline: "AI-powered Behavioural Analytics for Physical Spaces",
+    subtitle:
+      "Measure how people actually use your space: attention, engagement and movement, beyond the footfall you already count.",
+  },
+  gyms: {
+    headline: "AI-powered Behavioural Analytics for Physical Spaces",
+    subtitle:
+      "Measure how people actually use your space: attention, engagement and movement, beyond the footfall you already count.",
+  },
+  retail: {
+    headline: "Your flagship was built for engagement. Measure it.",
+    subtitle:
+      "Anonymous behavioural metrics for experiential retail: dwell, engagement and journey by zone, from the cameras already in the building.",
+  },
+};
+
 export default function HeroSection() {
   // One source of truth, shared with every section below the hero. The hero
   // now only reads it; the entry view's track is what writes it (§4).
   const { vertical } = useVertical();
 
-  // Title, subtitle and chips are deliberately identical on both tabs: the hero
-  // states what Constantine does for any physical space, and the demo below it
-  // is what changes with the vertical.
-  const headline = "AI-powered Behavioural Analytics for Physical Spaces";
-  const subtitle =
-    "Measure how people actually use your space: attention, engagement and movement, beyond the footfall you already count.";
+  const { headline, subtitle } = HERO[vertical];
   // One chip set across every vertical, per the copy spec.
   const chips = [
     "Anonymous by design",
@@ -187,6 +212,39 @@ export default function HeroSection() {
                     compact
                     active={vertical === "gyms"}
                   />
+                </div>
+              </div>
+            </div>
+
+            {/* Retail & flagship stores. Two different instruments rather than
+                a matched pair: the station is one fixture measured the way a
+                bench or a painting is, and the journey is the whole floor over
+                a trading day. A flagship is judged on both — what a given
+                station earns, and whether the floor as a whole holds people. */}
+            <div
+              className={`col-start-1 row-start-1 ease-in-out ${
+                vertical === "retail" ? "" : "pointer-events-none"
+              }`}
+              style={{
+                ...panelStyle("retail"),
+                transitionProperty: "opacity, visibility",
+                transitionDuration: `${FADE_MS}ms`,
+              }}
+              aria-hidden={vertical !== "retail"}
+            >
+              <div className="flex min-h-[480px] w-full flex-col gap-12 overflow-visible md:min-h-[420px] md:flex-row md:gap-12 md:justify-center md:items-center">
+                <div className="flex min-w-0 flex-1 justify-center md:max-w-[320px]">
+                  <EquipmentWall
+                    kind="station"
+                    title="Product demo station"
+                    chartToken="chart-1"
+                    compact
+                    active={vertical === "retail"}
+                    metrics={{ time: "Dwell (s)", rate: "Engagement rate" }}
+                  />
+                </div>
+                <div className="flex min-w-0 flex-1 justify-center md:ml-32 md:max-w-[320px]">
+                  <StoreJourney active={vertical === "retail"} />
                 </div>
               </div>
             </div>

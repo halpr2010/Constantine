@@ -5,6 +5,7 @@ import { token } from "@/lib/palette";
 import { onRedraw, stillQuery } from "@/lib/motion";
 import React, { useEffect, useRef, useState } from "react";
 import BenchPressWireframe from "@/components/BenchPressWireframe";
+import DemoStationWireframe from "@/components/DemoStationWireframe";
 import StairmasterVideo from "@/components/StairmasterVideo";
 
 function clamp(v: number, a: number, b: number) {
@@ -16,7 +17,14 @@ function lerp(a: number, b: number, t: number) {
 
 type EquipmentWallProps = {
   /** Live mode only: which animated piece to render. */
-  kind?: "bench" | "stair";
+  kind?: "bench" | "stair" | "station";
+  /**
+   * What the two live readings and the three static ones are CALLED. The
+   * engine is identical in every vertical — a proximity-driven intensity and a
+   * timer — so only the labels change, and defaulting them to the gym's words
+   * keeps that vertical byte-identical to before this was parameterised.
+   */
+  metrics?: Partial<typeof DEFAULT_METRICS>;
   title: string;
   chartToken: string;
   compact?: boolean;
@@ -34,6 +42,17 @@ type EquipmentWallProps = {
   rankingChange?: number;
   /** 12 monthly values, 0..1, for the static sparkline. */
   staticChartValues?: number[];
+};
+
+const DEFAULT_METRICS = {
+  /** The counting-up timer. */
+  time: "Workout Time (s)",
+  /** The 0-100% intensity. */
+  rate: "Utilisation",
+  /** Static card only. */
+  rank: "Ranking in Gym",
+  avg: "Avg. Utilisation (%)",
+  chart: "Monthly Utilisation",
 };
 
 const DEFAULT_CHART_VALUES = [
@@ -59,6 +78,7 @@ const CHART_LABELS = [
  */
 export default function EquipmentWall({
   kind,
+  metrics,
   title,
   chartToken,
   compact = false,
@@ -72,6 +92,7 @@ export default function EquipmentWall({
   rankingChange,
   staticChartValues,
 }: EquipmentWallProps) {
+  const m = { ...DEFAULT_METRICS, ...metrics };
   const isMini = size === "mini";
   const displayRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<HTMLCanvasElement | null>(null);
@@ -422,7 +443,7 @@ export default function EquipmentWall({
                   aria-label={
                     isStatic
                       ? title
-                      : `${title} — utilisation rises as the pointer approaches`
+                      : `${title} — ${m.rate.toLowerCase()} rises as the pointer approaches`
                   }
                 >
                   {imageSrc ? (
@@ -436,6 +457,10 @@ export default function EquipmentWall({
                       sizes="200px"
                       className="object-contain"
                     />
+                  ) : kind === "station" ? (
+                    <div className="absolute inset-0">
+                      <DemoStationWireframe util={reveal} />
+                    </div>
                   ) : kind === "bench" ? (
                     // No colour ramp here: the filter's low-contrast, high-
                     // brightness rest state lifts the barbell's solid black
@@ -465,7 +490,7 @@ export default function EquipmentWall({
                 <>
                   {rankingInGym != null && (
                     <div className="flex items-center justify-between">
-                      <span className="whitespace-nowrap">Ranking in Gym</span>
+                      <span className="whitespace-nowrap">{m.rank}</span>
                       <span
                         data-testid="ranking-value"
                         className="flex items-center gap-1"
@@ -496,19 +521,17 @@ export default function EquipmentWall({
                     </div>
                   )}
                   <div className="flex items-center justify-between">
-                    <span className="whitespace-nowrap">
-                      Avg. Utilisation (%)
-                    </span>
+                    <span className="whitespace-nowrap">{m.avg}</span>
                     <span>{(fixedUtilisation ?? 0).toFixed(0)}%</span>
                   </div>
                   <div className="pt-1 text-center text-xs font-medium text-instrument-fg">
-                    Monthly Utilisation
+                    {m.chart}
                   </div>
                 </>
               ) : (
                 <>
                   <div className="flex items-center justify-between">
-                    <span className="whitespace-nowrap">Workout Time (s)</span>
+                    <span className="whitespace-nowrap">{m.time}</span>
                     <span
                       data-testid="attention-value"
                       style={{ opacity: 0.45 + reveal * 0.55 }}
@@ -517,7 +540,7 @@ export default function EquipmentWall({
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="whitespace-nowrap">Utilisation</span>
+                    <span className="whitespace-nowrap">{m.rate}</span>
                     <span
                       data-testid="engagement-value"
                       style={{ opacity: 0.45 + reveal * 0.55 }}
@@ -547,8 +570,8 @@ export default function EquipmentWall({
                   }}
                   aria-label={
                     isStatic
-                      ? "Utilisation by month"
-                      : "Utilisation over last 10 seconds"
+                      ? `${m.rate} by month`
+                      : `${m.rate} over last 10 seconds`
                   }
                 />
               </div>

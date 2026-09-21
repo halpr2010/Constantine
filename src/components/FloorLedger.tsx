@@ -1,6 +1,6 @@
 "use client";
 
-import { useVertical } from "@/components/VerticalContext";
+import { useVertical, type Vertical } from "@/components/VerticalContext";
 
 /**
  * FloorLedger — one object, two states, carrying the page's central argument
@@ -88,6 +88,31 @@ const GYM: Venue = {
   source: "turnstile",
 };
 
+const RETAIL: Venue = {
+  door: { name: "Entrance", peak: 0.52, weight: 1, second: 0.2 },
+  zones: [
+    { name: "Product floor", peak: 0.5, weight: 0.86, second: 0.78 },
+    { name: "Demo station", peak: 0.58, weight: 0.74 },
+    { name: "Experience bar", peak: 0.36, weight: 0.62, second: 0.72 },
+    { name: "Lounge", peak: 0.66, weight: 0.5 },
+  ],
+  hours: ["09:00", "12:00", "15:00", "18:00", "21:00"],
+  source: "door counter",
+};
+
+const VENUE: Record<Vertical, Venue> = {
+  museums: MUSEUM,
+  gyms: GYM,
+  retail: RETAIL,
+};
+
+/** The synthetic space each caption names. */
+const SPACE: Record<Vertical, string> = {
+  museums: "gallery",
+  gyms: "club",
+  retail: "store",
+};
+
 /**
  * A day, as BARS samples in 0..1. Two gaussians plus a fixed jitter: the
  * jitter is what stops five tracks reading as five copies of one curve, and
@@ -131,7 +156,7 @@ function Bars({ values, y, strong }: { values: number[]; y: number; strong: bool
 
 export default function FloorLedger({ mode }: { mode: "blind" | "measured" }) {
   const { vertical } = useVertical();
-  const v = vertical === "gyms" ? GYM : MUSEUM;
+  const v = VENUE[vertical];
   const measured = mode === "measured";
   const doorValues = profile(v.door, 1);
 
@@ -272,7 +297,7 @@ export default function FloorLedger({ mode }: { mode: "blind" | "measured" }) {
 
       <p className="sr-only">
         {measured
-          ? `Illustration: a day in a synthetic ${vertical === "gyms" ? "club" : "gallery"}, one track per zone, every track carrying activity minute by minute with its busiest moment marked.`
+          ? `Illustration: a day in a synthetic ${SPACE[vertical]}, one track per zone, every track carrying activity minute by minute with its busiest moment marked.`
           : `Illustration: the same day, with only the ${v.door.name.toLowerCase()} track carrying data and every zone track empty and marked unrecorded.`}
       </p>
     </div>

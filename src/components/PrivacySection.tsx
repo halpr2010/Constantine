@@ -2,7 +2,7 @@
 
 import PrivacyStage from "@/components/PrivacyStage";
 import Reveal from "@/components/Reveal";
-import { useVertical } from "@/components/VerticalContext";
+import { useVertical, type Vertical } from "@/components/VerticalContext";
 
 /**
  * One privacy section for every vertical. The claims, structure and wording are
@@ -23,9 +23,16 @@ import { useVertical } from "@/components/VerticalContext";
  */
 const CHIPS = ["No identity profiles", "No facial recognition", "Edge processing"];
 
+/** What this vertical calls the people it measures. */
+const PERSON: Record<Vertical, string> = {
+  museums: "visitor",
+  gyms: "member",
+  retail: "guest",
+};
+
 export default function PrivacySection() {
   const { vertical } = useVertical();
-  const person = vertical === "gyms" ? "member" : "visitor";
+  const person = PERSON[vertical];
 
   return (
     <section

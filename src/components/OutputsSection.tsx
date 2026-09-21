@@ -1,7 +1,7 @@
 "use client";
 
 import GhostScene, { SceneVariant } from "@/components/GhostScene";
-import { useVertical } from "@/components/VerticalContext";
+import { useVertical, type Vertical } from "@/components/VerticalContext";
 
 /**
  * Outputs (§4) — the data → insight → action three-beat, per PlayVision.
@@ -145,6 +145,73 @@ const GYM: Content = {
     ],
     exports: "CSV · club report · API",
   },
+};
+
+const RETAIL: Content = {
+  framing:
+    "Constantine sends three things into your week: a clean count of who is in each part of the store, a ranked read on what changed, and a short list of things worth doing. Every panel below uses a synthetic store and illustrative figures.",
+  data: {
+    body: [
+      "Each camera reports the same three things: how many people are in a zone, how long they stay, and which way they face. Counts land minute by minute across the whole floor.",
+      "The footage stays in the building and is destroyed as it is processed. These numbers are the whole of what your dashboard holds.",
+    ],
+    meta: "Ground floor · 14:20",
+    columns: ["Zone", "In zone", "Median dwell"],
+    rows: [
+      { zone: "Product floor", count: "11", dwell: "2 min" },
+      { zone: "Demo station", count: "4", dwell: "3 min" },
+      { zone: "Lounge", count: "6", dwell: "14 min" },
+    ],
+  },
+  insight: {
+    body: [
+      "Overnight the counts become a ranking. You see which zones earned their floor space this week, where guests walked past, and how the store reads against last month.",
+      "Open a row to get the hours behind it, so a store lead can check the claim before acting on it.",
+    ],
+    title: "Engagement this week",
+    meta: "ranked · ground floor",
+    rows: [
+      { label: "Demo station", value: "71%", pct: 100 },
+      { label: "Experience bar", value: "54%", pct: 76 },
+      { label: "Product floor", value: "38%", pct: 54 },
+      { label: "Lounge", value: "22%", pct: 31 },
+    ],
+    tiles: [
+      { value: "71%", label: "peak engagement" },
+      { value: "3m 14s", label: "longest dwell" },
+      { value: "2", label: "places gained", up: true },
+    ],
+  },
+  action: {
+    body: [
+      "Monday morning brings a short brief: what changed, what it is costing you in floor time, and one thing to try. Each item carries the figures it came from.",
+      "Take the brief into a store report, a capex case, or your own tools through the API.",
+    ],
+    meta: "week 12",
+    items: [
+      {
+        title: "Move the second demo station onto the main run",
+        why: "It holds 3m 14s of dwell but sits off the path 62% of guests take.",
+      },
+      {
+        title: "Check the lounge at 11:00",
+        why: "Engagement dropped out of its weekly pattern on Tuesday and has stayed low since.",
+      },
+    ],
+    exports: "CSV · store report · API",
+  },
+};
+
+/** The section's copy, and the room noun its captions use. */
+const OUTPUTS: Record<Vertical, Content> = {
+  museums: MUSEUM,
+  gyms: GYM,
+  retail: RETAIL,
+};
+const PLACE: Record<Vertical, string> = {
+  museums: "gallery",
+  gyms: "gym floor",
+  retail: "store floor",
 };
 
 /** The disclaimer travels with the artefact, not with the section. */
@@ -362,8 +429,8 @@ function Beat({
 
 export default function OutputsSection() {
   const { vertical } = useVertical();
-  const c = vertical === "gyms" ? GYM : MUSEUM;
-  const place = vertical === "gyms" ? "gym floor" : "gallery";
+  const c = OUTPUTS[vertical];
+  const place = PLACE[vertical];
 
   return (
     <section

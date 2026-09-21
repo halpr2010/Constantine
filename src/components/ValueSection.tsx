@@ -2,7 +2,7 @@
 
 import FloorLedger from "@/components/FloorLedger";
 import Reveal from "@/components/Reveal";
-import { useVertical } from "@/components/VerticalContext";
+import { useVertical, type Vertical } from "@/components/VerticalContext";
 
 type Card = { title: string; desc: string };
 
@@ -54,9 +54,39 @@ const GYM = {
     "Floor behaviour, made measurable, so you can act on the friction before it becomes churn.",
 };
 
+const RETAIL = {
+  heading: "What you can now answer",
+  cards: [
+    {
+      title: "Which zones earn attention, and which just occupy floor?",
+      desc: "See where guests actually stop, so floor space is allocated on measured engagement rather than on plan.",
+    },
+    {
+      title: "How long do guests actually dwell — and where?",
+      desc: "Dwell per zone, by hour and by day, so the difference between a busy store and an engaged one is visible.",
+    },
+    {
+      title: "What share of visits engage with the experience, not just the shelves?",
+      desc: "Separate the guests who use what the store was built for from those who pass through it.",
+    },
+    {
+      title: "What does a minute of attention cost in-store versus in media?",
+      desc: "Put the floor's attention on the same basis as every other channel you buy, and compare them directly.",
+    },
+  ] as Card[],
+  closer:
+    "Engagement, made measurable, so the store can be priced like any other channel.",
+};
+
+const COPY: Record<Vertical, typeof MUSEUM> = {
+  museums: MUSEUM,
+  gyms: GYM,
+  retail: RETAIL,
+};
+
 export default function ValueSection() {
   const { vertical } = useVertical();
-  const copy = vertical === "gyms" ? GYM : MUSEUM;
+  const copy = COPY[vertical];
 
   return (
     <section

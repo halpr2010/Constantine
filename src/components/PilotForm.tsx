@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useVertical } from "@/components/VerticalContext";
+import { useVertical, type Vertical } from "@/components/VerticalContext";
 
 // Public Web3Forms submit key. Safe to ship in client code: it can only send a
 // message to the address that owns it, and cannot read anything back.
@@ -9,9 +9,35 @@ const ACCESS_KEY = "81697f24-158d-429a-b3ef-d8a2f5cbe78f";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
+/** Per-vertical form wording. The submitted payload carries `label`, so a
+ *  pilot request says which kind of space it came from. */
+const FIELDS: Record<
+  Vertical,
+  { label: string; nameField: string; emailPlaceholder: string; namePlaceholder: string }
+> = {
+  museums: {
+    label: "Museums & Galleries",
+    nameField: "Venue name",
+    emailPlaceholder: "you@museum.org",
+    namePlaceholder: "e.g. City Art Museum",
+  },
+  gyms: {
+    label: "Gyms",
+    nameField: "Gym name",
+    emailPlaceholder: "you@yourgroup.com",
+    namePlaceholder: "e.g. City Centre Gym",
+  },
+  retail: {
+    label: "Retail & Flagship Stores",
+    nameField: "Store name",
+    emailPlaceholder: "you@yourbrand.com",
+    namePlaceholder: "e.g. Flagship, Oxford Street",
+  },
+};
+
 export default function PilotForm() {
   const { vertical } = useVertical();
-  const isGym = vertical === "gyms";
+  const f = FIELDS[vertical];
 
   const [email, setEmail] = useState("");
   const [venue, setVenue] = useState("");
@@ -31,9 +57,9 @@ export default function PilotForm() {
           access_key: ACCESS_KEY,
           subject: `Pilot request${venue ? ` — ${venue}` : ""}`,
           from_name: "Constantine site — pilot request",
-          vertical: isGym ? "Gyms" : "Museums & Galleries",
+          vertical: f.label,
           email,
-          [isGym ? "Gym name" : "Venue name"]: venue,
+          [f.nameField]: venue,
         }),
       });
       const data = await res.json();
@@ -61,20 +87,20 @@ export default function PilotForm() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder={isGym ? "you@yourgroup.com" : "you@museum.org"}
+          placeholder={f.emailPlaceholder}
           className="w-full rounded-lg border border-line-input bg-surface-inset px-4 py-3 text-sm text-fg-primary placeholder:text-fg-muted focus:border-line-input-focus focus:outline-none"
         />
       </div>
       <div>
         <label htmlFor="venue" className="mb-2 block text-sm text-fg-muted">
-          {isGym ? "Gym name" : "Venue name"}
+          {f.nameField}
         </label>
         <input
           id="venue"
           type="text"
           value={venue}
           onChange={(e) => setVenue(e.target.value)}
-          placeholder={isGym ? "e.g. City Centre Gym" : "e.g. City Art Museum"}
+          placeholder={f.namePlaceholder}
           className="w-full rounded-lg border border-line-input bg-surface-inset px-4 py-3 text-sm text-fg-primary placeholder:text-fg-muted focus:border-line-input-focus focus:outline-none"
         />
       </div>
