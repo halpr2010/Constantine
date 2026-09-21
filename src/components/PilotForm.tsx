@@ -5,7 +5,17 @@ import { useVertical, type Vertical } from "@/components/VerticalContext";
 
 // Public Web3Forms submit key. Safe to ship in client code: it can only send a
 // message to the address that owns it, and cannot read anything back.
+//
+// WHERE PILOT REQUESTS LAND IS THIS KEY, NOT ANYTHING IN THE PAYLOAD. Web3Forms
+// binds the destination to the address the key was created for and offers no
+// `to` field, precisely so a public key cannot be used as an open relay. To
+// move requests to a different inbox, create a key for that address in the
+// Web3Forms dashboard and replace the line below — editing the address shown
+// to the visitor does not redirect anything.
 const ACCESS_KEY = "81697f24-158d-429a-b3ef-d8a2f5cbe78f";
+
+/** The address a visitor is told to use when the form itself fails. */
+const CONTACT_EMAIL = "ronan@constantineanalytics.com";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -119,7 +129,7 @@ export default function PilotForm() {
       )}
       {status === "error" && (
         <p className="text-sm text-accent-negative-soft">
-          Something went wrong. Please email ronanj.halpin@gmail.com directly.
+          Something went wrong. Please email {CONTACT_EMAIL} directly.
         </p>
       )}
     </form>
