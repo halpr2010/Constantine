@@ -21,6 +21,7 @@ import {
 const CHOICES: [Vertical, string][] = [
   ["museums", "Museums & galleries"],
   ["gyms", "Gyms & health clubs"],
+  ["retail", "Retail & flagship stores"],
 ];
 
 /**
@@ -35,7 +36,15 @@ const CHOICES: [Vertical, string][] = [
  * track is still 81px and 0.8 is as far as it can shrink before
  * "Gyms & health clubs" stops being comfortably readable.
  */
-const dockScale = () => (window.innerWidth >= 768 ? 0.68 : 0.8);
+/**
+ * 0.68 was measured against the reference when the track held TWO labels. A
+ * third adds ~290px, and at 1440 the docked track then pushed the header nav
+ * into two lines and wrapped the pilot button. 0.56 brings it back inside the
+ * row. The docked label lands at ~10.6px, which is the size the narrow docked
+ * control has always used (13px x 0.8), so this is the type size the header
+ * already ships rather than a new low.
+ */
+const dockScale = () => (window.innerWidth >= 768 ? 0.56 : 0.8);
 /**
  * The drift is a STRAIGHT DIAGONAL to the corner.
  *
@@ -50,7 +59,13 @@ const DRIFT_EASE = "cubic-bezier(0.32, 0.72, 0.24, 1)";
 const DRIFT_Y = DRIFT_EASE;
 const DRIFT_X = DRIFT_EASE;
 
-type Geom = Record<Vertical, { x: number; w: number }>;
+/**
+ * Three labels do not fit one row at 375px — "Retail & flagship stores" alone
+ * is 24 characters — so the track wraps, and the pill has to follow its label
+ * down a row as well as across. It tracked X and width only while there were
+ * two choices that always shared a line.
+ */
+type Geom = Record<Vertical, { x: number; y: number; w: number; h: number }>;
 
 /** The dock slot that is actually laid out right now (wide header row vs the narrow one). */
 function activeSlot(): HTMLElement | null {
@@ -95,6 +110,11 @@ function activeSlot(): HTMLElement | null {
 const MARK_COLOUR: Record<Vertical, string> = {
   museums: "#3B82F6",
   gyms: "#EC4899",
+  // Amber, for the same reason the other two are fixed: a vertical's mark is
+  // identity, not palette. Measured 3.19:1 on white and 6.59:1 on black, so it
+  // clears the 3:1 non-text floor on every ground the track stands on, and it
+  // is far enough from both blue and pink to tell apart at 17px.
+  retail: "#D97706",
 };
 
 function VerticalMark({ id }: { id: Vertical }) {
@@ -112,12 +132,20 @@ function VerticalMark({ id }: { id: Vertical }) {
           fill="currentColor"
           d="M9 2.1 L16.5 7.1 H1.5 Z M2.7 8.4 H4.5 V13.7 H2.7 Z M6.3 8.4 H8.1 V13.7 H6.3 Z M9.9 8.4 H11.7 V13.7 H9.9 Z M13.5 8.4 H15.3 V13.7 H13.5 Z M1.5 14.7 H16.5 V16.1 H1.5 Z"
         />
-      ) : (
+      ) : id === "gyms" ? (
         // A loaded bar, 15 x 10, with the bar and its two plates knocked out.
         <path
           fillRule="evenodd"
           fill="currentColor"
           d="M1.5 4 H16.5 V14 H1.5 Z M5.1 8.4 H12.9 V9.6 H5.1 Z M3.1 6.5 H4.5 V11.5 H3.1 Z M13.5 6.5 H14.9 V11.5 H13.5 Z"
+        />
+      ) : (
+        // A shopfront: awning, a centre door, a window either side. Deliberately
+        // NOT a shopping bag or a trolley — those say transaction, and this
+        // vertical is about the floor a brand builds for engagement.
+        <path
+          fill="currentColor"
+          d="M1.4 5.4 L3.2 2.8 H14.8 L16.6 5.4 Z M2.6 7 H6.6 V10.6 H2.6 Z M11.4 7 H15.4 V10.6 H11.4 Z M7.6 7 H10.4 V16.2 H7.6 Z M1.4 16.2 H16.6 V17.3 H1.4 Z"
         />
       )}
     </svg>
@@ -176,7 +204,12 @@ export default function VerticalSwitcher() {
     for (const [id] of CHOICES) {
       const c = choiceRefs.current[id];
       if (!c) return;
-      next[id] = { x: c.offsetLeft, w: c.offsetWidth };
+      next[id] = {
+        x: c.offsetLeft,
+        y: c.offsetTop,
+        w: c.offsetWidth,
+        h: c.offsetHeight,
+      };
     }
     setGeom(next as Geom);
   }, []);
@@ -290,8 +323,11 @@ export default function VerticalSwitcher() {
               aria-hidden
               className={`vsel-pill ${g ? "opacity-100" : "opacity-0"}`}
               style={{
-                transform: `translateX(${(g ?? geom.museums).x}px)`,
+                transform: `translate3d(${(g ?? geom.museums).x}px, ${
+                  (g ?? geom.museums).y
+                }px, 0)`,
                 width: (g ?? geom.museums).w,
+                height: (g ?? geom.museums).h,
               }}
             />
           )}

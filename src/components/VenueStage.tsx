@@ -72,6 +72,28 @@ const COPY = {
       },
     ],
   },
+  retail: {
+    lede:
+      "Every space Constantine measures starts as geometry: the plan, the zones you care about, and the coverage you already have.",
+    steps: [
+      {
+        word: "Footprint",
+        line: "The floor as built. Walls, doors and the boundary of the space, taken from the plan you already hold.",
+      },
+      {
+        word: "Zones",
+        line: "The areas you want answers about: a demo station, a product floor, the experience bar.",
+      },
+      {
+        word: "Sightlines",
+        line: "What each existing camera already covers, checked before a single measurement is taken.",
+      },
+      {
+        word: "Movement",
+        line: "Where guests go, where they stop, and how long they stay, counted zone by zone.",
+      },
+    ],
+  },
 } as const;
 
 /** Fraction of the run spent before the first step and after the last. */

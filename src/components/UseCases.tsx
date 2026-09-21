@@ -2,7 +2,7 @@
 
 import Reveal from "@/components/Reveal";
 import UseCaseGlyph, { GlyphKind } from "@/components/UseCaseGlyph";
-import { useVertical } from "@/components/VerticalContext";
+import { useVertical, type Vertical } from "@/components/VerticalContext";
 
 type Card = {
   title: string;
@@ -60,10 +60,53 @@ const GYM_CARDS: Card[] = [
   },
 ];
 
+const RETAIL_CARDS: Card[] = [
+  {
+    title: "Experiential retail",
+    desc: "Flagship and concept stores built for brand engagement: measure dwell, journey and engagement by zone, and price the store's attention like any other channel.",
+    signals: "Zone dwell, engagement share, cost per attentive minute.",
+    glyph: "ranked",
+    caption: "zones ranked by dwell, this week",
+  },
+  {
+    title: "Floor and fixture decisions",
+    desc: "Every floor move, fixture change and installation gets a baseline before it and a measurement after, per store and across the estate.",
+    signals: "Zone engagement, journey completion, walk-past rate.",
+    glyph: "delta",
+    caption: "the same zone before and after a floor move",
+  },
+  {
+    title: "Quiet-floor detection",
+    desc: "Zones whose engagement falls outside their own normal pattern raise a same-day flag to the store team, with no fixture sensors of any kind.",
+    signals: "Engagement anomalies, abandoned approaches.",
+    glyph: "anomaly",
+    caption: "engagement leaving its normal band",
+  },
+];
+
+const CARDS: Record<Vertical, Card[]> = {
+  museums: MUSEUM_CARDS,
+  gyms: GYM_CARDS,
+  retail: RETAIL_CARDS,
+};
+
+const HEADING: Record<Vertical, string> = {
+  museums: "Museum & Gallery Use Cases",
+  gyms: "Fitness Space Use Cases",
+  retail: "Retail & Flagship Use Cases",
+};
+
+const LEDE: Record<Vertical, string> = {
+  museums:
+    "From permanent collections to temporary exhibitions and cultural venues.",
+  gyms: "Three ways an operator turns floor-level behaviour into decisions: inside a club, across the estate, and in members' hands.",
+  retail:
+    "Three ways an operator turns floor-level behaviour into decisions: inside a store, across the estate, and in the media plan.",
+};
+
 export default function UseCases() {
   const { vertical } = useVertical();
-  const isGym = vertical === "gyms";
-  const cards = isGym ? GYM_CARDS : MUSEUM_CARDS;
+  const cards = CARDS[vertical];
 
   return (
     <section
@@ -74,14 +117,12 @@ export default function UseCases() {
       <div className="relative mx-auto max-w-6xl">
         <Reveal grammar="focus">
           <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
-            {isGym ? "Fitness Space Use Cases" : "Museum & Gallery Use Cases"}
+            {HEADING[vertical]}
           </h2>
         </Reveal>
         <Reveal grammar="ghost" lag={0.14} className="mt-4 max-w-2xl">
           <p className="text-fg-secondary">
-            {isGym
-              ? "Three ways an operator turns floor-level behaviour into decisions: inside a club, across the estate, and in members' hands."
-              : "From permanent collections to temporary exhibitions and cultural venues."}{" "}
+            {LEDE[vertical]}{" "}
             Each card ends in the reading it produces. The readings are
             illustrative.
           </p>

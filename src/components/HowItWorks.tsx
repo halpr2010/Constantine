@@ -4,7 +4,7 @@ import Image from "next/image";
 import PaintingWall from "@/components/MonaLisaWall";
 import EquipmentWall from "@/components/EquipmentWall";
 import Reveal from "@/components/Reveal";
-import { useVertical } from "@/components/VerticalContext";
+import { useVertical, type Vertical } from "@/components/VerticalContext";
 
 type Step = {
   n: string;
@@ -168,10 +168,78 @@ const GYM_STEPS: Step[] = [
   },
 ];
 
+/**
+ * The retail flow is the museum's four steps in retail's words. It carries NO
+ * imagery: /public has a survey and a calibration render for each of the other
+ * two verticals and nothing for a store, CLAUDE.md freezes brand assets, and a
+ * stand-in lifted from either of the others would show the wrong room. The
+ * steps read correctly without one; the gap is a real one and is noted in the
+ * PR rather than papered over.
+ */
+const RETAIL_STEPS: Step[] = [
+  {
+    n: "1.",
+    title: "Integrate",
+    lede: "A coverage survey maps your CCTV, standard IP cameras fill any blind spots",
+    ledeBold: true,
+    items: [
+      "Compatible with major CCTV setups (e.g. Hikvision, Axis)",
+      "No facial recognition or identity profiles",
+      "No fixture sensors, beacons or changes to the floor",
+    ],
+    closer:
+      "Video is processed on-site and immediately destroyed, only aggregated counts and metrics leave the store.",
+  },
+  {
+    n: "2.",
+    title: "Calibrate",
+    lede: "Every store is mapped to its real-world dimensions.",
+    sub: "This allows Constantine to understand:",
+    items: [
+      "Where each zone and fixture sits on the floor",
+      "Approach distances to a demo station or display",
+      "Movement between zones",
+      "Circulation from the entrance to the back of the store",
+    ],
+    closer:
+      "Because the floor is mapped to its real-world distances, Constantine can build true engagement metrics from a guest's position, walking speed and orientation.",
+  },
+  {
+    n: "3.",
+    title: "Measure",
+    lede: "Designed for cross-site analysis at scale and delivered via API into your existing stack, with a dashboard for teams acting on the signal directly.",
+    ledeBold: true,
+    items: [
+      "How long each zone holds attention",
+      "How many guests engage with an experience rather than pass it",
+      "How engagement shifts across the day, the week, and by store",
+    ],
+  },
+  {
+    n: "4.",
+    title: "Insight",
+    lede: "Store, brand and retail marketing teams receive real-time analytics and AI-powered recommendations:",
+    items: [
+      "Dwell and engagement distributions per zone",
+      "Journey completion from entrance to the back of the store",
+      "Walk-past rates on individual fixtures and displays",
+      "Engagement patterns by hour/day/week",
+      "Cost per attentive minute, against your media benchmarks",
+      "AI-powered layout and floor-mix recommendations",
+    ],
+    closer: "All outputs are aggregated and privacy-first.",
+  },
+];
+
+const STEPS_BY_VERTICAL: Record<Vertical, Step[]> = {
+  museums: MUSEUM_STEPS,
+  gyms: GYM_STEPS,
+  retail: RETAIL_STEPS,
+};
+
 export default function HowItWorks() {
   const { vertical } = useVertical();
-  const isGym = vertical === "gyms";
-  const steps = isGym ? GYM_STEPS : MUSEUM_STEPS;
+  const steps = STEPS_BY_VERTICAL[vertical];
 
   return (
     <section
@@ -187,11 +255,17 @@ export default function HowItWorks() {
         </Reveal>
         <Reveal grammar="ghost" lag={0.16} className="mt-4 max-w-2xl">
           <p className="text-fg-secondary">
-            {isGym ? (
+            {vertical === "gyms" ? (
               <>
                 From the CCTV you already own to equipment-level behavioural insight:
                 <br />
                 integrate, calibrate, and measure how members use the gym floor.
+              </>
+            ) : vertical === "retail" ? (
+              <>
+                From the CCTV you already own to zone-level behavioural insight:
+                <br />
+                integrate, calibrate, and measure how guests use the store floor.
               </>
             ) : (
               <>

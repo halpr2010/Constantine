@@ -103,12 +103,18 @@ export default function Home() {
                   until then: VerticalSwitcher sizes it at the moment of
                   selection, so the header carries no gap while the entry
                   question is still standing. The wide slot is the reference's
-                  top-right corner; below lg the header gives it its own row,
-                  because logo + pilot CTA + a 300px track do not share 720px. */}
+                  top-right corner; below it the header gives the track its own
+                  row, because logo + nav + pilot CTA + the track do not share
+                  one line.
+                  THRESHOLD RAISED lg -> xl for the third vertical. Three labels
+                  dock at ~480px against ~300px for two, and at 1024-1279 that
+                  left the nav and the pilot button wrapping onto second lines.
+                  Those widths now use the same second-row dock the narrower
+                  ones already did, so nothing is hidden and nothing wraps. */}
               <div
                 data-dock-slot="wide"
                 aria-hidden
-                className="hidden shrink-0 lg:block"
+                className="hidden shrink-0 xl:block"
               />
               <a
                 href="#pilot"
@@ -118,7 +124,7 @@ export default function Home() {
               </a>
             </div>
           </div>
-          <div data-entry-aside="" className="flex justify-end px-6 lg:hidden">
+          <div data-entry-aside="" className="flex justify-end px-6 xl:hidden">
             <div data-dock-slot="narrow" aria-hidden />
           </div>
           {/* The §5 rule rides the header's own bottom hairline, so page

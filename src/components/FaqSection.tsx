@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState, type ReactNode } from "react";
-import { useVertical } from "@/components/VerticalContext";
+import { useVertical, type Vertical } from "@/components/VerticalContext";
 
 /**
  * Categorised FAQ (§4, Pocket).
@@ -187,10 +187,17 @@ function categories(person: string, venue: string): Category[] {
   ];
 }
 
+/** The two nouns the FAQ swaps: who is measured, and whose team is asking. */
+const WORDS: Record<Vertical, { person: string; team: string }> = {
+  museums: { person: "visitor", team: "museum" },
+  gyms: { person: "member", team: "club" },
+  retail: { person: "guest", team: "store" },
+};
+
 export default function FaqSection() {
   const { vertical } = useVertical();
-  const isGym = vertical === "gyms";
-  const cats = categories(isGym ? "member" : "visitor", isGym ? "club" : "museum");
+  const w = WORDS[vertical];
+  const cats = categories(w.person, w.team);
 
   const uid = useId();
   const [active, setActive] = useState(0);
@@ -214,7 +221,7 @@ export default function FaqSection() {
           What buyers ask before a pilot
         </h2>
         <p className="mt-3 max-w-2xl text-fg-secondary">
-          The four gates a {isGym ? "club" : "museum"} team walks us through
+          The four gates a {w.team} team walks us through
           before saying yes.
         </p>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { GhostBody, GhostFilter, PoseId, feet } from "@/components/GhostFigure";
-import { useVertical } from "@/components/VerticalContext";
+import { useVertical, type Vertical } from "@/components/VerticalContext";
 
 /**
  * PrivacyStage — the §5 people treatment used as the ARGUMENT rather than as
@@ -87,7 +87,25 @@ const RECORDS = {
     { id: "t-11", zone: "cardio", dwell: "18m", facing: "SW" },
     { id: "t-07", zone: "cardio", dwell: "04m", facing: "SW" },
   ],
+  retail: [
+    { id: "t-04", zone: "demo station", dwell: "3m14", facing: "NE" },
+    { id: "t-11", zone: "product floor", dwell: "1m02", facing: "SW" },
+    { id: "t-07", zone: "product floor", dwell: "18s", facing: "SW" },
+  ],
 } as const;
+
+/** The room this vertical is standing in, in the two grammatical forms the
+ *  panel needs it. */
+const ROOM: Record<Vertical, string> = {
+  museums: "gallery",
+  gyms: "gym floor",
+  retail: "store floor",
+};
+const WHERE: Record<Vertical, string> = {
+  museums: "In the gallery",
+  gyms: "On the gym floor",
+  retail: "On the store floor",
+};
 
 /** What the record does not contain. This is the whole point of the panel. */
 const ABSENT: [string, string][] = [
@@ -162,10 +180,9 @@ function RecordCard({
 
 export default function PrivacyStage() {
   const { vertical } = useVertical();
-  const gym = vertical === "gyms";
-  const rows = RECORDS[gym ? "gyms" : "museums"];
-  const room = gym ? "gym floor" : "gallery";
-  const where = gym ? "On the gym floor" : "In the gallery";
+  const rows = RECORDS[vertical];
+  const room = ROOM[vertical];
+  const where = WHERE[vertical];
 
   const fNear = "pv-near";
   const fBack = "pv-back";

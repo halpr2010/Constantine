@@ -9,7 +9,14 @@ import React, {
   useState,
 } from "react";
 
-export type Vertical = "museums" | "gyms";
+export type Vertical = "museums" | "gyms" | "retail";
+
+/**
+ * The order the switcher shows them in, and the one place a third vertical had
+ * to be added. Everything vertical-scoped keys off this union, so TypeScript
+ * finds any lookup that has not been extended.
+ */
+export const VERTICALS: readonly Vertical[] = ["museums", "gyms", "retail"] as const;
 
 /**
  * FOUNDER DECISION, 09 Sep 2026: the entry question is asked on EVERY load.
@@ -50,8 +57,6 @@ type VerticalContextValue = {
 };
 
 const VerticalCtx = createContext<VerticalContextValue | null>(null);
-
-const isVertical = (v: unknown): v is Vertical => v === "museums" || v === "gyms";
 
 /**
  * Holds the one source of truth for which vertical the page is showing, plus

@@ -3,7 +3,7 @@
 import CaptureOverlay from "@/components/CaptureOverlay";
 import MediaSlot from "@/components/MediaSlot";
 import Reveal from "@/components/Reveal";
-import { useVertical } from "@/components/VerticalContext";
+import { useVertical, type Vertical } from "@/components/VerticalContext";
 
 /**
  * #scale — the PlayVision hero-stat layout (REFERENCES.md, 10/10).
@@ -105,6 +105,30 @@ const GYM: Content = {
     "Empty media slot: Constantine's zone overlay and reading card drawn on an unexposed frame, with every value left blank",
 };
 
+const RETAIL: Content = {
+  eyebrow: "Readings per camera, per day",
+  lede: "Constantine samples each camera four times a second. Every reading holds where someone is standing, which way they are facing, and how long they have been there. One camera on one store floor produces 345,600 of them in a day, and none of them holds a face.",
+  listHead: "What a reading holds",
+  list: [
+    "Floor position, as a point on your store plan.",
+    "Facing, so a guest working at a demo station reads differently from one walking past it.",
+    "Dwell, timed from arrival in the zone to the moment the guest moves on.",
+    "Zone and minute, so counts roll up by area and by hour.",
+  ],
+  slate: "Nothing has been filmed here yet.",
+  slateBody:
+    "A 30 to 45 second clip of a store floor goes in this frame once a pilot retailer gives us footage we are allowed to show. The marks around it are Constantine's overlay, drawn with nothing under it.",
+  spec: "pilot capture · wide · 16:9",
+  slotLabel:
+    "Empty media slot: Constantine's zone overlay and reading card drawn on an unexposed frame, with every value left blank",
+};
+
+const CONTENT: Record<Vertical, Content> = {
+  museums: MUSEUM,
+  gyms: GYM,
+  retail: RETAIL,
+};
+
 /**
  * The rail. Identical in both verticals on purpose: a pipeline specification
  * does not change because the room does, and a figure that held steady across
@@ -119,7 +143,7 @@ const RAIL: { k: string; v: string }[] = [
 
 export default function HeroStat() {
   const { vertical } = useVertical();
-  const c = vertical === "gyms" ? GYM : MUSEUM;
+  const c = CONTENT[vertical];
 
   return (
     <section
