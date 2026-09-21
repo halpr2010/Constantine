@@ -314,4 +314,27 @@ test.describe("§5 design floors (v2 constitution)", () => {
     await page.goto(BASE, { waitUntil: "networkidle" });
     expect(errors).toEqual([]);
   });
+
+  /**
+   * On load this page shows ONE vertical, so the check above only ever saw the
+   * default. A demo that only runs on a tab you have to click is invisible to
+   * it — the retail store-journey card shipped four "<circle> attribute r:
+   * NaN" errors that way, on the first frame after the tab was selected.
+   * Every vertical's demos now get their clock run.
+   */
+  test("no console errors on any vertical, once its demos have run", async ({
+    page,
+  }) => {
+    const errors: string[] = [];
+    page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
+    page.on("pageerror", (e) => errors.push(String(e)));
+    await page.goto(BASE, { waitUntil: "networkidle" });
+    for (const v of ["museums", "gyms", "retail"] as const) {
+      await page.getByTestId(`hero-tab-${v}`).click();
+      // Long enough for a card that starts a requestAnimationFrame loop on
+      // becoming active to have drawn its first frames.
+      await page.waitForTimeout(2500);
+      expect(errors, `console errors after selecting ${v}`).toEqual([]);
+    }
+  });
 });
