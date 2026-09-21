@@ -12,7 +12,7 @@ import { useVertical, type Vertical } from "@/components/VerticalContext";
 // move requests to a different inbox, create a key for that address in the
 // Web3Forms dashboard and replace the line below — editing the address shown
 // to the visitor does not redirect anything.
-const ACCESS_KEY = "81697f24-158d-429a-b3ef-d8a2f5cbe78f";
+const ACCESS_KEY = "5f5ccdfc-39fb-43eb-b9e6-2a361acb9b0a";
 
 /** The address a visitor is told to use when the form itself fails. */
 const CONTACT_EMAIL = "ronan@constantineanalytics.com";
